@@ -1,6 +1,6 @@
-/* eslint-disable linebreak-style */
-const mongoose = require('mongoose')
-const { Schema } = require('mongoose')
+
+import mongoose from 'mongoose'
+import { Schema } from 'mongoose'
 
 const addressSchema = new Schema({
   addressLine1: {
@@ -62,14 +62,12 @@ const ChurchSchema = new mongoose.Schema(
     name: {
       type: String,
       trim: true,
-      default: '',
-      max: 100,
-      required: true,
+      default: ''
     },
     mobile: {
       type: String,
       trim: false,
-      required: true,
+      required: false,
       max: 50,
       default: ''
     },
@@ -83,7 +81,100 @@ const ChurchSchema = new mongoose.Schema(
     address: {
       type: addressSchema,
       required: false
-    },      
+    },
+    features: [String],
+    sliders: [
+      {
+        title: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        message: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        status: {
+          type: Boolean,
+          default: true
+        },
+        imageOnly: {
+          type: Boolean,
+          default: false
+        },
+        secure_url: {
+          type: String,
+          required: false,
+          default: ''
+        },
+        public_id: {
+          type: String,
+          required: false,
+          default: ''
+        }
+      }
+    ],
+    contacts: [
+      {
+        title: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        fullNames: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        phone: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        status: {
+          type: Boolean,
+          default: true
+        }
+      }
+    ],
+    notifications: [
+      {
+        title: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        icon: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        time: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        type: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        status: {
+          type: Boolean,
+          default: false
+        },
+        description: {
+          type: String,
+          trim: true,
+          default: ''
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ],
     push_notifications: [
       {
         title: {
@@ -101,8 +192,16 @@ const ChurchSchema = new mongoose.Schema(
           default: true
         }
       }
-    ],   
-      
+    ],
+    onboardingComplete: {
+      type: Boolean,
+      default: false
+    },
+    stripe_user_id: {
+      type: String,
+      trim: true,
+      default: ''
+    },
     currency: {
       type: String,
       trim: true,
@@ -133,7 +232,11 @@ const ChurchSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: ''
-    },  
+    },
+    isSearchable: {
+      type: Boolean,
+      default: false
+    },
     subscriptionId: {
       type: String,
       trim: true,
@@ -159,7 +262,17 @@ const ChurchSchema = new mongoose.Schema(
       trim: true,
       required: false,
       default: ''
-    },   
+    },
+    logo_url: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    logo_id: {
+      type: String,
+      required: false,
+      default: ''
+    },
     secure_url: {
       type: String,
       required: false,
@@ -169,7 +282,67 @@ const ChurchSchema = new mongoose.Schema(
       type: String,
       required: false,
       default: ''
-    }    
+    },
+    sort_code: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    account_number: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    bank_name: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    reference: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    prayer_request_email: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    giving_url: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    enable_url_giving: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enable_bank_transfer: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enable_app_giving: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    facebook_url: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    instagram_url: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    youtube_url: {
+      type: String,
+      required: false,
+      default: ''
+    },
   },
   { timestamps: true }
 )
@@ -181,6 +354,5 @@ ChurchSchema.index({
   'address.town': 'text',
   'address.postcode': 'text'
 })
-
-const Church = mongoose.models.Church || mongoose.model('Church', ChurchSchema);
-module.exports = Church;
+const Church = mongoose.model('Church', ChurchSchema)
+export default Church
