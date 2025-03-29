@@ -1,0 +1,45 @@
+import { identifierValidator } from '../validation/identifierValidator';
+import { logger } from '../../utils/logger';
+import Event from '../models';
+
+const addEventRegister = async ({ suid }, body) => {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    await Event.findOneAndUpdate({ _id: body.eventId }, { $push: { register: body } }, { new: true }).exec();
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error adding event agenda');
+  }
+};
+
+const getEventRegisterById = async (eventId) => {
+  try {
+    const identifierValidationErrors = identifierValidator(eventId);
+    if (identifierValidationErrors.length) {
+      const error = new Error(identifierValidationErrors.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidationErrors.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    const attendees = event.register.sort((a, b) => b.createdAt - a.createdAt);
+    return attendees;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error fetching event register');
+  }
+};
+
+export { addEventRegister, getEventRegisterById };
