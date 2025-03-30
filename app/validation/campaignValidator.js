@@ -12,6 +12,6 @@ function campaignValidator(data) {
   return validator.validate(data, schema);
 }
 
-export default {
+export  {
   campaignValidator,
 };

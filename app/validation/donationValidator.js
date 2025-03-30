@@ -9,6 +9,6 @@ function donationValidator(data) {
   return validator.validate(data, schema);
 }
 
-export default {
+export  {
   donationValidator,
 };
