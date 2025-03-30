@@ -50,7 +50,7 @@ function updateFeatureValidator(data) {
 }
 
 
-export default {
+export  {
   updateAddressValidator,
   contactValidator,
   updateOneValidator,

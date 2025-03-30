@@ -1,0 +1,133 @@
+import { contactValidator } from '../validation/contactValidator';
+import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
+import { logger } from '../../utils/logger';
+import Church from '../models';
+
+const addContact = async ({ suid }, body) => {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const bodyErrors = contactValidator(body);
+    if (bodyErrors.length) {
+      const error = new Error(bodyErrors.map((it) => it.message).join(','));
+      error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const church = await Church.findByIdAndUpdate(suid, { $push: { contacts: body } }, { new: true });
+
+    const newContact = church.contacts[church.contacts.length - 1];
+    return newContact;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error adding contact');
+  }
+};
+
+const updateContact = async (contactId, body, { suid }) => {
+  const { title, status, fullNames, phone } = body;
+
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const bodyErrors = contactValidator(body);
+    if (bodyErrors.length) {
+      const error = new Error(bodyErrors.map((it) => it.message).join(','));
+      error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
+      throw error;
+    }
+    await Church.updateOne(
+      { suid, 'contacts._id': contactId },
+      {
+        $set: {
+          'contacts.$.fullNames': fullNames,
+          'contacts.$.title': title,
+          'contacts.$.phone': phone,
+          'contacts.$.status': status
+        }
+      }
+    ).exec();
+
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error updating contact');
+  }
+};
+
+const removeContact = async ({ suid }, contactId) => {
+  try {
+    const identifierValidateResult = identifierValidators([{ suid }, { contactId }]);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+    await Church.findByIdAndUpdate(suid, { $pull: { contacts: { _id: contactId } } }, { new: true }).exec();
+
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error deleting contacts');
+  }
+};
+const getFilteredAndSortedContacts = (contacts) =>
+  contacts.filter((contact) => contact.status === true).sort((a, b) => b.createdAt - a.createdAt);
+
+const fetchAllContacts = async (suid) => {
+  const identifierValidateResult = identifierValidator(suid);
+  if (identifierValidateResult.length) {
+    const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+    error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+    throw error;
+  }
+
+  try {
+    const church = await Church.findOne({ _id: suid });
+
+    if (!church) {
+      throw new Error('Church not found');
+    }
+
+    const contacts = getFilteredAndSortedContacts(church.contacts);
+    return contacts;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error fetching contacts');
+  }
+};
+
+const getAllContacts = async ({ suid }) => {
+  const identifierValidationErrors = identifierValidator(suid);
+  if (identifierValidationErrors.length) {
+    const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+    error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+    throw error;
+  }
+
+  try {
+    const church = await Church.findOne({ _id: suid });
+
+    if (!church) {
+      throw new Error('Church not found');
+    }
+
+    const contacts = church.contacts.sort((a, b) => b.createdAt - a.createdAt);
+    return contacts;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error fetching contacts');
+  }
+};
+
+export { addContact, updateContact, removeContact, fetchAllContacts, getAllContacts };
