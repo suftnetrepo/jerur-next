@@ -2,6 +2,9 @@ import { eventAgendaValidator } from '../validation/eventValidator';
 import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
 import Event from '../models';
+import { mongoConnect } from '@/utils/connectDb';
+
+mongoConnect();
 
 const addEventAgenda = async ({ suid }, body) => {
   try {

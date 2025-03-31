@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { logger } from '../utils/logger';
 import { NextResponse } from 'next/server';
 
-const {
+import {
   invoicePaymentSuccess,
   setDefaultPaymentMethod,
   invoicePaymentFailed,
@@ -10,8 +10,7 @@ const {
   updateSubscription,
   createSubscription,
   cancelSubscription,
-  updateStatus
-} = require('../services/webHooksService');
+} from '../../services/webHooksService';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
 
@@ -78,7 +77,6 @@ export async function POST(req) {
         await setDefaultPaymentMethod(event);
       },
       'invoice.payment_failed': invoicePaymentFailed,
-      'customer.source.updated': updateStatus,
       'customer.subscription.trial_will_end': trialWillEnd,
     };
 

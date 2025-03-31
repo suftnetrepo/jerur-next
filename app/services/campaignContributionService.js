@@ -3,6 +3,9 @@ import CampaignContribution from '../models';
 import { identifierValidator } from '../validation/identifierValidator';
 import { campaignContributionValidator } from '../validation/campaignContributionValidator';
 import { logger } from '../../utils/logger';
+import { mongoConnect } from '@/utils/connectDb';
+
+mongoConnect();
 
 async function updateCampaignAmount(campaignId, amount) {
   const updatedCampaign = await Campaign.updateOne({ _id: campaignId }, { $inc: { current_amount_funded: amount } });

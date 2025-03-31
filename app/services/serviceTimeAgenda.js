@@ -2,6 +2,9 @@ import { serviceTimeValidator } from '../validation/serviceTimeValidator';
 import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
 import ServiceTime from '../models/serviceTime';
+import { mongoConnect } from '@/utils/connectDb';
+
+mongoConnect();
 
 const addServiceTimeAgenda = async ({ suid }, body) => {
   try {

@@ -7,6 +7,9 @@ import { logger } from '../../utils/logger';
 import { sendGridMail } from '../lib/mail';
 import { compileEmailTemplate } from '../util/compile-email-template';
 import { sendVerificationCode } from './pushNotificationService';
+import { mongoConnect } from '@/utils/connectDb';
+
+mongoConnect();
 
 const generateToken = (currentUser, expiresIn) => {
   const { _id, email, first_name, last_name, mobile, role, user_status } = currentUser;
@@ -39,7 +42,7 @@ const generateToken = (currentUser, expiresIn) => {
   };
   return { token, member };
 };
-function getMembers({ suid }) {
+function getMembers( suid ) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -53,7 +56,7 @@ function getMembers({ suid }) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function getMemberCount({ suid }) {
+async function getMemberCount( suid ) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -71,7 +74,6 @@ async function getMemberCount({ suid }) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-
 function getMember(id) {
   try {
     const identifierValidateResult = identifierValidator(id);
@@ -87,8 +89,8 @@ function getMember(id) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function createMember(body) {
-  const { suid } = body;
+async function addMember(suid, body) {
+
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -126,7 +128,7 @@ async function createMember(body) {
     }
   }
 }
-async function createMemberManual(body) {
+async function addMemberManual(body) {
   const { suid } = body;
   try {
     const identifierValidateResult = identifierValidator(suid);
@@ -164,10 +166,10 @@ async function createMemberManual(body) {
     }
   }
 }
-async function updateMember(body) {
-  const { _id } = body;
+async function updateMember(id, body) {
+
   try {
-    const identifierValidateResult = identifierValidator(_id);
+    const identifierValidateResult = identifierValidator(id);
     if (identifierValidateResult.length) {
       const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
@@ -181,12 +183,12 @@ async function updateMember(body) {
       throw error;
     }
 
-    const updatedMember = await Member.findByIdAndUpdate(_id, body, {
+    const updatedMember = await Member.findByIdAndUpdate(id, body, {
       new: true
     });
 
     if (!updatedMember) {
-      throw new ApolloError('Member not found or update failed');
+      throw new Error('Member not found or update failed');
     }
 
     return true;
@@ -195,7 +197,7 @@ async function updateMember(body) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function verificationPin({ email, pin }) {
+async function verificationPin( email, pin ) {
   try {
     const validateResult = pinValidator({ email, pin });
     if (validateResult.length) {
@@ -207,23 +209,23 @@ async function verificationPin({ email, pin }) {
     const member = await Member.findOne({ email: new RegExp(email, 'i') });
 
     if (!member) {
-      throw new UserInputError('No Member found with this credentials.');
+      throw new Error('No Member found with this credentials.');
     }
 
     if (member.pin !== pin) {
-      throw new UserInputError('Invalid code');
+      throw new Error('Invalid code');
     }
 
     await member.save();
 
-    const token = generateToken(member, config.DURATION);
+    const token = generateToken(member, '30m');
     return token;
   } catch (error) {
     logger.error(error);
     throw new Error(error.message);
   }
 }
-async function verifyPin({ email }) {
+async function verifyPin( email ) {
   const validateResult = loginValidator({ email });
   if (validateResult.length) {
     const error = new Error(validateResult.map((it) => it.message).join(','));
@@ -272,7 +274,7 @@ async function sendVerificationCode(member) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function removeMember({ suid }, id) {
+async function removeMember( suid , id) {
   try {
     const identifierValidateResult = identifierValidator(id);
     if (identifierValidateResult.length) {
@@ -295,8 +297,8 @@ export {
   updateMember,
   getMember,
   verificationPin,
-  createMember,
+  addMember,
   verifyPin,
   getMemberCount,
-  createMemberManual
+  addMemberManual
 };

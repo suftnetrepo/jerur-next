@@ -4,8 +4,11 @@ import { logger } from '../../utils/logger';
 import Church from '../models';
 import { sendNotification } from '../../utils/push-notification';
 import { MESSAGE_TYPE_ENUMS } from '../../utils/enums';
+import { mongoConnect } from '@/utils/connectDb';
 
-const addPushNotification = async ({ suid }, body) => {
+mongoConnect();
+
+const addPushNotification = async (suid , body) => {
   const { title, message, send_notification } = body;
 
   try {
@@ -42,7 +45,7 @@ const addPushNotification = async ({ suid }, body) => {
   }
 };
 
-const updatePushNotification = async (notificationId, body, { suid }) => {
+const updatePushNotification = async (notificationId, body,  suid ) => {
   const { title, status, message, send_notification } = body;
 
   try {
@@ -81,7 +84,7 @@ const updatePushNotification = async (notificationId, body, { suid }) => {
   }
 };
 
-const removePushNotification = async ({ suid }, notificationId) => {
+const removePushNotification = async ( suid , notificationId) => {
   try {
     const identifierValidateResult = identifierValidators([{ suid }, { notificationId }]);
     if (identifierValidateResult.length) {
@@ -104,29 +107,7 @@ const removePushNotification = async ({ suid }, notificationId) => {
 const getFilteredAndSortedPushNotifications = (notifications) =>
   notifications.filter((notification) => notification.status === true).sort((a, b) => b.createdAt - a.createdAt);
 
-const fetchAllPushNotifications = async (suid) => {
-  try {
-    const identifierValidationErrors = identifierValidator(suid);
-    if (identifierValidationErrors.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-    const church = await Church.findOne({ _id: suid });
-
-    if (!church) {
-      throw new Error('Church not found');
-    }
-
-    const pushNotifications = getFilteredAndSortedPushNotifications(church.push_notifications);
-    return pushNotifications;
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching push notifications');
-  }
-};
-
-const getAllPushNotifications = async ({ suid }) => {
+const getAllPushNotifications = async ( suid, status = false ) => {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -140,8 +121,7 @@ const getAllPushNotifications = async ({ suid }) => {
       throw new Error('Church not found');
     }
 
-    const sliders = church.push_notifications.sort((a, b) => b.createdAt - a.createdAt);
-    return sliders;
+    return status ?  getFilteredAndSortedPushNotifications(church.push_notifications): church.push_notifications.sort((a, b) => b.createdAt - a.createdAt);
   } catch (error) {
     logger.error(error);
     throw new Error('Error fetching push notification');
@@ -151,6 +131,5 @@ export {
   addPushNotification,
   updatePushNotification,
   removePushNotification,
-  fetchAllPushNotifications,
   getAllPushNotifications
 };

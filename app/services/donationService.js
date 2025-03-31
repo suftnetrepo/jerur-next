@@ -3,8 +3,11 @@ import Donation from '../models';
 import { donationValidator } from '../validation/donationValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
+import { mongoConnect } from '@/utils/connectDb';
 
-async function addDonation({ suid }, body) {
+mongoConnect();
+
+async function addDonation( suid , body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -74,40 +77,7 @@ async function deleteDonation(id) {
   }
 }
 
-async function getDonationById(id) {
-  try {
-    const identifierValidateResult = identifierValidator(id);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-
-    const donation = await Donation.findById(id);
-    return donation;
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching donation');
-  }
-}
-
-async function getAllDonations({ suid }) {
-  try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-    const allDonations = await Donation.find({ suid }).sort({ createdAt: -1 });
-    return allDonations;
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching all donation');
-  }
-}
-
-async function getDonationByDailyAggregates({ suid }) {
+async function getDonationByDailyAggregates( suid ) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -153,7 +123,7 @@ async function getDonationByDailyAggregates({ suid }) {
   }
 }
 
-async function getDonationByMonthlyAggregates({ suid }) {
+async function getDonationByMonthlyAggregates( suid ) {
   try {
     const currentYear = new Date().getFullYear();
     const monthNames = [
@@ -211,7 +181,7 @@ async function getDonationByMonthlyAggregates({ suid }) {
   }
 }
 
-async function getByDonationTypeAggregates({ suid }) {
+async function getByDonationTypeAggregates(suid ) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -253,68 +223,47 @@ async function getByDonationTypeAggregates({ suid }) {
   }
 }
 
-async function getDonations({ suid }, pageNumber, pageSize, filterTerm) {
+async function getDonations({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
+  const skip = (page - 1) * limit;
+
   try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
+    const sortOptions = {};
+    if (sortField) {
+      sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
     }
 
-    const page = parseFloat(pageNumber, 10) || 1;
-    const size = parseFloat(pageSize, 10) || 1;
-    const skipCount = (page - 1) * size;
-
-    const baseConditions = { suid };
-
-    let filterConditions = [];
-    if (filterTerm) {
-      filterConditions = [
-        { donation_type: new RegExp(filterTerm, 'i') },
-        { first_name: new RegExp(filterTerm, 'i') },
-        { last_name: new RegExp(filterTerm, 'i') }
-      ];
-
-      const targetAmount = parseFloat(filterTerm);
-      if (!Number.isNaN(targetAmount)) {
-        filterConditions.push({ amount: targetAmount });
-      }
-
-      if (filterTerm === 'YES' || filterTerm === 'yes') {
-        filterConditions.push({ online: true });
-      }
-
-      if (filterTerm === 'NO' || filterTerm === 'no') {
-        filterConditions.push({ online: false });
-      }
-    }
-
-    const queryConditions = filterTerm
+    const searchFilter = searchQuery
       ? {
-          $and: [baseConditions, { $or: filterConditions }]
+          $or: [
+            { donation_type: { $regex: searchQuery, $options: 'i' } },
+            { first_name: { $regex: searchQuery, $options: 'i' } },
+            { last_name: { $regex: searchQuery, $options: 'i' } },
+            { online: { $regex: searchQuery, $options: 'i' } }
+          ]
         }
-      : baseConditions;
+      : {};
 
-    const countQuery = Donation.countDocuments(queryConditions);
-    const totalDonationsCount = await countQuery;
-    const donations = await Donation.find(queryConditions).sort({ createdAt: -1 }).skip(skipCount).limit(size);
+    const query = {
+      church:suid,
+      ...searchFilter
+    };
+
+    const [donations, totalCount] = await Promise.all([
+      Donation.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
+      Donation.countDocuments({})
+    ]);
 
     return {
-      pageInfo: {
-        pageNumber,
-        pageSize,
-        totalPages: Math.ceil(totalDonationsCount / pageSize)
-      },
-      donations
+      data: donations,
+      totalCount
     };
   } catch (error) {
     logger.error(error);
-    throw new Error('Error fetching donations');
+    throw new Error('An unexpected error occurred. Please try again.');
   }
 }
 
-async function filterDonationsByDate({ suid }, startDateStr, endDateStr, donation_type) {
+async function filterDonationsByDate(suid , startDateStr, endDateStr, donation_type) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -359,8 +308,6 @@ export {
   deleteDonation,
   updateDonation,
   addDonation,
-  getDonationById,
-  getAllDonations,
   getDonationByMonthlyAggregates,
   getByDonationTypeAggregates,
   getDonations,

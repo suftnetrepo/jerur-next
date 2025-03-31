@@ -2,8 +2,11 @@ import Fellowship from '../models';
 import { identifierValidator } from '../validation/identifierValidator';
 import { fellowshipValidator } from '../validation/fellowshipValidator';
 import { logger } from '../../utils/logger';
+import { mongoConnect } from '@/utils/connectDb';
 
-async function addFellowship({ suid }, body) {
+mongoConnect();
+
+async function addFellowship( suid , body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -91,7 +94,7 @@ async function getFellowshipById(id) {
   }
 }
 
-async function getAllFellowships({ suid }) {
+async function getAllFellowships( suid ) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -110,7 +113,7 @@ async function getAllFellowships({ suid }) {
   }
 }
 
-async function countInFellowshipCollection({ suid }) {
+async function countInFellowshipCollection( suid ) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {

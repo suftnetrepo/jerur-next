@@ -2,6 +2,9 @@ import ServiceTime from '../models';
 import { identifierValidator } from '../validation/identifierValidator';
 import { serviceTimeValidator } from '../validation/serviceTimeValidator';
 import { logger } from '../../utils/logger';
+import { mongoConnect } from '@/utils/connectDb';
+
+mongoConnect();
 
 async function addServiceTime({ suid }, body) {
   try {
@@ -88,7 +91,7 @@ async function getServiceTimeById(id) {
   }
 }
 
-async function getAllServiceTimes({ suid }) {
+async function getAllServiceTimes({ suid, status = false }) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -97,28 +100,11 @@ async function getAllServiceTimes({ suid }) {
       throw error;
     }
 
-    const allServiceTimes = await ServiceTime.find({ suid });
+    const allServiceTimes = await ServiceTime.find({ suid, status: status });
     return allServiceTimes.sort((a, b) => a.sequency_no - b.sequency_no);
   } catch (error) {
     logger.error(error);
     throw new Error('Error getting all service times');
-  }
-}
-
-async function fetchAllServiceTimes(suid) {
-  try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-
-    const allServiceTimes = await ServiceTime.find({ suid, status: true });
-    return allServiceTimes.sort((a, b) => a.sequency_no - b.sequency_no);
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching all service times');
   }
 }
 
@@ -127,6 +113,5 @@ export {
   editServiceTime,
   deleteServiceTime,
   getServiceTimeById,
-  getAllServiceTimes,
-  fetchAllServiceTimes
+  getAllServiceTimes
 };

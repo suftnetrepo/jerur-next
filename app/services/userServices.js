@@ -78,7 +78,7 @@ async function createUser(body) {
 
   try {
     const newUser = await User.create({
-      password: await generatePassword('#12345!'),
+      password: await generatePassword('12345!'),
       ...body
     });
 
