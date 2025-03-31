@@ -2,6 +2,9 @@ import Campaign from '../models';
 import { identifierValidator } from '../validation/identifierValidator';
 import { campaignValidator } from '../validation/campaignValidator';
 import { logger } from '../../utils/logger';
+import { mongoConnect } from '@/utils/connectDb';
+
+mongoConnect();
 
 async function addCampaign({ suid }, body) {
   try {
@@ -88,23 +91,7 @@ async function getCampaignById(id) {
   }
 }
 
-async function getAllCampaigns({ suid }) {
-  try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-    const allCampaigns = await Campaign.find({ suid }).sort({ createdAt: -1 });
-    return allCampaigns;
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching all campaigns');
-  }
-}
-
-async function countInCampaignCollection({ suid }) {
+async function countInCampaignCollection(suid) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -122,78 +109,43 @@ async function countInCampaignCollection({ suid }) {
   }
 }
 
-async function getTop10Campaigns({ suid }) {
+async function getCampaigns({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery, status = false }) {
+  const skip = (page - 1) * limit;
+
   try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-    const campaigns = await Campaign.find({ suid, status: true })
-      .sort({
-        target_amount: -1
-      })
-      .limit(10);
-    return campaigns;
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching all campaigns');
-  }
-}
-
-async function getCampaigns({ suid }, pageNumber, pageSize, filterTerm) {
-  try {
-    const page = parseFloat(pageNumber, 10) || 1;
-    const size = parseFloat(pageSize, 10) || 1;
-    const skipCount = (page - 1) * size;
-
-    const baseConditions = { suid };
-
-    let filterConditions = [];
-    if (filterTerm) {
-      filterConditions = [{ title: new RegExp(filterTerm, 'i') }];
-
-      const targetAmount = parseFloat(filterTerm);
-      if (!Number.isNaN(targetAmount)) {
-        filterConditions.push({ target_amount: targetAmount });
-        filterConditions.push({ current_amount_funded: targetAmount });
-      }
-
-      if (filterTerm === 'YES' || filterTerm === 'yes') {
-        filterConditions.push({ status: true });
-      }
-
-      if (filterTerm === 'NO' || filterTerm === 'no') {
-        filterConditions.push({ status: false });
-      }
+    const sortOptions = {};
+    if (sortField) {
+      sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
     }
 
-    const queryConditions = filterTerm
+    const searchFilter = searchQuery
       ? {
-          $and: [baseConditions, { $or: filterConditions }]
+          $or: [{ name: { $regex: searchQuery, $options: 'i' } }]
         }
-      : baseConditions;
+      : {};
 
-    const countQuery = Campaign.countDocuments(queryConditions);
-    const totalCampaignsCount = await countQuery;
-    const campaigns = await Campaign.find(queryConditions).sort({ createdAt: -1 }).skip(skipCount).limit(size);
+    const query = {
+      church: suid,
+      status: status,
+      ...searchFilter
+    };
+
+    const [campaigns, totalCount] = await Promise.all([
+      Campaign.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
+      Campaign.countDocuments({})
+    ]);
 
     return {
-      pageInfo: {
-        pageNumber,
-        pageSize,
-        totalPages: Math.ceil(totalCampaignsCount / pageSize)
-      },
-      campaigns
+      data: campaigns,
+      totalCount
     };
   } catch (error) {
     logger.error(error);
-    throw new Error('Error fetching campaigns');
+    throw new Error('An unexpected error occurred. Please try again.');
   }
 }
 
-async function fetchTop10Campaigns(suid) {
+async function getTop10Campaigns(suid) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -210,43 +162,6 @@ async function fetchTop10Campaigns(suid) {
   } catch (error) {
     logger.error(error);
     throw new Error('Error fetching all campaigns');
-  }
-}
-
-async function fetchCampaigns(suid, pageNumber, pageSize, filterTerm) {
-  const page = parseFloat(pageNumber, 10) || 1;
-  const size = parseFloat(pageSize, 10) || 1;
-  const skipCount = (page - 1) * size;
-
-  const baseConditions = { suid, status: true };
-
-  let filterConditions = [];
-  if (filterTerm) {
-    filterConditions = [{ title: new RegExp(filterTerm, 'i') }];
-  }
-
-  const queryConditions = filterTerm
-    ? {
-        $and: [baseConditions, { $or: filterConditions }]
-      }
-    : baseConditions;
-
-  try {
-    const countQuery = Campaign.countDocuments(queryConditions);
-    const totalCampaignsCount = await countQuery;
-    const campaigns = await Campaign.find(queryConditions).sort({ createdAt: -1 }).skip(skipCount).limit(size);
-
-    return {
-      pageInfo: {
-        pageNumber,
-        pageSize,
-        totalPages: Math.ceil(totalCampaignsCount / pageSize)
-      },
-      campaigns
-    };
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching campaigns');
   }
 }
 
@@ -255,10 +170,7 @@ export {
   updateCampaign,
   deleteCampaign,
   getCampaignById,
-  getAllCampaigns,
   countInCampaignCollection,
   getTop10Campaigns,
-  getCampaigns,
-  fetchCampaigns,
-  fetchTop10Campaigns
+  getCampaigns
 };

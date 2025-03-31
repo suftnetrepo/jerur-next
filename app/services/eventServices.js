@@ -2,8 +2,11 @@ import Event from '../models';
 import { identifierValidator } from '../validation/identifierValidator';
 import { eventValidator } from '../validation/eventValidator';
 import { logger } from '../../utils/logger';
+import { mongoConnect } from '@/utils/connectDb';
 
-async function addEvent({ suid }, body) {
+mongoConnect();
+
+async function creatEvent({ suid }, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -88,133 +91,49 @@ async function getEventById(id) {
   }
 }
 
-async function getAllEvents({ suid }) {
-  try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-    const events = await Event.find({ suid });
-    return events;
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching all events');
-  }
-}
-
-async function countInEventCollection({ suid }) {
-  try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-    const eventCount = await Event.countDocuments({
-      suid
-    });
-    return eventCount;
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching event count');
-  }
-}
-
-async function getEvents({ suid }, pageNumber, pageSize, filterTerm) {
-  const page = parseInt(pageNumber, 10) || 1;
-  const size = parseInt(pageSize, 10) || 1;
-  const skipCount = (page - 1) * size;
-
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-
-  const baseConditions = {
-    suid,
-    status: true,
-    end_date: { $gte: currentDate }
-  };
-
-  let filterConditions = [];
-  if (filterTerm) {
-    filterConditions = [{ title: new RegExp(filterTerm, 'i') }];
-
-    if (filterTerm === 'YES' || filterTerm === 'yes') {
-      filterConditions.push({ status: true });
-    }
-
-    if (filterTerm === 'NO' || filterTerm === 'no') {
-      filterConditions.push({ status: false });
-    }
-  }
-
-  const queryConditions = filterTerm
-    ? {
-        $and: [baseConditions, { $or: filterConditions }]
-      }
-    : baseConditions;
+async function getEvents({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery, status = false }) {
+  const skip = (page - 1) * limit;
 
   try {
-    const countQuery = Event.countDocuments(queryConditions);
-    const totalEventsCount = await countQuery;
-    const events = await Event.find(queryConditions).sort({ createdAt: -1 }).skip(skipCount).limit(size);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    const sortOptions = sortField ? { [sortField]: sortOrder === 'desc' ? -1 : 1 } : { createdAt: -1 };
+
+    const searchFilter = searchQuery
+      ? {
+          $or: [
+            { title: { $regex: searchQuery, $options: 'i' } },
+            { status: { $regex: searchQuery, $options: 'i' } }
+          ]
+        }
+      : {};
+
+    const query = {
+      church: suid,
+      ...searchFilter
+    };
+
+    if (status) {
+      query.end_date = { $gte: currentDate };
+      query.status = true;
+    }
+
+    const [events, totalCount] = await Promise.all([
+      Event.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
+      Event.countDocuments({ church: suid })
+    ]);
 
     return {
-      pageInfo: {
-        pageNumber,
-        pageSize,
-        totalPages: Math.ceil(totalEventsCount / pageSize)
-      },
-      events
+      data: events,
+      totalCount
     };
   } catch (error) {
     logger.error(error);
-    throw new Error('Error fetching events');
+    throw new Error('An unexpected error occurred. Please try again.');
   }
 }
 
-async function fetchEvents(suid, pageNumber, pageSize, filterTerm) {
-  const page = parseInt(pageNumber, 10) || 1;
-  const size = parseInt(pageSize, 10) || 1;
-  const skipCount = (page - 1) * size;
-
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-
-  const baseConditions = {
-    suid,
-    status: true,
-    end_date: { $gte: currentDate }
-  };
-
-  const escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-  let filterConditions = [];
-  if (filterTerm) {
-    filterConditions = [{ title: new RegExp(escapeRegex(filterTerm), 'i') }];
-  }
-
-  const queryConditions = filterTerm ? { $and: [baseConditions, { $or: filterConditions }] } : baseConditions;
-
-  try {
-    const totalEventsCount = await Event.countDocuments(queryConditions);
-    const events = await Event.find(queryConditions).sort({ start_date: -1 }).skip(skipCount).limit(size);
-
-    return {
-      pageInfo: {
-        pageNumber: page,
-        pageSize: size,
-        totalPages: totalEventsCount > 0 ? Math.ceil(totalEventsCount / size) : 0
-      },
-      events
-    };
-  } catch (error) {
-    logger.error(error.stack || error);
-    throw new Error('Error fetching events');
-  }
-}
-
-async function fetchTop10Events(suid) {
+async function getTop10Events(suid) {
   const identifierValidateResult = identifierValidator(suid);
   if (identifierValidateResult.length) {
     const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
@@ -242,14 +161,4 @@ async function fetchTop10Events(suid) {
   }
 }
 
-export {
-  addEvent,
-  editEvent,
-  deleteEvent,
-  getEventById,
-  getAllEvents,
-  countInEventCollection,
-  getEvents,
-  fetchEvents,
-  fetchTop10Events
-};
+export { creatEvent, editEvent, deleteEvent, getEventById, getEvents, getTop10Events };

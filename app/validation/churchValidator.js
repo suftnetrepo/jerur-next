@@ -49,10 +49,35 @@ function updateFeatureValidator(data) {
   return validator.validate(data, schema)
 }
 
+function churchValidator(data) {
+  const validator = new Validator();
+  const schema = {
+      email: { type: 'email', empty: false, max: 50 },
+      name: { type: 'string', empty: false, max: 50 },
+      subscriptionId: { type: 'string', empty: false},
+      priceId: { type: 'string', empty: false },
+      stripeCustomerId: { type: 'string', empty: false },
+      mobile: { type: 'string', empty: false, max: 50 },
+  };
+  return validator.validate(data, schema);
+}
+
+function churchUpdateValidator(data) {
+  const validator = new Validator();
+  const schema = {
+      email: { type: 'email', empty: false, max: 50 },
+      name: { type: 'string', empty: false, max: 50 },        
+      mobile: { type: 'string', empty: false, max: 50 },
+  };
+  return validator.validate(data, schema);
+}
+
 
 export  {
   updateAddressValidator,
   contactValidator,
   updateOneValidator,
-  updateFeatureValidator
+  updateFeatureValidator,
+  churchValidator,
+  churchUpdateValidator
 };

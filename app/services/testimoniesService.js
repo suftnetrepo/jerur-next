@@ -3,6 +3,9 @@ import { testimoniesValidator } from '../validation/userValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import Testimonies from '../models/testimonies';
 import { logger } from '../../utils/logger';
+import { mongoConnect } from '@/utils/connectDb';
+
+mongoConnect();
 
 function getTestimonies(suid) {
   const identifierValidateResult = identifierValidator(suid);
@@ -19,8 +22,7 @@ function getTestimonies(suid) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function createTestimony(body) {
-  const { suid } = body;
+async function createTestimony(suid, body) {
 
   try {
     const identifierValidateResult = identifierValidator(suid);
@@ -51,11 +53,10 @@ async function createTestimony(body) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function updateTestimonies(body) {
-  const { _id } = body;
+async function updateTestimonies(id, body) {
 
   try {
-    const identifierValidateResult = identifierValidator(_id);
+    const identifierValidateResult = identifierValidator(id);
     if (identifierValidateResult.length) {
       const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
@@ -64,11 +65,11 @@ async function updateTestimonies(body) {
 
     const bodyErrors = testimoniesValidator(body);
     if (bodyErrors.length) {
-      throw new Error(bodyErrors.map((it) => it.message).join(','), {
-        invalidArgs: bodyErrors.map((it) => it.field).join(',')
-      });
+      const error = new Error(bodyErrors.map((it) => it.message).join(','));
+      error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
+      throw error;
     }
-    const updatedTestimony = await Testimonies.findByIdAndUpdate(_id, body, {
+    const updatedTestimony = await Testimonies.findByIdAndUpdate(id, body, {
       new: true
     });
 
@@ -82,7 +83,7 @@ async function updateTestimonies(body) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function removeTestimony({ suid }, id) {
+async function removeTestimony( suid , id) {
   try {
     const identifierValidateResult = identifierValidator(id);
     if (identifierValidateResult.length) {
@@ -99,7 +100,7 @@ async function removeTestimony({ suid }, id) {
   }
 }
 
-export default {
+export {
   updateTestimonies,
   removeTestimony,
   createTestimony,

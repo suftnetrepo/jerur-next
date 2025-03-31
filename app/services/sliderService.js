@@ -2,8 +2,11 @@ import { sliderValidator } from '../validation/sliderValidator';
 import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
 import Church from '../models/church';
+import { mongoConnect } from '@/utils/connectDb';
 
-const addSlider = async ({ suid }, body) => {
+mongoConnect();
+
+const addSlider = async ( suid , body) => {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -28,7 +31,7 @@ const addSlider = async ({ suid }, body) => {
   }
 };
 
-const updateSlider = async (sliderId, body, { suid }) => {
+const updateSlider = async (sliderId, body,  suid ) => {
   const { title, status, message, secure_url, public_id, imageOnly } = body;
 
   try {
@@ -67,7 +70,7 @@ const updateSlider = async (sliderId, body, { suid }) => {
   }
 };
 
-const removeSlider = async ({ suid }, sliderId) => {
+const removeSlider = async ( suid , sliderId) => {
   try {
     const identifierValidateResult = identifierValidators([{ suid }, { sliderId }]);
     if (identifierValidateResult.length) {
@@ -107,7 +110,7 @@ const fetchAllSliders = async (suid) => {
   }
 };
 
-const getAllSliders = async ({ suid }) => {
+const getAllSliders = async (suid ) => {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {

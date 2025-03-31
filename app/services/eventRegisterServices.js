@@ -1,6 +1,9 @@
-import { identifierValidator } from '../validation/identifierValidator';
+import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
 import Event from '../models';
+import { mongoConnect } from '@/utils/connectDb';
+
+mongoConnect();
 
 const addEventRegister = async ({ suid }, body) => {
   try {
@@ -42,4 +45,20 @@ const getEventRegisterById = async (eventId) => {
   }
 };
 
-export { addEventRegister, getEventRegisterById };
+async function deleteEventRegister(id, eventId) {
+  try {
+    const identifierValidateResult = identifierValidators([{ id }, { eventId }]);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+    await Event.findByIdAndUpdate(eventId, { $pull: { register: { _id: id } } }, { new: true }).exec();
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error deleting event register');
+  }
+}
+
+export { addEventRegister, getEventRegisterById, deleteEventRegister };
