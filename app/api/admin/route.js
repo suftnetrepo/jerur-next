@@ -6,8 +6,7 @@ import {
   getChurchById,
   getChurchByIdentifier,
   getChurchesByName,
-  getChurchesByCountryCode,
-  getChurchByIdentifier
+  getChurchesByCountryCode
 } from '../../services/churchService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
@@ -78,7 +77,7 @@ export const GET = async (req) => {
 
     return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };
