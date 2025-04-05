@@ -6,7 +6,7 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-async function addServiceTime({ suid }, body) {
+async function addServiceTime( suid , body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -91,7 +91,7 @@ async function getServiceTimeById(id) {
   }
 }
 
-async function getAllServiceTimes({ suid, status = false }) {
+async function getAllServiceTimes(suid, status = false) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {

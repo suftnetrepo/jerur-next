@@ -17,11 +17,11 @@ export default function SidebarNav() {
       <SidebarNavItem icon={faGauge} href="/protected/admin/dashboard">
         Dashboard
       </SidebarNavItem>
-      <SidebarNavItem icon={faUser} href="/protected/admin/user">
+      <SidebarNavItem icon={faUser} href="/protected/admin/users">
         Users
       </SidebarNavItem>
-      <SidebarNavItem icon={faBuildingUser} href="/protected/admin/category">
-        Categories
+      <SidebarNavItem icon={faBuildingUser} href="/protected/admin/churches">
+        Churches
       </SidebarNavItem>
       <SidebarNavItem icon={faCogs} href="/protected/admin/settings">
         Settings

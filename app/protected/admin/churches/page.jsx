@@ -1,22 +1,27 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Table } from '../../../../src/components/elements/table/table';
+import { Table } from '@/components/elements/table/table';
 import { useAdmin } from '../../../../hooks/useAdmin';
-import { TiEye, TiUser } from 'react-icons/ti';
+import { TiEye } from 'react-icons/ti';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
 import { dateFormatted } from '../../../../utils/helpers';
-import RenderIntegratorOffcanvas from '../renderIntegratorOffcanvas';
-import RenderIntegratorUserOffcanvas from '../renderIntegratorUserOffcanvas';
 
-const Integrator = () => {
+const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [show, setShow] = useState(false);
-  const [showUsers, setShowUsers] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const { data, error, loading, totalCount, handleFetchIntegrators, handleReset, handleSelect, handleFetchUserById,handleUpdateUser, userData, viewData } =
-    useAdmin(debouncedSearchQuery);
+  const {
+    data,
+    error,
+    loading,
+    totalCount,
+    handleFetchChurches,
+    handleReset,
+    handleSelect,
+    viewData
+  } = useAdmin(debouncedSearchQuery);
 
   const handleClose = () => {
     handleReset();
@@ -25,14 +30,7 @@ const Integrator = () => {
   const handleShow = () => {
     setShow(true);
   };
-  const handleCloseUsers = () => {
-    handleReset();
-    setShowUsers(false);
-  };
-  const handleShowUsers = () => {
-    setShowUsers(true);
-  };
- 
+
   const getStatusColorCode = (status) => {
     const colors = {
       canceled: 'bg-danger',
@@ -47,7 +45,7 @@ const Integrator = () => {
   const columns = useMemo(
     () => [
       {
-        Header: 'Company',
+        Header: 'Church',
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
             <img
@@ -57,8 +55,8 @@ const Integrator = () => {
               width="40"
               height="40"
               onError={(e) => {
-                e.target.onerror = null; 
-                e.target.src = "/img/blank.png"; 
+                e.target.onerror = null;
+                e.target.src = '/img/blank.png';
               }}
             />
             <span>{row.original.name}</span>
@@ -97,14 +95,6 @@ const Integrator = () => {
                 handleSelect(row.original);
               }}
             />
-            <TiUser
-              size={30}
-              className="pointer me-2"
-              onClick={async () => {
-                handleShowUsers()
-                await handleFetchUserById(row.original?._id)
-              }}
-            />
           </div>
         )
       }
@@ -116,7 +106,7 @@ const Integrator = () => {
     <>
       <div className={`ms-5 me-5 mt-2 ${!loading ? 'overlay__block' : null}`}>
         <div className="card-body">
-          <h5 className="card-title ms-2 mb-2">Integrators</h5>
+          <h5 className="card-title ms-2 mb-2">Churches</h5>
           <div className="d-flex justify-content-between align-items-center mb-3">
             {/* Search Box */}
             <input
@@ -132,16 +122,15 @@ const Integrator = () => {
             columns={columns}
             pageCount={totalCount}
             loading={loading}
-            fetchData={handleFetchIntegrators}
+            fetchData={handleFetchChurches}
           />
         </div>
       </div>
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
       <RenderIntegratorOffcanvas handleClose={handleClose} show={show} data={viewData} />
-      <RenderIntegratorUserOffcanvas handleClose={handleCloseUsers} show={showUsers} data={userData} handleUpdateUser={handleUpdateUser} />
     </>
   );
 };
 
-export default Integrator;
+export default Page;

@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import User from '@/api/models/user';
+import User from './app/models/user';
 import { mongoConnect } from './utils/connectDb';
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -13,48 +13,53 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        await mongoConnect();
+        await mongoConnect(); 
+      
         try {
-          const user = await User.findOne({ email: credentials.email });
-
+          const user = await User.findOne({
+            email: new RegExp(`^${credentials.email}$`, 'i')
+          });
+      
           if (!user) {
-            throw new Error('User not found. Please sign up for an account.');
+            return null; 
           }
-
+      
           const isMatch = await bcrypt.compare(credentials.password, user.password);
           if (!isMatch) {
-            throw new Error('Incorrect email or password.');
+            return null; 
           }
-
+      
           return {
             id: user._id.toString(),
             email: user.email,
             role: user.role,
-            integrator: user.integrator,
+            church: user.church.toString(),
             first_name: user.first_name,
             last_name: user.last_name
           };
         } catch (error) {
           console.error('Authentication error:', error.message);
-          throw new Error(error.message);
+          return null; 
         }
       }
     })
   ],
   session: { strategy: 'jwt' },
-  secret: process.env.NEXTAUTH_SECRET?.trim() || 'ft8c95VaAkJiIl7x2zyI5vdVvqblSmF5THeod78WA34=',
+  secret: process.env.NEXTAUTH_SECRET,
   useSecureCookies: false,
   trustHost: true,
   callbacks: {
     async jwt({ token, user }) {
+
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.role = user.role;
-        token.integrator = user.integrator;
+        token.church = user.church;
         token.first_name = user.first_name;
         token.last_name = user.last_name;
       }
+      
       return token;
     },
     async session({ session, token }) {
@@ -62,7 +67,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         id: token.id,
         email: token.email,
         role: token.role,
-        integrator: token.integrator,
+        church: token.church,
         first_name: token.first_name,
         last_name: token.last_name
       };
@@ -71,10 +76,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
   events: {
     signOut(message) {
-      console.log("User signed out:", message);
-    },
+      console.log('User signed out:', message);
+    }
   },
   pages: {
-    signIn: '/login'
+    signIn: '/login',
+    error: '/error' 
   }
 });

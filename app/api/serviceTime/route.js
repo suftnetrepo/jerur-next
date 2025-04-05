@@ -1,9 +1,4 @@
-import {
-  addServiceTime,
-  editServiceTime,
-  deleteServiceTime,
-  getAllServiceTimes,
-} from '../../services/serviceTime';
+import { addServiceTime, editServiceTime, deleteServiceTime, getAllServiceTimes } from '../../services/serviceTime';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
 
@@ -13,7 +8,7 @@ export const GET = async (req) => {
     const user = userData ? JSON.parse(userData) : null;
     const url = new URL(req.url);
     const status = url.searchParams.get('status');
-    const { data } = await getAllServiceTimes({ suid: user?.church, status });
+    const data = await getAllServiceTimes(user?.church, status);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);
@@ -54,7 +49,7 @@ export const POST = async (req) => {
     const user = userData ? JSON.parse(userData) : null;
     const body = await req.json();
 
-    const result = await addServiceTime({ suid: user?.church }, body);
+    const result = await addServiceTime(user?.church, body);
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     logger.error(error);

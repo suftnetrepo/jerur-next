@@ -14,17 +14,17 @@ export const pricingList = [
     billingCycle: 'Monthly',
     index: 1,
     currency: '£',
-    live_priceId: 'price_1JJEZ2LJUyk9CjU7Snxgf8Pa',
-    priceId: 'price_1QhYEZIMOhOpzENNyrrY8MZr',
+    live_priceId: 'price_1HiLxAJ9QQF7JMlNBZvGeR43',
+    priceId: 'price_1HDVRhJ9QQF7JMlNSdnkB7l4',
     planName: 'Basic Plan',
     features: [
-      'Manage up to 10 projects with basic tracking.',
-      'Collaborate with up to 5 engineers.',
-      'Stay updated on task progress in real-time.',
-      'Share and attach files easily.',
-      'Access essential features via the mobile app.',
-      'Chat with up to 5 team members in real time.',
-      'Get email support during business hours.'
+     'Service Time Management',
+      'Fundraising Campaigns',
+      'Online Giving ',
+      'Multi-Platform Access',
+      'Event Management',
+      'Dedicated Customer Support',
+      'Data Security and Privacy',    
     ]
   },
   {
@@ -38,16 +38,16 @@ export const pricingList = [
     planName: 'Premium',
     currency: '£',
     index: 2,
-    live_priceId: 'price_1JJEZ2LJUyk9CjU7hLsimtyH',
-    priceId: 'price_1QhYG5IMOhOpzENN2Q4ZemIe',
+    live_priceId: 'price_1HiLxAJ9QQF7JMlNAiqlLjPv',
+    priceId: 'price_1HDVRhJ9QQF7JMlNxp77CsjK',
     features: [
-      'Manage unlimited projects.',
-      'Collaborate with up to 20 engineers.',
-      'Visualize timelines with Gantt charts.',
-      'Get 1TB of cloud storage for file sharing.',
-      'Full access to features via the mobile app.',
-      'Chat with your entire team freely.',
-      'Enjoy priority email and live chat support.'
+      'Service Time Management',
+      'Fundraising Campaigns',
+      'Online Giving ',
+      'Multi-Platform Access',
+      'Event Management',
+      'Dedicated Customer Support',
+      'Data Security and Privacy',     
     ]
   },
   {
@@ -62,18 +62,15 @@ export const pricingList = [
     currency: '£',
     index: 3,
     live_priceId: 'price_1JJEZ2LJUyk9CjU7WqYguOQ6',
-    priceId: 'price_1QhYLgIMOhOpzENNbP4n8MX6',
+    priceId: 'price_1HHWPsJ9QQF7JMlN2X4BTJC3',
     features: [
-      'Manage unlimited projects and engineers.',
-      'Set advanced roles for large teams.',
-      'Coordinate multiple projects on one dashboard.',
-      'Provide clients secure portal access.',
-      'Add custom branding to your platform.',
-      'Get help from a dedicated account manager.',
-      'Access 24/7 support for any issues.',
-      'Enjoy unlimited chat for teams and clients.',
-      'Use premium mobile app features.',
-      'Store files without limits in the cloud.'
+      'Service Time Management',
+      'Fundraising Campaigns',
+      'Online Giving ',
+      'Multi-Platform Access',
+      'Event Management',
+      'Dedicated Customer Support',
+      'Data Security and Privacy',
     ]
   }
 ];
@@ -86,5 +83,4 @@ const findPrice = (priceId : string, live : boolean) => {
 };
 
 export { findPrice };
-
 

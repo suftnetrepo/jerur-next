@@ -6,7 +6,7 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-const addServiceTimeAgenda = async ({ suid }, body) => {
+const addServiceTimeAgenda = async (suid, body) => {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -114,9 +114,4 @@ const getServiceTimeAgendasById = async (serviceTimeId) => {
   }
 };
 
-export {
-  addServiceTimeAgenda,
-  updateServiceTimeAgenda,
-  removeServiceTimeAgenda,
-  getServiceTimeAgendasById
-};
+export { addServiceTimeAgenda, updateServiceTimeAgenda, removeServiceTimeAgenda, getServiceTimeAgendasById };

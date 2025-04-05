@@ -6,7 +6,7 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-async function addCampaign({ suid }, body) {
+async function addCampaign( suid , body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {

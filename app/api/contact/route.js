@@ -9,7 +9,7 @@ import {
       const url = new URL(req.url);
       const id = url.searchParams.get('id')
       const status = url.searchParams.get('status')
-      const { data } = await getAllContacts({ suid: id, status });
+      const data  = await getAllContacts( id, status);
       return NextResponse.json({ data, success: true });
   
     } catch (error) {

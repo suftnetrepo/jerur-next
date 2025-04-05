@@ -43,7 +43,13 @@ const userValidator = {
   },
   reset:()=> {
     return {
-        ...userValidator.fields
+      first_name: '',
+      last_name: '',
+      email: '',
+      mobile: '',
+      user_status: false,
+      role: '',
+      visible: ''
     }
     
   },

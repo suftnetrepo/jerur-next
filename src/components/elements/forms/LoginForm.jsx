@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import NextLink from '@/components/reuseable/links/NextLink';
 import Button from 'react-bootstrap/Button';
@@ -14,7 +16,7 @@ const LoginForm = () => {
   const [validationError, setValidationError] = useState({});
   const [fields, setFields] = useState({ email: '', password: '' });
   const [visiblePassword, setVisiblePassword] = useState(false);
-  const [csrfToken, setCsrfToken] = useState("")
+  const [csrfToken, setCsrfToken] = useState('');
   const { handleError, error } = useSecure();
   const router = useRouter();
 
@@ -48,22 +50,19 @@ const LoginForm = () => {
     } catch (chatError) {
       console.error('Chat sign-in failed:', chatError);
     }
-    
+
     const urlParams = new URLSearchParams(window.location.search);
     const returnUrl = urlParams.get('returnUrl');
 
     const updatedSession = await getSession();
-  
+
     let redirectPath;
     if (returnUrl) {
       redirectPath = returnUrl;
+      router.push(returnUrl);
     } else {
-      redirectPath = updatedSession?.user.role === 'integrator' 
-        ? '/protected/integrator/dashboard' 
-        : '/protected/admin/dashboard';
+      router.push('/protected/admin/dashboard');
     }
-    
-   router.push(redirectPath);
   };
 
   return (
@@ -116,7 +115,7 @@ const LoginForm = () => {
         <div className="d-flex align-items-center justify-content-between">
           <div className="row w-100">
             <div className="col-md-9 col-lg-9">
-              <LoadingButton  type="button" onClick={() => handleSubmit()}>
+              <LoadingButton type="button" onClick={() => handleSubmit()}>
                 Sign In
               </LoadingButton>
             </div>

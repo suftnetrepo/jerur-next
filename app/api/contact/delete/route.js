@@ -8,7 +8,7 @@ export const DELETE = async (req) => {
     const user = userData ? JSON.parse(userData) : null;
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
-    const { data } = await removeContact({ suid: user.church, id });
+    const data = await removeContact(user.church, id );
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

@@ -1,7 +1,7 @@
 'use client';
 
 import { NextPage } from 'next';
-import { Fragment, Suspense } from 'react';
+import { Suspense } from 'react';
 import VerifyCodeForm from '@/components/elements/forms/VerifyCodeForm';
 
 const VerifyCode: NextPage = () => {

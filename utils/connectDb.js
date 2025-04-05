@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 export const mongoConnect = async () => {
-  const connectionUrl = process.env.NEXT_PUBLIC_MONGODB_URL || "mongodb+srv://sr72:Kcmkcm12345!@cluster0.ihqj3.mongodb.net/natchi_dev?retryWrites=true&w=majority";
+  const connectionUrl = process.env.MONGO_URI;
 
   if (!connectionUrl) {
     console.error('Error: MONGO_URI is not defined in environment variables.');

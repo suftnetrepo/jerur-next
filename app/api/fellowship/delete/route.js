@@ -7,7 +7,7 @@ export const DELETE = async (req) => {
   
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
-    const { data } = await deleteFellowship( id );
+    const  data= await deleteFellowship( id );
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

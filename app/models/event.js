@@ -1,8 +1,6 @@
 import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
 
-const { Schema } = mongoose
-
 const EventSchema = new mongoose.Schema(
   {
     suid: { type: Schema.Types.ObjectId, ref: 'Church', required: true },

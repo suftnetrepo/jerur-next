@@ -6,7 +6,7 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-const addEventAgenda = async ({ suid }, body) => {
+const addEventAgenda = async ( suid , body) => {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
