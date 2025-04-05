@@ -6,7 +6,7 @@ import { useAdmin } from '../../../../hooks/useAdmin';
 import { TiEye } from 'react-icons/ti';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
-import { dateFormatted } from '../../../../utils/helpers';
+// import { dateFormatted } from '../../../../utils/helpers';
 
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,11 +63,11 @@ const Page = () => {
           </div>
         )
       },
-      {
-        Header: 'Date',
-        accessor: 'createdAt',
-        Cell: ({ value }) => <div className="d-flex align-items-center">{dateFormatted(value)}</div>
-      },
+      // {
+      //   Header: 'Date',
+      //   accessor: 'createdAt',
+      //   Cell: ({ value }) => <div className="d-flex align-items-center">{dateFormatted(value)}</div>
+      // },
       { Header: 'Mobile', accessor: 'mobile', sortType: 'basic' },
       { Header: 'Email', accessor: 'email' },
       { Header: 'Plan', accessor: 'plan' },
@@ -104,7 +104,7 @@ const Page = () => {
 
   return (
     <>
-      <div className={`ms-5 me-5 mt-2 ${!loading ? 'overlay__block' : null}`}>
+      <div className={`ms-5 me-5 mt-2 `}>
         <div className="card-body">
           <h5 className="card-title ms-2 mb-2">Churches</h5>
           <div className="d-flex justify-content-between align-items-center mb-3">
@@ -128,7 +128,7 @@ const Page = () => {
       </div>
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
-      <RenderIntegratorOffcanvas handleClose={handleClose} show={show} data={viewData} />
+
     </>
   );
 };

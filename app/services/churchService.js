@@ -387,7 +387,6 @@ export {
   getWeeklyChurchSignOnData,
   updateChurch,
   updateChurchStatus,
-  updateChurchContact,
   updateChurchAddress,
   deleteChurch,
   getChurchById,
