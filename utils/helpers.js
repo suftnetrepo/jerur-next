@@ -291,7 +291,43 @@ function formatReadableDate(isoDate) {
   return date.toLocaleDateString('en-US', options);
 }
 
+function checkAmount(amount) {
+  if (amount && /\d/.test(amount)) {
+    return amount;
+  }
+  return null;
+}
+
+function encrypt(text) {
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const keyBuffer = Buffer.from(process.env.ENCRYPTION_KEY, 'hex'); 
+  const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv); 
+  let encrypted = cipher.update(text);
+
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+
+  return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
+}
+
+function decrypt(text) {
+  const textParts = text.split(':');
+  const iv = Buffer.from(textParts.shift(), 'hex');
+  const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(process.env.ENCRYPTION_KEY), iv);
+  let decrypted = decipher.update(encryptedText);
+
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+  return decrypted.toString();
+}
+
+const generateKey = () => crypto.randomBytes(32).toString('hex');
+
 export {
+  encrypt,
+  decrypt,
+  generateKey,
+  checkAmount,
   formatReadableDate,
   formatCurrency,
   currencySymbolMapper,

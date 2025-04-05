@@ -42,10 +42,10 @@ export const TASK_COMMENTS = {
   removeOne: `${HOST}task_comment/`
 };
 
-export const INTEGRATOR = {
-  fetchIntegrators: `${HOST}admin`,
-  fetchSingle: `${HOST}integrator/fetchSingle`,
-  uploadOne: `${HOST}integrator/updateOne`
+export const CHURCH = {
+  fetchChurches: `${HOST}admin`,
+  fetchSingle: `${HOST}church/fetchSingle`,
+  uploadOne: `${HOST}church/updateOne`
 };
 
 export const SUBSCRIBER = {

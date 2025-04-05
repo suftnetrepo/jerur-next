@@ -19,12 +19,12 @@ export const PUT = async (req) => {
     const body = await req.json();
 
     if (action === 'bulk') {
-      const updated = await updateBulk({ suid: user?.church }, body);
+      const updated = await updateBulk(user?.church , body);
       return NextResponse.json({ success: true, data: updated });
     }
 
     if (action === 'one') {
-      const updated = await updateOneChurch({ suid: user?.church }, body);
+      const updated = await updateOneChurch(user?.church , body);
       return NextResponse.json({ success: true, data: updated });
     }
 
@@ -35,22 +35,22 @@ export const PUT = async (req) => {
     }
 
     if (action === 'address') {
-      const updated = await updateChurchAddress({ suid: user?.church }, body);
+      const updated = await updateChurchAddress(user?.church , body);
       return NextResponse.json({ success: true, data: updated });
     }
 
     if (action === 'contact') {
-      const updated = await updateChurchContact({ suid: user?.church }, body);
+      const updated = await updateChurchContact(user?.church , body);
       return NextResponse.json({ success: true, data: updated });
     }
 
     if (action === 'features') {
-      const updated = await updateFeatures({ suid: user?.church }, body);
+      const updated = await updateFeatures(user?.church , body);
       return NextResponse.json({ success: true, data: updated });
     }
 
     if (action === 'church') {
-      const updated = await updateChurch({ suid: user?.church }, body);
+      const updated = await updateChurch(user?.church , body);
       return NextResponse.json({ success: true, data: updated });
     }
 

@@ -1,4 +1,4 @@
-'use client';
+
 
 import { Fragment } from 'react';
 import LoginForm from '@/components/elements/forms/LoginForm';

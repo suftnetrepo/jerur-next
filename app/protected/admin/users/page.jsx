@@ -3,32 +3,32 @@
 import React, { useMemo, useState } from 'react';
 import { Table } from '@/components/elements/table/table';
 import { Button } from 'react-bootstrap';
-import { useCategories } from '../../../../hooks/useCategories';
+import { useUser } from '../../../../hooks/useUser';
 import Badge from 'react-bootstrap/Badge';
 import { MdDelete } from 'react-icons/md';
 import { TiEdit } from 'react-icons/ti';
 import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
-import RenderCategoryOffcanvas from './renderCategoryOffcanvas';
 import useDebounce from '../../../../hooks/useDebounce';
+import RenderUserOffcanvas from '../renderUserOffcanvas';
 
-const Category = () => {
+const User = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [show, setShow] = useState(false);
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const {
     data,
     error,
     editData,
-    totalCount,
-    handleFetch,
     loading,
-    handleDelete,
+    totalCount,
+    handleFetchUsers,
+    handleDeleteUser,
     handleEdit,
-    handleSelect,
-    handleSave,
+    handleEditUser,
+    handleSaveUser,
     handleReset
-  } = useCategories(debouncedSearchQuery);
+  } = useUser(debouncedSearchQuery);
 
   const handleClose = () => {
     handleReset();
@@ -41,11 +41,23 @@ const Category = () => {
 
   const columns = useMemo(
     () => [
-      { Header: 'Name', accessor: 'name', sortType: 'basic' },
-      { Header: 'Description', accessor: 'description', sortType: 'basic' },
+      {
+        Header: 'Church',
+        accessor: 'church',
+        Cell: ({ value }) => (
+          <div className="d-flex justify-content-start align-items-start">
+            {value.name}
+          </div>
+        )
+      },
+      { Header: 'Firstname', accessor: 'first_name', sortType: 'basic' },
+      { Header: 'Lastname', accessor: 'last_name', sortType: 'basic' },
+      { Header: 'Mobile', accessor: 'mobile', sortType: 'basic' },
+      { Header: 'Email', accessor: 'email' },
+      { Header: 'Role', accessor: 'role' },
       {
         Header: 'Status',
-        accessor: 'status',
+        accessor: 'user_status',
         Cell: ({ value }) => (
           <div className="d-flex justify-content-center align-items-center">
             {value ? (
@@ -71,12 +83,12 @@ const Category = () => {
               className="pointer me-2"
               onClick={() => {
                 handleShow();
-                handleSelect(row.original);
+                handleEdit(row.original);
               }}
             />
             <DeleteConfirmation
               onConfirm={async (id) => {
-                handleDelete(id);
+                handleDeleteUser(id);
               }}
               onCancel={() => {}}
               itemId={row.original._id}
@@ -94,7 +106,7 @@ const Category = () => {
     <>
       <div className={`ms-5 me-5 mt-2 ${!loading ? 'overlay__block' : null}`}>
         <div className="card-body">
-          <h5 className="card-title ms-2 mb-2">Categories</h5>
+          <h5 className="card-title ms-2 mb-2">Users</h5>
           <div className="d-flex justify-content-between align-items-center mb-3">
             {/* Search Box */}
             <input
@@ -111,23 +123,23 @@ const Category = () => {
                 handleShow();
               }}
             >
-             + Add Category
+             + Add User
             </Button>
           </div>
-          <Table data={data} columns={columns} pageCount={totalCount} fetchData={handleFetch} />
+          <Table data={data} columns={columns} pageCount={totalCount} loading={loading} fetchData={handleFetchUsers} />
         </div>
       </div>
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
-      <RenderCategoryOffcanvas
+      <RenderUserOffcanvas
         handleClose={handleClose}
         show={show}
-        editData={editData}
-        handleEdit={handleEdit}
-        handleSave={handleSave}
+        userData={editData}
+        handleEditUser={handleEditUser}
+        handleSaveUser={handleSaveUser}
       />
     </>
   );
 };
 
-export default Category;
+export default User;

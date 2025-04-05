@@ -12,7 +12,7 @@ export const GET = async (req) => {
     const url = new URL(req.url);
     const id = url.searchParams.get('id')
 
-    const { data } = await getServiceTimeAgendasById(id);
+    const data  = await getServiceTimeAgendasById(id);
     return NextResponse.json({ data, success: true });
 
   } catch (error) {
@@ -56,7 +56,7 @@ export const POST = async (req) => {
     const user = userData ? JSON.parse(userData) : null;
     const body = await req.json();
 
-    const result = await addServiceTimeAgenda({ suid: user?.church }, body);
+    const result = await addServiceTimeAgenda( user?.church , body);
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     logger.error(error);

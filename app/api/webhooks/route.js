@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { logger } from '../utils/logger';
+import { logger } from '@/utils/logger';
 import { NextResponse } from 'next/server';
 
 import {
@@ -10,7 +10,7 @@ import {
   updateSubscription,
   createSubscription,
   cancelSubscription,
-} from '../../services/webHooksService';
+} from '@/services/webHooksService';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
 

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { USER } from '../utils/apiUrl';
+import { userValidator } from '@/protected/integrator/rules';
+
 
 const useUser = (searchQuery) => {
   const [state, setState] = useState({
@@ -36,7 +38,7 @@ const useUser = (searchQuery) => {
 
   const handleReset = () => {
     setState((pre) => {
-      return { ...pre, editData: null, error: null };
+      return { ...pre, editData: userValidator.reset(), error: null };
     });
   };
 

@@ -6,9 +6,9 @@ export const POST = async (req) => {
   try {
     const userData = req.headers.get('x-user-data');
     const user = userData ? JSON.parse(userData) : null;
-   
+
     const body = await req.json();
-    const { data } = await createTestimony(user.church, body);
+    const data = await createTestimony(user.church, body);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

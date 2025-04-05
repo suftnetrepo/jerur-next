@@ -4,10 +4,9 @@ import { NextResponse } from 'next/server';
 
 export const DELETE = async (req) => {
   try {
-  
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
-    const { data } = await deleteDonation( id );
+    const data = await deleteDonation(id);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

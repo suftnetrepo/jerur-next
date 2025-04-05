@@ -7,6 +7,8 @@ const RenderUserOffcanvas = ({ show, handleClose, userData, handleSaveUser, hand
   const [errorMessages, setErrorMessages] = useState({});
   const [fields, setFields] = useState(userValidator.fields);
 
+  console.log("........................userData", userData)
+
   useEffect(() => {
     setFields((pre) => {
       return {
@@ -130,9 +132,8 @@ const RenderUserOffcanvas = ({ show, handleClose, userData, handleSaveUser, hand
                 <Form.Label className="text-dark">Role</Form.Label>
                 <Form.Select name="role" value={fields.role} className="border-dark" onChange={handleChange}>
                   <option value="">Select a role</option>
-                  <option value="student">Student</option>
+                  <option value="user">User</option>
                   <option value="admin">Admin</option>
-                  <option value="instructor">Instructor</option>
                 </Form.Select>
                 {errorMessages.role?.message && <span className="text-danger">{errorMessages.role?.message}</span>}
               </Form.Group>

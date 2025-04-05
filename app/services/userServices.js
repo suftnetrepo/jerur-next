@@ -1,4 +1,5 @@
-import User from '../models/user';
+import User from './../models/user';
+import Church from './../models/church';
 import { logger } from '../../utils/logger';
 import { userValidator, userEditValidator } from '@/validator';
 import { isValidObjectId, generatePassword, comparePassword } from '@/utils/helpers';
@@ -6,34 +7,90 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-async function getUsers({ page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
+async function getUsers({ page = 1, limit = 10, sortField = 'createdAt', sortOrder = 'desc', searchQuery }) {
   const skip = (page - 1) * limit;
 
   try {
+    // Provide default sort options if none specified
     const sortOptions = {};
-    if (sortField) {
-      sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
-    }
+    sortOptions[sortField || 'createdAt'] = sortOrder === 'desc' ? -1 : 1;
 
-    const searchFilter = searchQuery
-      ? {
+    const pipeline = [
+      // Join with church collection
+      { $lookup: {
+          from: 'churches',
+          localField: 'church',
+          foreignField: '_id',
+          as: 'churchData'
+      }},
+      // Unwind the churchData array
+      { $unwind: '$churchData' },
+      // Match based on all fields including church name
+      { $match: searchQuery ? {
           $or: [
             { first_name: { $regex: searchQuery, $options: 'i' } },
             { last_name: { $regex: searchQuery, $options: 'i' } },
             { email: { $regex: searchQuery, $options: 'i' } },
-            { role: { $regex: searchQuery, $options: 'i' } }
+            { role: { $regex: searchQuery, $options: 'i' } },
+            { 'churchData.name': { $regex: searchQuery, $options: 'i' } }
           ]
-        }
-      : {};
+        } : {} },
+      // Sort results
+      { $sort: sortOptions },
+      // Skip for pagination
+      { $skip: skip },
+      // Limit results
+      { $limit: parseInt(limit) },
+      // Project to reshape the document - maintain church name and exclude password
+      { $project: {
+          _id: 1,
+          first_name: 1,
+          last_name: 1,
+          email: 1,
+          role: 1,
+          mobile: 1,
+          user_status: 1,
+          profilePicture: 1,
+          bio: 1,
+          secure_url: 1,
+          public_id: 1,
+          fcm: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          church: {
+            _id: '$churchData._id',
+            name: '$churchData.name'
+          }
+      }}
+    ];
 
-    const query = {
-      ...searchFilter
-    };
+    // Count documents using similar query
+    const countPipeline = [
+      { $lookup: {
+          from: 'churches',
+          localField: 'church',
+          foreignField: '_id',
+          as: 'churchData'
+      }},
+      { $unwind: '$churchData' },
+      { $match: searchQuery ? {
+          $or: [
+            { first_name: { $regex: searchQuery, $options: 'i' } },
+            { last_name: { $regex: searchQuery, $options: 'i' } },
+            { email: { $regex: searchQuery, $options: 'i' } },
+            { role: { $regex: searchQuery, $options: 'i' } },
+            { 'churchData.name': { $regex: searchQuery, $options: 'i' } }
+          ]
+        } : {} },
+      { $count: "total" }
+    ];
 
-    const [users, totalCount] = await Promise.all([
-      User.find(query).sort(sortOptions).skip(skip).limit(limit).select('-password').exec(),
-      User.countDocuments()
+    const [users, countResult] = await Promise.all([
+      User.aggregate(pipeline),
+      User.aggregate(countPipeline)
     ]);
+
+    const totalCount = countResult.length > 0 ? countResult[0].total : 0;
 
     return {
       data: users,

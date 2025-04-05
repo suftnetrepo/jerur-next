@@ -6,7 +6,7 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-async function addFellowship( suid , body) {
+async function addFellowship(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -94,7 +94,7 @@ async function getFellowshipById(id) {
   }
 }
 
-async function getAllFellowships( suid ) {
+async function getAllFellowships(suid) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -113,7 +113,7 @@ async function getAllFellowships( suid ) {
   }
 }
 
-async function countInFellowshipCollection( suid ) {
+async function countInFellowshipCollection(suid) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {

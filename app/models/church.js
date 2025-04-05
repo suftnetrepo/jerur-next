@@ -354,5 +354,6 @@ ChurchSchema.index({
   'address.town': 'text',
   'address.postcode': 'text'
 })
-const Church = mongoose.model('Church', ChurchSchema)
-export default Church
+
+const Church = mongoose.models.Church || mongoose.model('Church', ChurchSchema);
+export default Church;

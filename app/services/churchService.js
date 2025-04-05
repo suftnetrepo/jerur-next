@@ -12,7 +12,7 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-async function updateChurchContact({ suid }, body) {
+async function updateChurchContact(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -38,7 +38,7 @@ async function updateChurchContact({ suid }, body) {
   }
 }
 
-async function updateFeatures({ suid }, features) {
+async function updateFeatures(suid, features) {
   try {
     const validateResult = updateFeatureValidator({ features });
     if (validateResult.length) {
@@ -55,7 +55,7 @@ async function updateFeatures({ suid }, features) {
   }
 }
 
-async function updateChurchAddress({ suid }, body) {
+async function updateChurchAddress(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -169,7 +169,7 @@ async function updateBulk({ suid }, body) {
     throw new Error('Error updating contacts');
   }
 }
-async function updateOneChurch({ suid }, name, value) {
+async function updateOneChurch(suid, name, value) {
   try {
     const validateResult = updateOneValidator({ name, value });
 
@@ -347,15 +347,13 @@ async function getWeeklyChurchSignOnData() {
   }
 }
 async function updateChurch(id, body) {
-  
-
   try {
     const bodyErrors = churchUpdateValidator(body);
-  if (bodyErrors.length) {
-    const error = new Error(bodyErrors.map((it) => it.message).join(','));
-    error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
-    throw error;
-  }
+    if (bodyErrors.length) {
+      const error = new Error(bodyErrors.map((it) => it.message).join(','));
+      error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
+      throw error;
+    }
 
     const updated = await Church.findByIdAndUpdate(id, body, {
       new: true
@@ -368,13 +366,8 @@ async function updateChurch(id, body) {
   }
 }
 async function updateChurchStatus(stripeCustomerId, body) {
-
   try {
-    const updated = await Church.findOneAndUpdate(
-      { stripeCustomerId: stripeCustomerId },
-      body, 
-      { new: true } 
-    );
+    const updated = await Church.findOneAndUpdate({ stripeCustomerId: stripeCustomerId }, body, { new: true });
 
     if (!updated) {
       throw new Error('Church not found or update failed');
@@ -382,7 +375,7 @@ async function updateChurchStatus(stripeCustomerId, body) {
 
     return updated;
   } catch (error) {
-    logger.error(error);   
+    logger.error(error);
     throw new Error('Error updating church status');
   }
 }

@@ -7,7 +7,7 @@ export const PUT = async (req) => {
     const url = new URL(req.url);
     const body = await req.json();
     const id = url.searchParams.get('id');
-    const { data } = await updateMember(id, body);
+    const data = await updateMember(id, body);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

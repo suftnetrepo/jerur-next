@@ -1,5 +1,4 @@
-import Campaign from '../models';
-import CampaignContribution from '../models';
+import Campaign from '../models/campaign';
 import { identifierValidator } from '../validation/identifierValidator';
 import { campaignContributionValidator } from '../validation/campaignContributionValidator';
 import { logger } from '../../utils/logger';
@@ -7,16 +6,9 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-async function updateCampaignAmount(campaignId, amount) {
-  const updatedCampaign = await Campaign.updateOne({ _id: campaignId }, { $inc: { current_amount_funded: amount } });
-
-  if (updatedCampaign.nModified === 0) {
-    throw new Error('Campaign not found or update failed');
-  }
-}
-
 async function addContribution(body) {
-  const { campaign, amount } = body;
+  const { campaign: campaignId, amount } = body;
+
   const bodyErrors = campaignContributionValidator(body);
   if (bodyErrors.length) {
     const error = new Error(bodyErrors.map((it) => it.message).join(','));
@@ -25,66 +17,89 @@ async function addContribution(body) {
   }
 
   try {
-    const newCampaignContribution = new CampaignContribution({
-      ...body
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    campaign.contribution.push({
+      amount,
+      first_name: body.first_name,
+      last_name: body.last_name,
+      email: body.email
     });
 
-    const savedCampaignContribution = await newCampaignContribution.save();
+    campaign.current_amount_funded += amount;
 
-    await updateCampaignAmount(campaign, amount);
-
-    return savedCampaignContribution;
+    const updated = await campaign.save();
+    return updated;
   } catch (error) {
     logger.error(error);
     throw new Error('Error adding campaign contribution');
   }
 }
 
-async function getContributionById(id) {
+async function getContributionById(campaignId, index) {
   try {
-    const identifierValidateResult = identifierValidator(id);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+    const errors = identifierValidator(campaignId);
+    if (errors.length) {
+      const error = new Error(errors.map((e) => e.message).join(','));
+      error.invalidArgs = errors.map((e) => e.field).join(',');
       throw error;
     }
 
-    const campaignContribution = await CampaignContribution.findById(id);
-    return campaignContribution;
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) throw new Error('Campaign not found');
+
+    const contribution = campaign.contribution[index];
+    if (!contribution) throw new Error('Contribution not found');
+
+    return contribution;
   } catch (error) {
     logger.error(error);
-    throw new Error('Error fetching campaign contribution');
+    throw new Error('Error fetching contribution');
   }
 }
 
 async function getContributionsByUser(email) {
   try {
-    const allCampaignContributions = await CampaignContribution.find({
-      email
+    const campaigns = await Campaign.find({
+      'contribution.email': email
     });
-    return allCampaignContributions;
+
+    const contributions = campaigns.flatMap((c) =>
+      c.contribution.filter((contrib) => contrib.email === email)
+    );
+
+    return contributions;
   } catch (error) {
     logger.error(error);
-    throw new Error('Error fetching campaign contribution by email');
+    throw new Error('Error fetching contributions by user email');
   }
 }
 
-async function getContributionsByCampaignId(id) {
+async function getContributionsByCampaignId(campaignId) {
   try {
-    const identifierValidateResult = identifierValidator(id);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+    const errors = identifierValidator(campaignId);
+    if (errors.length) {
+      const error = new Error(errors.map((e) => e.message).join(','));
+      error.invalidArgs = errors.map((e) => e.field).join(',');
       throw error;
     }
-    const allCampaignContributions = await CampaignContribution.find({
-      campaignId: id
-    });
-    return allCampaignContributions;
+
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) throw new Error('Campaign not found');
+
+    return campaign.contribution;
   } catch (error) {
     logger.error(error);
-    throw new Error('Error fetching campaign contribution by campaign id');
+    throw new Error('Error fetching contributions by campaign');
   }
 }
 
-export { addContribution, getContributionById, getContributionsByUser, getContributionsByCampaignId };
+export {
+  addContribution,
+  getContributionById,
+  getContributionsByUser,
+  getContributionsByCampaignId
+};

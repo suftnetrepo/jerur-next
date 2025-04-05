@@ -22,7 +22,7 @@ export const GET = async (req) => {
 
     if (action === 'get') {
       const id = url.searchParams.get('id');
-      const data = await getMember(user?.church, id);
+      const data = await getMember(id);
       return NextResponse.json({ data, success: true });
     }
 
