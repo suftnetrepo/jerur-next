@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { TEAM, USER } from '../utils/apiUrl';
-import { teamValidator } from '../app/protected/integrator/rules';
+import { teamValidator } from '../app/protected/church/rules';
 import { customStyles } from '../utils/helpers';
 
 const useTeam = (id: string) => {

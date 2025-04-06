@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { DOCUMENT } from '../utils/apiUrl';
-import { fileValidator } from '../app/protected/integrator/rules';
+import { fileValidator } from '../app/protected/church/rules';
 
 const useDocument = (id) => {
   const [state, setState] = useState({

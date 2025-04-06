@@ -12,14 +12,8 @@ const RenderIntegratorOffcanvas = ({ show, handleClose, data }) => {
             <Row className="mb-3">
               <Col>
                 <Form.Group>
-                  <Form.Label className="text-dark">Company</Form.Label>
+                  <Form.Label className="text-dark">Church</Form.Label>
                   <Form.Control type="text" readOnly value={data.name} className="border-dark" />
-                </Form.Group>
-              </Col>
-              <Col>
-                <Form.Group>
-                  <Form.Label className="text-dark">Mobile</Form.Label>
-                  <Form.Control type="text" readOnly value={data.mobile} className="border-dark" />
                 </Form.Group>
               </Col>
             </Row>
@@ -33,11 +27,17 @@ const RenderIntegratorOffcanvas = ({ show, handleClose, data }) => {
               </Col>
               <Col>
                 <Form.Group>
-                  <Form.Label className="text-dark">Status</Form.Label>
-                  <Form.Control type="text" readOnly value={data.status} className="border-dark" />
+                  <Form.Label className="text-dark">Mobile</Form.Label>
+                  <Form.Control type="text" readOnly value={data.mobile} className="border-dark" />
                 </Form.Group>
               </Col>
             </Row>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="text-dark">Address</Form.Label>
+              <Form.Control type="text" readOnly value={data?.address?.completeAddress} className="border-dark" />
+            </Form.Group>
+
 
             <Form.Group className="mb-3">
               <Form.Label className="text-dark">Plan</Form.Label>
@@ -81,10 +81,20 @@ const RenderIntegratorOffcanvas = ({ show, handleClose, data }) => {
               </Row>
             )}
 
-            <Form.Group className="mb-3">
-              <Form.Label className="text-dark">Description</Form.Label>
-              <Form.Control as="textarea" rows={3} readOnly value={data.description} className="border-dark" />
-            </Form.Group>
+            <Row className="mb-3">
+              <Col>
+                <Form.Group>
+                  <Form.Label className="text-dark">Status</Form.Label>
+                  <Form.Control type="text" readOnly value={data.status} className="border-dark" />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row className="mb-3">
+              <Form.Group>
+                <Form.Label className="text-dark">Description</Form.Label>
+                <Form.Control as="textarea" rows={3} readOnly value={data.description} className="border-dark" />
+              </Form.Group>
+            </Row>
           </Form>
         </Offcanvas.Body>
       </Offcanvas>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { USER } from '../utils/apiUrl';
-import { userValidator } from '@/protected/integrator/rules';
+import { userValidator } from '@/protected/church/rules';
 
 
 const useUser = (searchQuery) => {

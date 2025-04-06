@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcryptjs';
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 

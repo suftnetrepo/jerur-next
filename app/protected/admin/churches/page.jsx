@@ -6,22 +6,15 @@ import { useAdmin } from '../../../../hooks/useAdmin';
 import { TiEye } from 'react-icons/ti';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
-// import { dateFormatted } from '../../../../utils/helpers';
+import { dateFormatted } from '../../../../utils/helpers';
+import RenderChurchOffcanvas from '../renderChurchOffcanvas';
 
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [show, setShow] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const {
-    data,
-    error,
-    loading,
-    totalCount,
-    handleFetchChurches,
-    handleReset,
-    handleSelect,
-    viewData
-  } = useAdmin(debouncedSearchQuery);
+  const { data, error, loading, totalCount, handleFetchChurches, handleReset, handleSelect, viewData } =
+    useAdmin(debouncedSearchQuery);
 
   const handleClose = () => {
     handleReset();
@@ -46,6 +39,7 @@ const Page = () => {
     () => [
       {
         Header: 'Church',
+        sortType: 'basic',
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
             <img
@@ -63,11 +57,11 @@ const Page = () => {
           </div>
         )
       },
-      // {
-      //   Header: 'Date',
-      //   accessor: 'createdAt',
-      //   Cell: ({ value }) => <div className="d-flex align-items-center">{dateFormatted(value)}</div>
-      // },
+      {
+        Header: 'Date',
+        accessor: 'createdAt',
+        Cell: ({ value }) => <div className="d-flex align-items-center">{dateFormatted(value)}</div>
+      },
       { Header: 'Mobile', accessor: 'mobile', sortType: 'basic' },
       { Header: 'Email', accessor: 'email' },
       { Header: 'Plan', accessor: 'plan' },
@@ -128,7 +122,7 @@ const Page = () => {
       </div>
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
-
+      <RenderChurchOffcanvas show={show} handleClose={handleClose} data={viewData} />
     </>
   );
 };

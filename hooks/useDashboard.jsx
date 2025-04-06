@@ -3,20 +3,14 @@ import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { DASHBOARD } from '../utils/apiUrl';
 
-interface Initialize {
-  data: [] | null;
-  loading: boolean;
-  error: null | string;
-}
-
 const useDashboard = () => {
-  const [state, setState] = useState<Initialize>({
-    data: null,
+  const [state, setState] = useState({
+    data: [],
     loading: false,
     error: null
   });
 
-  const handleError = (error: string) => {
+  const handleError = (error) => {
     setState((pre) => {
       return { ...pre, error: error, loading: false };
     });

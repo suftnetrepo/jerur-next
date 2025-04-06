@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { INTEGRATOR, USER } from '../utils/apiUrl';
-import { integratorValidator } from '../app/protected/integrator/rules';
+import { integratorValidator } from '../app/protected/church/rules';
 
 const useSettings = () => {
   const [state, setState] = useState({

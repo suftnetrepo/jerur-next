@@ -7,8 +7,6 @@ const RenderUserOffcanvas = ({ show, handleClose, userData, handleSaveUser, hand
   const [errorMessages, setErrorMessages] = useState({});
   const [fields, setFields] = useState(userValidator.fields);
 
-  console.log("........................userData", userData)
-
   useEffect(() => {
     setFields((pre) => {
       return {
