@@ -36,7 +36,7 @@ export const GET = async (req) => {
     }
 
     if (action === 'aggregate') {
-      const { data } = await getAggregateChurchStatus();
+      const data = await getAggregateChurchStatus();
       return NextResponse.json({ data, success: true });
     }
 
@@ -48,30 +48,30 @@ export const GET = async (req) => {
 
     if (action === 'byIdentifier') {
       const identifier = url.searchParams.get('identifier');
-      const { data } = await getChurchByIdentifier(identifier);
+      const data = await getChurchByIdentifier(identifier);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'byId') {
       const id = url.searchParams.get('id');
-      const { data } = await getChurchById(id);
+      const data = await getChurchById(id);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'byName') {
       const name = url.searchParams.get('name');
-      const { data } = await getChurchesByName(name);
+      const data = await getChurchesByName(name);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'recent') {
       const limit = url.searchParams.get('limit');
-      const { data } = await getRecentChurches(limit);
+      const data = await getRecentChurches(limit);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'weekly') {
-      const { data } = await getWeeklyChurchSignOnData();
+      const data = await getWeeklyChurchSignOnData();
       return NextResponse.json({ data, success: true });
     }
 

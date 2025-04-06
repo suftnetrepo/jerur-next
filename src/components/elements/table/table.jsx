@@ -41,44 +41,50 @@ function Table({ data, columns, pageCount: controlledPageCount, fetchData }) {
       <div className="table-responsive">
         <table {...getTableProps()} className="table table-bordered table-striped">
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                    {column.render('Header')}
-                    <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? ' 🔽' // Descending
-                          : ' 🔼' // Ascending
-                        : 
-                        ' ⬍'}
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
+            {headerGroups.map(headerGroup => {
+              const headerGroupProps = headerGroup.getHeaderGroupProps();
               return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                  ))}
+                <tr key={headerGroupProps.key} {...headerGroupProps}>
+                  {headerGroup.headers.map(column => {
+                    // Get the props without the key
+                    const headerProps = column.getHeaderProps(column.getSortByToggleProps());
+                    // Extract the key
+                    const { key, ...restHeaderProps } = headerProps;
+                    
+                    return (
+                      <th key={key} {...restHeaderProps}>
+                        {column.render('Header')}
+                        <span>
+                          {column.isSorted
+                            ? column.isSortedDesc
+                              ? ' 🔽' // Descending
+                              : ' 🔼' // Ascending
+                            : ' ⬍'}
+                        </span>
+                      </th>
+                    );
+                  })}
                 </tr>
               );
             })}
-            {/* <tr>
-              <td colSpan="10000">
-                {loading ? (
-                  <div className="text-center">Loading...</div>
-                ) : (
-                  `Showing ${page.length} of ~${controlledPageCount * pageSize} results`
-                )}
-              </td>
-            </tr> */}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {page.map(row => {
+              prepareRow(row);
+              const rowProps = row.getRowProps();
+              return (
+                <tr key={rowProps.key} {...rowProps}>
+                  {row.cells.map(cell => {
+                    const cellProps = cell.getCellProps();
+                    return (
+                      <td key={cellProps.key} {...cellProps}>
+                        {cell.render('Cell')}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

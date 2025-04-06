@@ -1,4 +1,4 @@
-import Church from '../models';
+import Church from '../models/church';
 import { identifierValidator } from '../validation/identifierValidator';
 import {
   contactValidator,
