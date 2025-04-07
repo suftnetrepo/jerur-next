@@ -42,7 +42,7 @@ export const GET = async (req) => {
 
     if (action === 'countryCode') {
       const countryCode = url.searchParams.get('countryCode');
-      const { data } = await getChurchesByCountryCode(countryCode);
+      const data  = await getChurchesByCountryCode(countryCode);
       return NextResponse.json({ data, success: true });
     }
 
@@ -77,7 +77,7 @@ export const GET = async (req) => {
 
     return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

@@ -61,7 +61,7 @@ const LoginForm = () => {
       redirectPath = returnUrl;
       router.push(returnUrl);
     } else {
-      router.push('/protected/admin/dashboard');
+      router.push('/protected/church/dashboard');
     }
   };
 
