@@ -53,7 +53,7 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <span className="d-block">Members</span>
-                    <span className="fs-16 fw-semibold">{memberCount?.activeCount}</span>
+                    <span className="fs-16 fw-semibold">{memberCount}</span>
                   </div>
                 </div>
                 <div>
