@@ -264,7 +264,7 @@ const generateMembersForChurch = (churchId) => {
         first_name: faker.person.firstName(),
         last_name: faker.person.lastName(),
         mobile: faker.phone.number(),
-        user_status: faker.datatype.boolean(),
+        status: faker.helpers.arrayElement(["active", "provisional", "inactive", "under discipline"]),
         email: faker.internet.email(),
         pin: faker.number.int({ min: 1000, max: 9999 }),
         role: faker.helpers.arrayElement(['member', 'volunteer', 'leader', 'pastor'])

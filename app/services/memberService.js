@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { memberValidator, pinValidator, loginValidator } from '../validation/userValidator';
 import { identifierValidator } from '../validation/identifierValidator';
-import Member from '../models';
-import { config } from '../configs';
+import Member from '../models/member';
+import { config } from '../../config';
 import { logger } from '../../utils/logger';
-import { sendGridMail } from '../lib/mail';
-import { compileEmailTemplate } from '../util/compile-email-template';
-import { sendVerificationCode } from './pushNotificationService';
+import { sendEmail } from '../../lib/mail';
+import { emailTemplates } from '../email';
+import { compileEmailTemplate } from '../templates/compile-email-template';
 import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
@@ -24,7 +24,7 @@ const generateToken = (currentUser, expiresIn) => {
       role,
       suid: currentUser.church._id
     },
-    config.JWT_SECRET,
+    process.env.JWT_SECRET,
     {
       expiresIn
     }
@@ -58,19 +58,19 @@ function getMembers( suid ) {
 }
 async function getMemberCount( suid ) {
   try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-    const members = await Member.find({ church: suid });
-    const activeCount = members.filter((member) => member.user_status)?.length;
+    // const identifierValidateResult = identifierValidator(suid);
+    // if (identifierValidateResult.length) {
+    //   const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+    //   error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+    //   throw error;
+    // }
+    const members = await Member.find({ });
+    const activeCount = members.filter((member) => member.status !=="inactive")?.length;
     const noneActiveCount = members?.length - activeCount;
 
     return { activeCount, noneActiveCount };
   } catch (error) {
-    logger.error('Error getting member count:', error);
+    console.error('Error getting member count:', error);
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
@@ -114,10 +114,10 @@ async function addMember(suid, body) {
     });
 
     if (!newUser) {
-      throw new ApolloError('create new member failed');
+      throw new Error('create new member failed');
     }
 
-    const token = generateToken(newUser, config.DURATION);
+    const token = generateToken(newUser, process.env.DURATION);
     return token;
   } catch (error) {
     logger.error(error);
@@ -153,7 +153,7 @@ async function addMemberManual(body) {
     });
 
     if (!newUser) {
-      throw new ApolloError('create new member failed');
+      throw new Error('create new member failed');
     }
 
     return newUser;
@@ -249,15 +249,14 @@ async function sendVerificationCode(member) {
 
     const { first_name, last_name, email } = member;
 
-    const template = await compileEmailTemplate({
-      fileName: 'codeVerification.mjml',
-      data: {
+    const template = await compileEmailTemplate(
+      emailTemplates.codeVerification({
         name: `${first_name} ${last_name}`,
-        code,
+        code: code,
         contact_email: process.env.CONTACT_EMAIL,
         team: process.env.TEAM
-      }
-    });
+      })
+    );
 
     const mailOptions = {
       from: process.env.USER_NAME,
@@ -267,7 +266,7 @@ async function sendVerificationCode(member) {
       html: template
     };
 
-    sendGridMail(mailOptions);
+    sendEmail(mailOptions);
     return true;
   } catch (error) {
     logger.error(error);
@@ -291,6 +290,16 @@ async function removeMember( suid , id) {
   }
 }
 
+const getRecentMembers = async (id, limit = 10) => {
+  try {
+    const recentMembers = await Member.find({ }).sort({ createdAt: -1 }).limit(limit);
+    return recentMembers;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error fetching recent members. Please try again.');
+  }
+};
+
 export {
   getMembers,
   removeMember,
@@ -300,5 +309,6 @@ export {
   addMember,
   verifyPin,
   getMemberCount,
-  addMemberManual
+  addMemberManual,
+  getRecentMembers
 };

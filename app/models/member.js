@@ -20,20 +20,13 @@ const memberSchema = new Schema(
       required: false,
       default: ''
     },
-    user_status: {
-      type: Boolean,
-      default: false
-    },
+    status: { type: String, enum: ["active", "provisional", "inactive", "under discipline"], required: true },
     email: { type: String, unique: true, lowercase: true },
     pin: {
       type: Number,
       default: 0
     },
-    role: {
-      type: String,
-      required: false,
-      default: ''
-    }   
+    role: { type: String, enum: ['member', 'volunteer', 'leader', 'pastor'], required: true }
   },
   { timestamps: true }
 )

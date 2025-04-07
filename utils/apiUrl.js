@@ -59,6 +59,14 @@ export const DASHBOARD = {
   chart: `${HOST}admin?action=chart`
 };
 
+export const CHURCH_DASHBOARD = {
+  paginate: `${HOST}church?action=paginate`,
+  aggregate: `${HOST}church?action=aggregate`,
+  recent: `${HOST}member?action=recent`,
+  memberCount: `${HOST}member?action=count`,
+  chart: `${HOST}church?action=chart`
+};
+
 export const STRIPE = {
   createCustomer: `${HOST}stripe/customer`,
   createSubscriber: `${HOST}stripe/subscriber`,
