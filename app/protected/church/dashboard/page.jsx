@@ -3,52 +3,40 @@
 import React, { useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 // import { getAggregate } from '../../../../utils/helpers';
-// import { useProjectDashboard } from '../../../../hooks/useProjectDashboard';
-// import {
-//   ProjectAnalysis,
-//   TotalInvested,
-//   NumberofInvested,
-//   Portfoliovalue,
-//   Returnsrate,
-//   UserAggregates
-// } from '../../../share/chart';
-// import RecentProjects from '../recentProjects';
+import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
+import {
+  ProjectAnalysis,
+  TotalInvested,
+  NumberofInvested,
+  Portfoliovalue,
+  Returnsrate,
+  UserAggregates
+} from '../../../share/chart';
+import RecentMembers from '../recentMembers';
 // import { useUser } from '../../../../hooks/useUser';
 
 const Dashboard = () => {
-  // const { handleAggregate, data } = useProjectDashboard();
+  const { recentData, memberCount } = useChurchDashboard();
 
-  // useEffect(() => {
-  //   handleAggregate();
-  // }, []);
+  console.log("............................memberCount", memberCount)
 
-  // const RenderChart = () => {
-  //   const { handleChartAggregate, data } = useProjectDashboard();
-  //   useEffect(() => {
-  //     handleChartAggregate();
-  //   }, []);
+  const RenderChart = (data) => {
+    return (
+      <div className="card-body">
+        <h5 className="card-title mb-2"></h5>
+        {/* <div>{data && <ProjectAnalysis data={data} />}</div> */}
+      </div>
+    );
+  };
 
-  //   return (
-  //     <div className="card-body">
-  //       <h5 className="card-title mb-2"></h5>
-  //       {/* <div>{data && <ProjectAnalysis data={data} />}</div> */}
-  //     </div>
-  //   );
-  // };
-
-  // const RenderUserRoleChart = () => {
-  //   const { handleAggregate, aggregateData } = useUser('');
-  //   useEffect(() => {
-  //     handleAggregate();
-  //   }, []);
-
-  //   return (
-  //     <div className="card-body">
-  //       <h5 className="card-title mb-2"></h5>
-  //       {/* <div>{aggregateData.length && <UserAggregates data={aggregateData} />}</div> */}
-  //     </div>
-  //   );
-  // };
+  const RenderUserRoleChart = (data) => {
+    return (
+      <div className="card-body">
+        <h5 className="card-title mb-2"></h5>
+        {/* <div>{aggregateData.length && <UserAggregates data={aggregateData} />}</div> */}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -64,13 +52,13 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="d-block">Total Projects</span>
-                    {/* <span className="fs-16 fw-semibold">{data?.totalProjects}</span> */}
+                    <span className="d-block">Members</span>
+                    <span className="fs-16 fw-semibold">{memberCount?.activeCount}</span>
                   </div>
                 </div>
                 <div>
                   <div id="total-investments">
-                    {/* <TotalInvested /> */}
+                    <TotalInvested />
                   </div>
                 </div>
               </div>
@@ -89,13 +77,13 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="d-block">Completed</span>
+                    <span className="d-block">Upcoming Events</span>
                     {/* <span className="fs-16 fw-semibold">{getAggregate(data?.statuses, 'Completed')}</span> */}
                   </div>
                 </div>
                 <div>
                   <div id="total-investments">
-                    {/* <NumberofInvested /> */}
+                    <NumberofInvested />
                   </div>
                 </div>
               </div>
@@ -114,7 +102,7 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="d-block">In Progress</span>
+                    <span className="d-block">Upcoming Events</span>
                     <span className="fs-16 fw-semibold">
                       {/* {getAggregate(data?.statuses, 'Progress')} */}
                       <i className="ti ti-arrow-narrow-up ms-1 text-success"></i>
@@ -123,7 +111,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <div id="portfolio-value">
-                    {/* <Portfoliovalue /> */}
+                    <Portfoliovalue />
                   </div>
                 </div>
               </div>
@@ -151,7 +139,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <div id="returns-rate">
-                    {/* <Returnsrate /> */}
+                    <Returnsrate />
                   </div>
                 </div>
               </div>
@@ -161,20 +149,16 @@ const Dashboard = () => {
       </div>
       <div className="row ms-1 me-1 mt-4 d-flex justify-content-between align-items-center">
         <div className="col-sm-6 col-lg-8  me-2">
-          <div className="card-body">
-            {/* <RenderChart /> */}
-          </div>
+          <div className="card-body">{/* <RenderChart /> */}</div>
         </div>
         <div className="col-sm-6 col-lg-3 d-flex justify-content-center align-items-center ">
-          <div className="card-body">
-            {/* <RenderUserRoleChart /> */}
-          </div>
+          <div className="card-body">{/* <RenderUserRoleChart /> */}</div>
         </div>
       </div>
       <div className="row ms-1 me-1 card mt-4">
-        <Card.Header className="ps-4">Recent Projects</Card.Header>
+        <Card.Header className="ps-4">Recent Members</Card.Header>
         <div className="card-body">
-          {/* <RecentProjects /> */}
+          <RecentMembers data={recentData} />
         </div>
       </div>
     </>

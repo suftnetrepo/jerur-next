@@ -1,4 +1,4 @@
-import { getMember, getMembers, getMemberCount } from '../../services/memberService';
+import { getMember, getMembers, getMemberCount, getRecentMembers } from '../../services/memberService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
 
@@ -17,6 +17,11 @@ export const GET = async (req) => {
 
     if (action === 'count') {
       const data = await getMemberCount(user?.church);
+      return NextResponse.json({ data, success: true });
+    }
+
+    if (action === 'recent') {
+      const data  = await getRecentMembers(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
