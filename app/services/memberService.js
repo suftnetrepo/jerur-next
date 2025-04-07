@@ -65,10 +65,7 @@ async function getMemberCount( suid ) {
     //   throw error;
     // }
     const members = await Member.find({ });
-    const activeCount = members.filter((member) => member.status !=="inactive")?.length;
-    const noneActiveCount = members?.length - activeCount;
-
-    return { activeCount, noneActiveCount };
+    return members?.length ;
   } catch (error) {
     console.error('Error getting member count:', error);
     throw new Error('An unexpected error occurred. Please try again.');

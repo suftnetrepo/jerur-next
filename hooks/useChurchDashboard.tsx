@@ -7,7 +7,7 @@ interface Initialize {
   recentData: [] | null | {};
   aggregateData: null | any;
   chartData: null | any;
-  memberCount: {};
+  memberCount: number;
   loading: boolean;
   error: null | string;
 }
@@ -17,7 +17,7 @@ const useChurchDashboard = () => {
     recentData: [],
     aggregateData: null,
     chartData: null,
-    memberCount: {},
+    memberCount: 0,
     loading: false,
     error: null
   });
