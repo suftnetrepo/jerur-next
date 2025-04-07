@@ -9,6 +9,6 @@ function sliderValidator(data) {
   return validator.validate(data, schema)
 }
 
-export default {
+export  {
   sliderValidator
 }
