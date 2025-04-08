@@ -16,9 +16,9 @@ import RecentMembers from '../recentMembers';
 // import { useUser } from '../../../../hooks/useUser';
 
 const Dashboard = () => {
-  const { recentData, memberCount } = useChurchDashboard();
+  const { recentData, memberCount, chartData } = useChurchDashboard();
 
-  console.log("............................memberCount", memberCount)
+  console.log("............................aggregateData", chartData)
 
   const RenderChart = (data) => {
     return (
@@ -29,11 +29,13 @@ const Dashboard = () => {
     );
   };
 
-  const RenderUserRoleChart = (data) => {
+  const RenderUserRoleChart = ({data}) => {
+
+    console.log("..........................data......", data)
     return (
       <div className="card-body">
         <h5 className="card-title mb-2"></h5>
-        {/* <div>{aggregateData.length && <UserAggregates data={aggregateData} />}</div> */}
+        <div>{data?.length && <UserAggregates data={data} />}</div>
       </div>
     );
   };
@@ -152,7 +154,7 @@ const Dashboard = () => {
           <div className="card-body">{/* <RenderChart /> */}</div>
         </div>
         <div className="col-sm-6 col-lg-3 d-flex justify-content-center align-items-center ">
-          <div className="card-body">{/* <RenderUserRoleChart /> */}</div>
+          <div className="card-body"><RenderUserRoleChart data={chartData} /></div>
         </div>
       </div>
       <div className="row ms-1 me-1 card mt-4">

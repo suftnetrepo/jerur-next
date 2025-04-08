@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { attendanceValidator } from '../validation/attendanceValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
@@ -8,7 +9,6 @@ mongoConnect();
 
 const add = async (body) => {
   try {
-
     const bodyErrors = attendanceValidator(body);
     if (bodyErrors.length) {
       const error = new Error(bodyErrors.map((it) => it.message).join(','));
@@ -44,14 +44,33 @@ async function remove(id) {
   }
 }
 
-const getAttendanceTrends = async (startDate, endDate, interval = 'week') => {
+const getAttendanceTrends = async (churchId) => {
   try {
+    const interval = 'week';
+    const now = new Date();
+
+    const fromDate = new Date(now);
+    fromDate.setHours(0, 0, 0, 0);
+
+    const toDate = new Date(now);
+    toDate.setDate(now.getDate() + 6);
+    toDate.setHours(23, 59, 59, 999);
+
+    const formatMap = {
+      day: '%Y-%m-%d',
+      week: '%Y-%U',
+      month: '%Y-%m'
+    };
+
+    const dateFormat = formatMap[interval] || formatMap['week'];
+
     return await Attendance.aggregate([
       {
         $match: {
+          church: new mongoose.Types.ObjectId(churchId),
           checkInTime: {
-            $gte: new Date(startDate),
-            $lte: new Date(endDate)
+            $gte: fromDate,
+            $lte: toDate
           }
         }
       },
@@ -59,33 +78,25 @@ const getAttendanceTrends = async (startDate, endDate, interval = 'week') => {
         $group: {
           _id: {
             $dateToString: {
-              format: {
-                day: "%Y-%m-%d",
-                week: "%Y-%U",
-                month: "%Y-%m"
-              }[interval],
-              date: "$checkInTime"
+              format: dateFormat,
+              date: '$checkInTime'
             }
           },
-          count: { $sum: 1 },
-          members: { 
-            $sum: { $cond: [{ $ifNull: ["$memberId", false] }, 1, 0] }
-          }
+          count: { $sum: 1 }
         }
       },
-      { $sort: { "_id": 1 } },
+      { $sort: { _id: 1 } },
       {
         $project: {
-          date: "$_id",
-          total: "$count",
-          members: 1,
-          guests: 1,
+          date: '$_id',
+          total: '$count',
+
           _id: 0
         }
       }
     ]);
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error generating attendance trends');
   }
 };
@@ -105,14 +116,14 @@ const getMemberAttendanceStats = async (memberId) => {
         $group: {
           _id: null,
           totalServicesAttended: { $sum: 1 },
-          firstAttendance: { $min: "$checkInTime" },
-          lastAttendance: { $max: "$checkInTime" },
+          firstAttendance: { $min: '$checkInTime' },
+          lastAttendance: { $max: '$checkInTime' },
           averagePerMonth: {
             $avg: {
               $dateDiff: {
-                startDate: "$checkInTime",
+                startDate: '$checkInTime',
                 endDate: new Date(),
-                unit: "month"
+                unit: 'month'
               }
             }
           }
@@ -120,13 +131,13 @@ const getMemberAttendanceStats = async (memberId) => {
       },
       {
         $lookup: {
-          from: "members",
-          localField: "memberId",
-          foreignField: "_id",
-          as: "memberDetails"
+          from: 'members',
+          localField: 'memberId',
+          foreignField: '_id',
+          as: 'memberDetails'
         }
       },
-      { $unwind: "$memberDetails" }
+      { $unwind: '$memberDetails' }
     ]);
   } catch (error) {
     logger.error(error);
@@ -147,32 +158,31 @@ const getServiceAttendanceSummary = async (serviceId) => {
       { $match: { serviceId: mongoose.Types.ObjectId(serviceId) } },
       {
         $group: {
-          _id: "$serviceId",
+          _id: '$serviceId',
           totalAttendees: { $sum: 1 },
-          members: { 
-            $sum: { 
-              $cond: [{ $ifNull: ["$memberId", false] }, 1, 0] 
+          members: {
+            $sum: {
+              $cond: [{ $ifNull: ['$memberId', false] }, 1, 0]
             }
           },
-          firstCheckIn: { $min: "$checkInTime" },
-          lastCheckIn: { $max: "$checkInTime" }
+          firstCheckIn: { $min: '$checkInTime' },
+          lastCheckIn: { $max: '$checkInTime' }
         }
       },
       {
         $lookup: {
-          from: "services",
-          localField: "_id",
-          foreignField: "_id",
-          as: "serviceDetails"
+          from: 'services',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'serviceDetails'
         }
       },
-      { $unwind: "$serviceDetails" }
+      { $unwind: '$serviceDetails' }
     ]);
   } catch (error) {
     logger.error(error);
     throw new Error('Error generating service summary');
   }
 };
-
 
 export { add, remove, getAttendanceTrends, getMemberAttendanceStats, getServiceAttendanceSummary };

@@ -12,7 +12,6 @@ async function comparePassword(password, hashString) {
   return bcrypt.compare(password, hashString);
 }
 
-
 const getAggregate = (data, status) => {
   {
     const result = (data || []).find((j) => j.status === status);
@@ -223,7 +222,7 @@ function convertTimestampToTime(timestamp) {
 
 const formatDateTime = (isoString) => {
   const date = new Date(isoString);
-  
+
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
   const day = String(date.getDate()).padStart(2, '0');
@@ -252,9 +251,7 @@ function formatCurrency(currencySymbol, amount) {
     return amount;
   }
 
-  const formattedAmount =
-    currencySymbol +
-    numericAmount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  const formattedAmount = currencySymbol + numericAmount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 
   return formattedAmount;
 }
@@ -275,7 +272,7 @@ function currencySymbolMapper(currencySymbol) {
     svc: 'svc',
     vef: 'vef',
     ltl: 'ltl',
-    sll: 'sll',
+    sll: 'sll'
   };
 
   if (currencySymbol in currencyMap) {
@@ -300,8 +297,8 @@ function checkAmount(amount) {
 
 function encrypt(text) {
   const iv = crypto.randomBytes(IV_LENGTH);
-  const keyBuffer = Buffer.from(process.env.ENCRYPTION_KEY, 'hex'); 
-  const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv); 
+  const keyBuffer = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+  const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv);
   let encrypted = cipher.update(text);
 
   encrypted = Buffer.concat([encrypted, cipher.final()]);

@@ -9,6 +9,7 @@ import Fellowship from '../../models/fellowship';
 import Member from '../../models/member';
 import ServiceTime from '../../models/serviceTime';
 import Testimonies from '../../models/testimonies';
+import Attendance from '../../models/attendance';
 
 import { NextResponse } from 'next/server';
 import { mongoConnect } from '../../../utils/connectDb';
@@ -33,6 +34,7 @@ const clearSeeds = async () => {
     await Church.deleteMany({});
     await User.deleteMany({});
     await Campaign.deleteMany({});
+    await Attendance.deleteMany({});
     await Donation.deleteMany({});
     await Event.deleteMany({});
     await Fellowship.deleteMany({});
@@ -264,7 +266,7 @@ const generateMembersForChurch = (churchId) => {
         first_name: faker.person.firstName(),
         last_name: faker.person.lastName(),
         mobile: faker.phone.number(),
-        status: faker.helpers.arrayElement(["active", "provisional", "inactive", "under discipline"]),
+        status: faker.helpers.arrayElement(['active', 'provisional', 'inactive', 'under discipline']),
         email: faker.internet.email(),
         pin: faker.number.int({ min: 1000, max: 9999 }),
         role: faker.helpers.arrayElement(['member', 'volunteer', 'leader', 'pastor'])
@@ -385,6 +387,50 @@ const generateDonationsForChurch = (churchId) => {
   return donations;
 };
 
+const generateAttendanceForChurch = (churchId, members, serviceTimes) => {
+  const allowedDays = [0, 2, 5, 6]; // Sun, Tue, Fri, Sat
+  const attendances = [];
+
+  const seenCombos = new Set(); // To prevent duplicates
+
+  members.forEach((member) => {
+    let count = 0;
+
+    while (count < 5) {
+      let date;
+      do {
+        date = faker.date.soon({ days: faker.number.int({ min: 1, max: 60 }) });
+      } while (!allowedDays.includes(date.getDay()));
+
+      // Normalize to 10AM-ish
+      date.setHours(faker.number.int({ min: 8, max: 11 }), 0, 0, 0);
+
+      const service = faker.helpers.arrayElement(serviceTimes);
+
+      const dateKey = date.toISOString(); // format for uniqueness
+
+      const key = `${service._id.toString()}_${dateKey}_${churchId.toString()}`;
+
+      if (seenCombos.has(key)) continue;
+
+      seenCombos.add(key);
+
+      attendances.push(
+        new Attendance({
+          church: churchId,
+          memberId: member._id,
+          service: service._id,
+          checkInTime: date
+        })
+      );
+
+      count++;
+    }
+  });
+
+  return attendances;
+};
+
 const seedDatabase = async () => {
   try {
     const churches = Array.from({ length: 5 }, () => generateRandomChurch());
@@ -413,6 +459,15 @@ const seedDatabase = async () => {
 
     const donations = savedChurches.flatMap((church) => generateDonationsForChurch(church._id));
     await Donation.insertMany(donations);
+
+    const attendances = savedChurches.flatMap((church) => {
+      const churchMembers = members.filter((m) => m.church == church._id.toString());
+
+      const churchServiceTimes = serviceTimes.filter((s) => s.suid == church._id.toString());
+
+      return generateAttendanceForChurch(church._id, churchMembers, churchServiceTimes);
+    });
+    await Attendance.insertMany(attendances);
 
     console.log('10 Users and 5 Churches successfully inserted');
   } catch (error) {
