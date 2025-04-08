@@ -23,7 +23,7 @@ export const CATEGORY = {
   createOne: `${HOST}categories`,
   updateOne: `${HOST}categories`,
   removeOne: `${HOST}categories`,
-  fetch: `${HOST}categories`,
+  fetch: `${HOST}categories`
 };
 
 export const INVOICE = {
@@ -64,7 +64,8 @@ export const CHURCH_DASHBOARD = {
   aggregate: `${HOST}church?action=aggregate`,
   recent: `${HOST}member?action=recent`,
   memberCount: `${HOST}member?action=count`,
-  chart: `${HOST}church?action=chart`
+  chart: `${HOST}member?action=chart`,
+  trent: `${HOST}attendance?action=trent`
 };
 
 export const STRIPE = {

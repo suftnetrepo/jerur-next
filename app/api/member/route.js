@@ -1,11 +1,11 @@
-import { getMember, getMembers, getMemberCount, getRecentMembers } from '../../services/memberService';
+import { getMember, getMembers, getMemberCount, getRecentMembers, aggregateMemberByRole } from '../../services/memberService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
 
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
@@ -28,6 +28,11 @@ export const GET = async (req) => {
     if (action === 'get') {
       const id = url.searchParams.get('id');
       const data = await getMember(id);
+      return NextResponse.json({ data, success: true });
+    }
+
+    if (action === 'chart') {
+      const data = await aggregateMemberByRole(user?.church);
       return NextResponse.json({ data, success: true });
     }
 

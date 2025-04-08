@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose'
 import { memberValidator, pinValidator, loginValidator } from '../validation/userValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import Member from '../models/member';
-import { config } from '../../config';
 import { logger } from '../../utils/logger';
 import { sendEmail } from '../../lib/mail';
 import { emailTemplates } from '../email';
@@ -297,7 +297,34 @@ const getRecentMembers = async (id, limit = 10) => {
   }
 };
 
+const aggregateMemberByRole = async (church) => {
+  try {
+    const data = await Member.aggregate([
+      { $match: { church: new mongoose.Types.ObjectId(church) } },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          role: '$_id',
+          count: 1,
+          _id: 0
+        }
+      }
+    ]);
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Error aggregating user data. Please try again.');
+  }
+};
+
 export {
+  aggregateMemberByRole,
   getMembers,
   removeMember,
   updateMember,

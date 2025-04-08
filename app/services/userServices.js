@@ -1,4 +1,5 @@
 import User from './../models/user';
+import mongoose from 'mongoose'
 import Church from './../models/church';
 import { logger } from '../../utils/logger';
 import { userValidator, userEditValidator } from '@/validator';
@@ -220,10 +221,10 @@ async function searchUsers(searchTerm) {
   }
 }
 
-const aggregateUserDataByRole = async (integratorId) => {
+const aggregateUserDataByRole = async (church) => {
   try {
     const data = await User.aggregate([
-      { $match: { integrator: new mongoose.Types.ObjectId(integratorId) } },
+      { $match: { church: new mongoose.Types.ObjectId(church) } },
       {
         $group: {
           _id: '$role',
@@ -241,7 +242,7 @@ const aggregateUserDataByRole = async (integratorId) => {
 
     return data;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error aggregating user data. Please try again.');
   }
 };

@@ -11,9 +11,8 @@ const AttendanceSchema = new Schema(
   { timestamps: true },
 );
 
-AttendanceSchema.createIndex(
-  { service: 1, memberId: 1, church :1},
-  { unique: true, partialFilterExpression: { memberId: { $exists: true } } }
+AttendanceSchema.index(
+  { church: 1 },
 );
 
 const Attendance = mongoose.models.Attendance || mongoose.model('Attendance', AttendanceSchema);

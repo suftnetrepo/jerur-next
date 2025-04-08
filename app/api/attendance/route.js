@@ -5,18 +5,18 @@ import {
 } from '../../services/attendanceService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
+    const user = await getUserSession(req);
     const url = new URL(req.url);
-
     const action = url.searchParams.get('action');
 
     if (action === 'trent') {
-      const startDate = url.searchParams.get('startDate');
-      const endDate = url.searchParams.get('endDate');
-      const interval = url.searchParams.get('interval');
-      const data = await getAttendanceTrends(startDate, endDate, interval);
+      const data = await getAttendanceTrends(user.church);
+
+      console.log(".....................data..........", data)
       return NextResponse.json({ data, success: true });
     }
 
@@ -32,7 +32,7 @@ export const GET = async (req) => {
       return NextResponse.json({ data, success: true });
     }
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

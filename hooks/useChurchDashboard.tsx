@@ -7,6 +7,7 @@ interface Initialize {
   recentData: [] | null | {};
   aggregateData: null | any;
   chartData: null | any;
+  trentData: null | any;
   memberCount: number;
   loading: boolean;
   error: null | string;
@@ -17,6 +18,7 @@ const useChurchDashboard = () => {
     recentData: [],
     aggregateData: null,
     chartData: null,
+    trentData: null,
     memberCount: 0,
     loading: false,
     error: null
@@ -46,6 +48,8 @@ const useChurchDashboard = () => {
 
   const handleMemberCount = async () => fetchDataHandler(CHURCH_DASHBOARD.memberCount, 'memberCount');
 
+  const handleAttendanceTrent = async () => fetchDataHandler(CHURCH_DASHBOARD.trent, 'trentData');
+
   const fetchAll = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
@@ -53,7 +57,8 @@ const useChurchDashboard = () => {
         handleRecent(),
         handleAggregate(),
         handleChartAggregate(),
-        handleMemberCount()
+        handleMemberCount(),
+        handleAttendanceTrent()
       ]);
 
       const hasError = results.some((result) => !result.success);

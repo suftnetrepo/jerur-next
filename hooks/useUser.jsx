@@ -111,6 +111,7 @@ const useUser = (searchQuery) => {
 
     try {
       const { data, success, errorMessage, totalCount } = await zat(USER.fetch, null, VERBS.GET, {
+        action:"getAll",
         page: pageIndex === 0 ? 1 : pageIndex,
         limit: pageSize,
         ...(sortField && { sortField }),
