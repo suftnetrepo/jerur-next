@@ -7,6 +7,10 @@ export const GET = async (req) => {
   try {
     const user = await getUserSession(req);
 
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
 

@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card } from 'react-bootstrap';
 // import { getAggregate } from '../../../../utils/helpers';
 import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
 import {
-  ProjectAnalysis,
   TotalInvested,
   NumberofInvested,
   Portfoliovalue,
@@ -13,25 +12,12 @@ import {
   UserAggregates
 } from '../../../share/chart';
 import RecentMembers from '../recentMembers';
-// import { useUser } from '../../../../hooks/useUser';
+import AttendanceAnalysis from '../chart/attendance_analysis'
 
 const Dashboard = () => {
-  const { recentData, memberCount, chartData } = useChurchDashboard();
-
-  console.log("............................aggregateData", chartData)
-
-  const RenderChart = (data) => {
-    return (
-      <div className="card-body">
-        <h5 className="card-title mb-2"></h5>
-        {/* <div>{data && <ProjectAnalysis data={data} />}</div> */}
-      </div>
-    );
-  };
+  const { recentData, memberCount, chartData, trentData } = useChurchDashboard();
 
   const RenderUserRoleChart = ({data}) => {
-
-    console.log("..........................data......", data)
     return (
       <div className="card-body">
         <h5 className="card-title mb-2"></h5>
@@ -151,7 +137,7 @@ const Dashboard = () => {
       </div>
       <div className="row ms-1 me-1 mt-4 d-flex justify-content-between align-items-center">
         <div className="col-sm-6 col-lg-8  me-2">
-          <div className="card-body">{/* <RenderChart /> */}</div>
+          <div className="card-body"> {trentData && <AttendanceAnalysis data={trentData} />}</div>
         </div>
         <div className="col-sm-6 col-lg-3 d-flex justify-content-center align-items-center ">
           <div className="card-body"><RenderUserRoleChart data={chartData} /></div>

@@ -17,6 +17,15 @@ import { mongoConnect } from '../../../utils/connectDb';
 mongoConnect();
 
 const UK_CITIES = ['London', 'Peterborough', 'Manchester', 'Birmingham', 'Leeds'];
+const dayToNumber = {
+  Sunday: 0,
+  Monday: 1,
+  Tuesday: 2,
+  Wednesday: 3,
+  Thursday: 4,
+  Friday: 5,
+  Saturday: 6
+};
 
 export async function GET() {
   try {
@@ -136,6 +145,7 @@ const generateServiceTimesForChurch = (churchId) => {
   const serviceTimes = [];
 
   days.forEach((day, index) => {
+    const dayNumber = dayToNumber[day];
     const startHour = 9 + index * 2; // e.g., 9, 11, 13
     const endHour = startHour + 2;
 
@@ -150,6 +160,7 @@ const generateServiceTimesForChurch = (churchId) => {
         remote: faker.datatype.boolean(),
         remote_link: faker.internet.url(),
         sequency_no: index + 1,
+        days: [dayNumber],
         agenda: Array.from({ length: 3 }, (_, i) => ({
           title: faker.lorem.words(3),
           start_time: `${startHour + i}:00`,
@@ -387,44 +398,45 @@ const generateDonationsForChurch = (churchId) => {
   return donations;
 };
 
-const generateAttendanceForChurch = (churchId, members, serviceTimes) => {
-  const allowedDays = [0, 2, 5, 6]; // Sun, Tue, Fri, Sat
+const generateAttendanceForChurch = (churchId, serviceTimes, options = {}) => {
+  const { lookbackDays = 30 } = options;
   const attendances = [];
+  const today = new Date();
+  
+  // Create a map to track used dates for each day of week
+  const usedDates = new Map();
+  
+  serviceTimes.forEach((service) => {
+    if (!Array.isArray(service.days) || service.days.length === 0) return;
 
-  const seenCombos = new Set(); // To prevent duplicates
+    const targetDay = service.days[0];
+    
+    // Find an available date for this service day that hasn't been used yet
+    for (let i = 0; i < lookbackDays; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      
+      if (date.getDay() === targetDay && !usedDates.has(date.toDateString())) {
+        const [startHourStr, startMinuteStr = '00'] = service.start_time.split(':');
+        const hour = parseInt(startHourStr, 10);
+        const minute = parseInt(startMinuteStr, 10);
 
-  members.forEach((member) => {
-    let count = 0;
+        const randomOffset = faker.number.int({ min: -10, max: 10 });
 
-    while (count < 5) {
-      let date;
-      do {
-        date = faker.date.soon({ days: faker.number.int({ min: 1, max: 60 }) });
-      } while (!allowedDays.includes(date.getDay()));
+        const checkInTime = new Date(date);
+        checkInTime.setHours(hour, minute + randomOffset, 0, 0);
 
-      // Normalize to 10AM-ish
-      date.setHours(faker.number.int({ min: 8, max: 11 }), 0, 0, 0);
-
-      const service = faker.helpers.arrayElement(serviceTimes);
-
-      const dateKey = date.toISOString(); // format for uniqueness
-
-      const key = `${service._id.toString()}_${dateKey}_${churchId.toString()}`;
-
-      if (seenCombos.has(key)) continue;
-
-      seenCombos.add(key);
-
-      attendances.push(
-        new Attendance({
+        const attendance = new Attendance({
           church: churchId,
-          memberId: member._id,
           service: service._id,
-          checkInTime: date
-        })
-      );
+          checkInTime,
+          count: faker.number.int({ min: 1, max: 10 })
+        });
 
-      count++;
+        attendances.push(attendance);
+        usedDates.set(date.toDateString(), true); // Mark this date as used
+        break;
+      }
     }
   });
 
@@ -460,13 +472,7 @@ const seedDatabase = async () => {
     const donations = savedChurches.flatMap((church) => generateDonationsForChurch(church._id));
     await Donation.insertMany(donations);
 
-    const attendances = savedChurches.flatMap((church) => {
-      const churchMembers = members.filter((m) => m.church == church._id.toString());
-
-      const churchServiceTimes = serviceTimes.filter((s) => s.suid == church._id.toString());
-
-      return generateAttendanceForChurch(church._id, churchMembers, churchServiceTimes);
-    });
+    const attendances = savedChurches.flatMap((church) => generateAttendanceForChurch(church._id, serviceTimes));
     await Attendance.insertMany(attendances);
 
     console.log('10 Users and 5 Churches successfully inserted');
