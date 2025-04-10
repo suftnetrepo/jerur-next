@@ -44,6 +44,11 @@ const ServiceTimeSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
+    days: {
+      type: [Number],
+      enum: [0, 1, 2, 3, 4, 5, 6],
+      required: true
+    },
     agenda: [
       {
         title: {

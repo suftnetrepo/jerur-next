@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { attendanceValidator } from '../validation/attendanceValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
+import ServiceTime from '../models/serviceTime';
 import Attendance from '../models/attendance';
 import { mongoConnect } from '@/utils/connectDb';
 
@@ -16,12 +17,34 @@ const add = async (body) => {
       throw error;
     }
 
-    const newAttendance = new Attendance({
-      ...body
+    const { church, service, checkInTime, count = 1 } = body;
+
+    const startOfDay = new Date(checkInTime);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(checkInTime);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const existing = await Attendance.findOne({
+      church,
+      service,
+      checkInTime: { $gte: startOfDay, $lte: endOfDay }
     });
 
-    const result = await newAttendance.save();
-    return result;
+    if (existing) {
+      existing.count += count;
+      const updated = await existing.save();
+      return updated;
+    } else {
+      const newAttendance = new Attendance({
+        church,
+        service,
+        checkInTime,
+        count
+      });
+      const result = await newAttendance.save();
+      return result;
+    }
   } catch (error) {
     logger.error(error);
     throw new Error('Error adding attendance');
@@ -46,58 +69,33 @@ async function remove(id) {
 
 const getAttendanceTrends = async (churchId) => {
   try {
-    const interval = 'week';
     const now = new Date();
-
-    const fromDate = new Date(now);
-    fromDate.setHours(0, 0, 0, 0);
-
-    const toDate = new Date(now);
-    toDate.setDate(now.getDate() + 6);
-    toDate.setHours(23, 59, 59, 999);
-
-    const formatMap = {
-      day: '%Y-%m-%d',
-      week: '%Y-%U',
-      month: '%Y-%m'
-    };
-
-    const dateFormat = formatMap[interval] || formatMap['week'];
-
-    return await Attendance.aggregate([
-      {
-        $match: {
-          church: new mongoose.Types.ObjectId(churchId),
-          checkInTime: {
-            $gte: fromDate,
-            $lte: toDate
-          }
+      const startDate = new Date(now);
+      const dayOfWeek = now.getDay(); 
+      startDate.setDate(now.getDate() - dayOfWeek); 
+      startDate.setHours(0, 0, 0, 0); 
+    
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 6); 
+      endDate.setHours(23, 59, 59, 999); 
+    
+      const results = await Attendance.find({
+        church: churchId,
+        checkInTime: {
+          $gte: startDate,
+          $lte: endDate
         }
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: {
-              format: dateFormat,
-              date: '$checkInTime'
-            }
-          },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { _id: 1 } },
-      {
-        $project: {
-          date: '$_id',
-          total: '$count',
-
-          _id: 0
-        }
-      }
-    ]);
+      })
+      .sort({ checkInTime: 1 })
+      .populate({
+        path: 'service',
+        select: 'title' 
+      });
+    
+    return results;
   } catch (error) {
-    console.error(error);
-    throw new Error('Error generating attendance trends');
+    console.error('Error filtering attendance records:', error);
+    throw error;
   }
 };
 
