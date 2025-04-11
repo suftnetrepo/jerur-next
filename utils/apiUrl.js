@@ -114,10 +114,10 @@ export const TEAM = {
   removeOne: `${HOST}project_team/`
 };
 
-export const TASK = {
-  createOne: `${HOST}task`,
-  updateOne: `${HOST}task`,
-  fetchOne: `${HOST}task/`,
-  fetch: `${HOST}task/`,
-  removeOne: `${HOST}task/`
+export const REGULAR_SERVICE = {
+  createOne: `${HOST}regularService`,
+  updateOne: `${HOST}regularService`,
+  fetchOne: `${HOST}regularService/`,
+  fetch: `${HOST}regularService/`,
+  removeOne: `${HOST}regularService/`
 };

@@ -30,29 +30,32 @@ export default function SidebarNav() {
   );
 }
 
-const IntegratorSidebarNav = () => {
+const ChurchSidebarNav = () => {
   return (
     <ul className="list-unstyled mt-4">
-      <SidebarNavItem icon={faGauge} href="/protected/integrator/dashboard">
+      <SidebarNavItem icon={faGauge} href="/protected/church/dashboard">
         Dashboard
       </SidebarNavItem>
-      <SidebarNavItem icon={faProjectDiagram} href="/protected/integrator/project">
-        Projects
+      <SidebarNavItem icon={faMoneyCheck} href="/protected/church/member">
+        Member
       </SidebarNavItem>
-      <SidebarNavItem icon={faMoneyCheck} href="/protected/integrator/invoice">
-        Invoices
+      <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-services">
+        Regular Service
       </SidebarNavItem>
-      <SidebarNavItem icon={faBuildingUser} href="/protected/integrator/user">
-        Users
+      <SidebarNavItem icon={faMoneyCheck} href="/protected/church/event-schedule">
+        Event calendar
       </SidebarNavItem>
-      <SidebarNavItem icon={faComment} href="/protected/integrator/chat">
-        Chat
+      <SidebarNavItem icon={faMoneyCheck} href="/protected/church/fellowship">
+        Fellowship
       </SidebarNavItem>
-      <SidebarNavItem icon={faCogs} href="/protected/integrator/settings">
-        Settings
+      <SidebarNavItem icon={faBuildingUser} href="/protected/church/user">
+        User
+      </SidebarNavItem>
+      <SidebarNavItem icon={faCogs} href="/protected/church/settings">
+        Setting
       </SidebarNavItem>
     </ul>
   );
 };
 
-export { IntegratorSidebarNav };
+export { ChurchSidebarNav };

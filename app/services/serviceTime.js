@@ -1,4 +1,4 @@
-import ServiceTime from '../models';
+import ServiceTime from '../models/serviceTime';
 import { identifierValidator } from '../validation/identifierValidator';
 import { serviceTimeValidator } from '../validation/serviceTimeValidator';
 import { logger } from '../../utils/logger';
@@ -67,10 +67,10 @@ async function deleteServiceTime(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    await ServiceTime.findByIdAndRemove(id);
+    await ServiceTime.findByIdAndDelete(id);
     return true;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error deleting service time');
   }
 }

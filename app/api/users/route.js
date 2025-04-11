@@ -32,7 +32,7 @@ export const GET = async (req) => {
       return NextResponse.json({ data, success: true, totalCount }, { status: 200 });
     }
   } catch (error) {
-    console.log(error);
+    logger.log(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

@@ -318,9 +318,16 @@ function decrypt(text) {
   return decrypted.toString();
 }
 
+const normalizeTime = (timeStr) => {
+  const [h, m] = timeStr.split(':');
+  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+};
+
+
 const generateKey = () => crypto.randomBytes(32).toString('hex');
 
 export {
+  normalizeTime,
   encrypt,
   decrypt,
   generateKey,

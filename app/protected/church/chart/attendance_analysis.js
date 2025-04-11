@@ -158,7 +158,7 @@ const AttendanceAnalysis = ({ data }) => {
       <Row>
         <Col>
           {chartLoaded && <Chart options={chartData.options} series={chartData.series} type="bar" height={350} />}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <div className='pb-4' style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             {Object.entries(DAY_COLORS).map(([day, color]) => (
               <div key={day} style={{ display: 'flex', alignItems: 'center' }}>
                 <div
