@@ -1,11 +1,15 @@
 import { addServiceTime, editServiceTime, deleteServiceTime, getAllServiceTimes } from '../../services/serviceTime';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const url = new URL(req.url);
     const status = url.searchParams.get('status');
     const data = await getAllServiceTimes(user?.church, status);
@@ -38,15 +42,18 @@ export const PUT = async (req) => {
     const updated = await editServiceTime(id, body);
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };
 
 export const POST = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await req.json();
 
     const result = await addServiceTime(user?.church, body);

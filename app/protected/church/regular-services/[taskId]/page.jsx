@@ -4,8 +4,8 @@ import React, { useState, Suspense } from 'react';
 import { validate } from '../../../../../validator/validator';
 import { taskValidator } from '../../rules';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useTaskEdit } from '../../../../../hooks/useTask';
-import TaskForm from '../taskForm';
+import { useTaskEdit } from '../../../../../hooks/useRegularService';
+import TaskForm from '../form';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
 
 const EditForm = () => {

@@ -3,7 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import { validate } from '../../../../../validator/validator';
 import { taskValidator } from '../../rules';
-import { useTaskEdit } from '../../../../../hooks/useTask';
+import { useTaskEdit } from '../../../../../hooks/useRegularService';
 import { ConfirmationDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
@@ -11,7 +11,7 @@ import Button from 'react-bootstrap/Button';
 import { MdArrowBack } from 'react-icons/md';
 import dynamic from 'next/dynamic';
 
-const TaskForm = dynamic(() => import('../taskForm'), { ssr: false });
+const TaskForm = dynamic(() => import('../form'), { ssr: false });
 
 const TaskCreateContent = () => {
   const router = useRouter();

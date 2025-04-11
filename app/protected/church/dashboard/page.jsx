@@ -4,31 +4,16 @@ import React from 'react';
 import { Card } from 'react-bootstrap';
 // import { getAggregate } from '../../../../utils/helpers';
 import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
-import {
-  TotalInvested,
-  NumberofInvested,
-  Portfoliovalue,
-  Returnsrate,
-  UserAggregates
-} from '../../../share/chart';
+import { TotalInvested, NumberofInvested, Portfoliovalue, Returnsrate, UserAggregates } from '../../../share/chart';
 import RecentMembers from '../recentMembers';
-import AttendanceAnalysis from '../chart/attendance_analysis'
+import AttendanceAnalysis from '../chart/attendance_analysis';
 
 const Dashboard = () => {
   const { recentData, memberCount, chartData, trentData } = useChurchDashboard();
 
-  const RenderUserRoleChart = ({data}) => {
-    return (
-      <div className="card-body">
-        <h5 className="card-title mb-2"></h5>
-        <div>{data?.length && <UserAggregates data={data} />}</div>
-      </div>
-    );
-  };
-
   return (
     <>
-      <div className="row ms-1 me-1">
+      <div className="row p-1">
         <div className="col-sm-6 col-lg-3">
           <Card className=" py-3 px-3">
             <Card.Body>
@@ -135,14 +120,16 @@ const Dashboard = () => {
           </Card>
         </div>
       </div>
-      <div className="row ms-1 me-1 mt-4 d-flex justify-content-between align-items-center">
-        <div className="col-sm-6 col-lg-8  me-2">
+      <div className="row ms-1 me-1 mt-4 ">
+        <div className="col-sm-6 col-md-7 card me-2 d-flex justify-content-start">
+          <Card.Header className="ps-4">Service Attendance  </Card.Header>
           <div className="card-body"> {trentData && <AttendanceAnalysis data={trentData} />}</div>
         </div>
-        <div className="col-sm-6 col-lg-3 d-flex justify-content-center align-items-center ">
-          <div className="card-body"><RenderUserRoleChart data={chartData} /></div>
+        <div className="col-sm-6 col-md-4 card d-flex h-auto justify-content-center align-items-center ">
+          {chartData?.length && <UserAggregates data={chartData} />}
         </div>
       </div>
+
       <div className="row ms-1 me-1 card mt-4">
         <Card.Header className="ps-4">Recent Members</Card.Header>
         <div className="card-body">

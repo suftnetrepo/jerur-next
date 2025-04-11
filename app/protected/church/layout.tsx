@@ -4,7 +4,7 @@ import React from 'react';
 import SidebarProvider from '../../../src/components/layouts/SidebarProvider';
 import SidebarOverlay from '../../../src/components/layouts/Sidebar/SidebarOverlay';
 import Sidebar from '../../../src/components/layouts/Sidebar/Sidebar';
-import { IntegratorSidebarNav } from '../../../src/components/layouts/Sidebar/SidebarNav';
+import { ChurchSidebarNav } from '../../../src/components/layouts/Sidebar/SidebarNav';
 import Header from '../../../src/components/layouts/Header/Header';
 import Footer from '../../../src/components/layouts/Footer/Footer';
 import { config } from '@fortawesome/fontawesome-svg-core';
@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <SidebarOverlay />
       <Sidebar>
-        <IntegratorSidebarNav />
+        <ChurchSidebarNav />
       </Sidebar>
 
       <div className="wrapper d-flex flex-column min-vh-100">
