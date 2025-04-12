@@ -67,3 +67,66 @@ export const regularServiceValidator = {
     remote_link: ''
   }
 };
+
+export const regularServiceAgendaValidator = {
+  rules: {
+    title: [
+      {
+        pattern: /^.+$/,
+        message: 'title is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'title must be no more than 50 characters'
+      }
+    ],
+    start_time: [
+      {
+        pattern: /^.+$/,
+        message: 'start time is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'star time must be no more than 10 characters'
+      }
+    ],
+    end_time: [
+      {
+        pattern: /^.+$/,
+        message: 'end time is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'end time must be no more than 10 characters'
+      }
+    ],
+    sequency_no: [
+      {
+        pattern: /^.+$/,
+        message: 'sequency no is required'
+      }
+    ],
+  },
+
+  reset: () => {
+    return {
+      _id: '',
+      title: '',
+      start_time: '',
+      end_time: '',
+      sequency_no: '',
+      description: '',
+      status: false,
+    };
+  },
+  fields: {
+    _id: '',
+    title: '',
+    start_time: '',
+    end_time: '',
+    sequency_no: '',
+    description: '',
+    status: false,
+  }
+};
+

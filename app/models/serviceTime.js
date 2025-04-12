@@ -87,7 +87,7 @@ const ServiceTimeSchema = new mongoose.Schema(
           type: String,
           trim: false,
           required: false,
-          max: 10
+          max: 50
         }
       }
     ]
