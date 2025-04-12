@@ -6,14 +6,17 @@ import { Button } from 'react-bootstrap';
 import { useRegularService } from '../../../../hooks/useRegularService';
 import { MdArrowBack } from 'react-icons/md';
 import { TiEdit } from 'react-icons/ti';
+import { FaTasks } from 'react-icons/fa';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import { useRouter } from 'next/navigation';
 import Tooltip from '@mui/material/Tooltip';
 import RenderFormOffcanvas from './renderFormOffcanvas';
+import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
 
 const Render = () => {
   const router = useRouter();
   const [show, setShow] = useState(false);
+  const [showAgenda, setShowAgenda] = useState(false);
   const {
     data,
     error,
@@ -85,6 +88,18 @@ const Render = () => {
                 />
               </span>
             </Tooltip>
+            <Tooltip title="View Service Agenda" arrow>
+              <span className="p-0">
+                <FaTasks
+                  size={30}
+                  className="pointer ms-2"
+                  onClick={async () => {
+                    setShowAgenda(true);
+                    await handleSelect(row.original);
+                  }}
+                />
+              </span>
+            </Tooltip>
           </div>
         )
       }
@@ -100,7 +115,7 @@ const Render = () => {
         </Button>
         <h3 className="card-title ms-2">Regular Services</h3>
       </div>
-      <div className={`ms-5 me-5 mt-2 ${!loading ? 'overlay__block' : null}`}>
+      <div className={` mt-2 ${!loading ? 'overlay__block' : null}`}>
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-end mb-3">
             <div></div>
@@ -132,6 +147,7 @@ const Render = () => {
         error={error}
         setShow={setShow}
       />
+      {fields._id && <RenderAgendaOffcanvas show={showAgenda} setShow={setShowAgenda} selectedServiceId={fields._id} />}
     </div>
   );
 };

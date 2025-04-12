@@ -6,15 +6,8 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-const addServiceTimeAgenda = async (suid, body) => {
+const addServiceTimeAgenda = async (body) => {
   try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
-
     const bodyErrors = serviceTimeValidator(body);
     if (bodyErrors.length) {
       const error = new Error(bodyErrors.map((it) => it.message).join(','));
@@ -22,7 +15,7 @@ const addServiceTimeAgenda = async (suid, body) => {
       throw error;
     }
     const serviceTime = await ServiceTime.findOneAndUpdate(
-      { _id: body.serviceTimeId },
+      { _id: body.serviceId },
       { $push: { agenda: body } },
       { new: true }
     ).exec();

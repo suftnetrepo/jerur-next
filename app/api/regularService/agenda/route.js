@@ -6,6 +6,7 @@ import {
 } from '../../../services/serviceTimeAgenda';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
@@ -26,8 +27,8 @@ export const DELETE = async (req) => {
     const url = new URL(req.url);
 
     const id = url.searchParams.get('id');
-    const serviceTimeId = url.searchParams.get('serviceTimeId');
-    const deleted = await removeServiceTimeAgenda(id, serviceTimeId);
+    const serviceId = url.searchParams.get('serviceId');
+    const deleted = await removeServiceTimeAgenda(id, serviceId);
 
     return NextResponse.json({ success: true, data: deleted });
   } catch (error) {
@@ -52,11 +53,15 @@ export const PUT = async (req) => {
 
 export const POST = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
     const body = await req.json();
 
-    const result = await addServiceTimeAgenda( user?.church , body);
+    const result = await addServiceTimeAgenda(body);
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     logger.error(error);

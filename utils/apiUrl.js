@@ -121,3 +121,11 @@ export const REGULAR_SERVICE = {
   fetch: `${HOST}regularService/`,
   removeOne: `${HOST}regularService/`
 };
+
+export const REGULAR_SERVICE_AGENDA = {
+  createOne: `${HOST}regularService/agenda`,
+  updateOne: `${HOST}regularService/agenda`,
+  fetchOne: `${HOST}regularService/agenda`,
+  fetch: `${HOST}regularService/agenda/`,
+  removeOne: `${HOST}regularService/agenda/`
+};
