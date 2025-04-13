@@ -132,7 +132,7 @@ async function getCampaigns({ suid, page = 1, limit = 10, sortField, sortOrder, 
 
     const [campaigns, totalCount] = await Promise.all([
       Campaign.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
-      Campaign.countDocuments({})
+      Campaign.countDocuments({church: suid})
     ]);
 
     return {

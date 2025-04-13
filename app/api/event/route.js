@@ -29,8 +29,8 @@ export const GET = async (req) => {
       const page = parseInt(url.searchParams.get('page') || '1', 10);
       const limit = parseInt(url.searchParams.get('limit') || '10', 10);
 
-      const { data, success, totalCount } = await getEvents({
-        suid: user?.integrator,
+      const { data, totalCount } = await getEvents({
+        suid: user?.church,
         page,
         limit,
         sortField,
@@ -38,23 +38,25 @@ export const GET = async (req) => {
         searchQuery,
         status
       });
-      return NextResponse.json({ data, success, totalCount });
+      return NextResponse.json({ data, success: true , totalCount });
     }
 
-    if (action === 'single') {
+    console.log("......................action", action)
+
+    if (action === "single") {
       const id = url.searchParams.get('id');
-      const { data } = await getEventById(id);
+      const  data  = await getEventById(id);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'top10') {
-      const { data } = await getTop10Events(user?.church);
+      const  data  = await getTop10Events(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
     return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

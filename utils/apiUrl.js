@@ -137,5 +137,5 @@ export const EVENT = {
   removeOne: `${HOST}event/`,
   fetchTop10: `${HOST}event?action=top10`,
   paginate: `${HOST}event?action=paginate`,
-  fetchOne: `${HOST}event?action=single`
+  fetchOne: `${HOST}event`
 };

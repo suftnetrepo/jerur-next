@@ -1,4 +1,4 @@
-import Event from '../models';
+import Event from '../models/event';
 import { identifierValidator } from '../validation/identifierValidator';
 import { eventValidator } from '../validation/eventValidator';
 import { logger } from '../../utils/logger';
@@ -6,7 +6,7 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-async function creatEvent( suid , body) {
+async function creatEvent(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -68,7 +68,7 @@ async function deleteEvent(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    await Event.findByIdAndRemove(id);
+    await Event.findOneAndDelete(id);
     return true;
   } catch (error) {
     logger.error(error);
@@ -87,6 +87,7 @@ async function getEventById(id) {
     const event = await Event.findById(id);
     return event;
   } catch (error) {
+    logger.error(error);
     throw new Error('Error fetching event');
   }
 }
@@ -101,26 +102,23 @@ async function getEvents({ suid, page = 1, limit = 10, sortField, sortOrder, sea
 
     const searchFilter = searchQuery
       ? {
-          $or: [
-            { title: { $regex: searchQuery, $options: 'i' } },
-            { status: { $regex: searchQuery, $options: 'i' } }
-          ]
+          $or: [{ title: { $regex: searchQuery, $options: 'i' } }]
         }
       : {};
 
     const query = {
-      church: suid,
+      suid,
       ...searchFilter
     };
 
-    if (status) {
+    if (!status) {
       query.end_date = { $gte: currentDate };
       query.status = true;
     }
 
     const [events, totalCount] = await Promise.all([
       Event.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
-      Event.countDocuments({ church: suid })
+      Event.countDocuments({ suid: suid })
     ]);
 
     return {

@@ -41,7 +41,7 @@ const CreateForm = () => {
             <Button variant="outline-secondary" onClick={() => router.push(`/protected/church/events`)}>
               <MdArrowBack size={24} /> Back
             </Button>
-            <h3 className="card-title ms-2">Schedule New Event</h3>
+            <h3 className="card-title ms-2"> New Event</h3>
           </div>
           <Form
             handleChange={handleChange}

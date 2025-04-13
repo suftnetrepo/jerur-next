@@ -44,8 +44,8 @@ const EditForm = () => {
       <div className="ms-5 me-10 mt-5">
         <div className="card-body">
           <div className="d-flex justify-content-start align-items-center mb-3">
-            <Button variant="outline-secondary" onClick={() => router.push(`/protected/integrator/project`)}><MdArrowBack size={24} /> Back</Button>
-            <h3 className="card-title ms-2">Edit Event Schedule</h3>
+            <Button variant="outline-secondary" onClick={() => router.push(`/protected/church/events`)}><MdArrowBack size={24} /> Back</Button>
+            <h3 className="card-title ms-2">Edit Event</h3>
           </div>
 
           <Form

@@ -45,7 +45,8 @@ const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSe
                 <Form.Control
                   type="datetime-local"
                   value={fields?.start_date}
-                  onChange={(e) => handleChange('start_date', e.target.value)}
+                  onChange={(e) => { handleChange('start_date', e.target.value) }}
+                  onBlur={(e)=>   e.target.blur()}
                 />
               </Form.Group>
               {errorMessages?.start_date?.message && (
@@ -59,6 +60,7 @@ const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSe
                   type="datetime-local"
                   value={fields?.end_date}
                   onChange={(e) => handleChange('end_date', e.target.value)}
+                  onBlur={(e)=>   e.target.blur()}
                 />
               </Form.Group>
               {errorMessages?.end_date?.message && (
