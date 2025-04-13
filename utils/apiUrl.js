@@ -129,3 +129,13 @@ export const REGULAR_SERVICE_AGENDA = {
   fetch: `${HOST}regularService/agenda/`,
   removeOne: `${HOST}regularService/agenda/`
 };
+
+export const EVENT = {
+  createOne: `${HOST}event`,
+  updateOne: `${HOST}event`,
+  fetch: `${HOST}event/`,
+  removeOne: `${HOST}event/`,
+  fetchTop10: `${HOST}event?action=top10`,
+  paginate: `${HOST}event?action=paginate`,
+  fetchOne: `${HOST}event?action=single`
+};

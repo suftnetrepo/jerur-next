@@ -3,13 +3,11 @@
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
 import Editor from '../../../../src/components/reuseable/editor';
-import Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import FindAddress from '../../../share/findAddress';
 
-const ProjectForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSelectedAddress }) => {
-
-  const handlePaste = (e) => {  
+const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSelectedAddress }) => {
+  const handlePaste = (e) => {
     const pastedText = e.clipboardData.getData('text');
     handleChange('description', pastedText);
     e.preventDefault();
@@ -20,17 +18,17 @@ const ProjectForm = ({ errorMessages, handleSubmit, handleChange, fields, handle
       <div className="row">
         <div className="col-md-6">
           <Form.Group controlId="formName" className="mb-3">
-            <Form.Label className="text-dark">Name</Form.Label>
+            <Form.Label className="text-dark">Title</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter project name"
-              name="name"
-              value={fields?.name}
-              onChange={(e) => handleChange('name', e.target.value)}
+              placeholder="Enter event title"
+              name="title"
+              value={fields?.title}
+              onChange={(e) => handleChange('title', e.target.value)}
               className="border-dark"
             />
-            {errorMessages?.name?.message && (
-              <span className="text-danger fs-13 ms-2">{errorMessages?.name?.message}</span>
+            {errorMessages?.title?.message && (
+              <span className="text-danger fs-13 ms-2">{errorMessages?.title?.message}</span>
             )}
           </Form.Group>
         </div>
@@ -42,68 +40,29 @@ const ProjectForm = ({ errorMessages, handleSubmit, handleChange, fields, handle
         <div className="col-md-6">
           <div className="row">
             <div className="col-md-6">
-              <Form.Group controlId="formManager" className="mb-3">
-                <Form.Label className="text-dark">Manager</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter manager"
-                  name="manager"
-                  value={fields?.manager}
-                  onChange={(e) => handleChange('manager', e.target.value)}
-                  className="border-dark"
-                />
-                {errorMessages?.manager?.message && (
-                  <span className="text-danger fs-13">{errorMessages?.manager?.message}</span>
-                )}
-              </Form.Group>
-            </div>
-            <div className="col-md-6">
-              <Form.Group controlId="formStakeHolder" className="mb-3">
-                <Form.Label className="text-dark">Stakeholder</Form.Label>
-                <Form.Control
-                  type="stakeholder"
-                  placeholder="Enter stakeholder"
-                  name="stakeholder"
-                  value={fields?.stakeholder}
-                  onChange={(e) => handleChange('stakeholder', e.target.value)}
-                  className="border-dark"
-                />
-                {errorMessages?.stakeholder?.message && (
-                  <span className="text-danger fs-13">{errorMessages?.stakeholder?.message}</span>
-                )}
-              </Form.Group>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col-md-6">
-          <div className="row">
-            <div className="col-md-6">
               <Form.Group controlId="formStartDate">
                 <Form.Label className="text-dark">Start Date</Form.Label>
                 <Form.Control
                   type="datetime-local"
-                  value={fields?.startDate}
-                  onChange={(e) => handleChange('startDate', e.target.value)}
+                  value={fields?.start_date}
+                  onChange={(e) => handleChange('start_date', e.target.value)}
                 />
               </Form.Group>
-              {errorMessages?.startDate?.message && (
-                <span className="text-danger fs-13">{errorMessages?.startDate?.message}</span>
+              {errorMessages?.start_date?.message && (
+                <span className="text-danger fs-13">{errorMessages?.start_date?.message}</span>
               )}
             </div>
             <div className="col-md-6">
               <Form.Group controlId="formEndDate">
-                <Form.Label className="text-dark">Due Date</Form.Label>
+                <Form.Label className="text-dark">End Date</Form.Label>
                 <Form.Control
                   type="datetime-local"
-                  value={fields?.endDate}
-                  onChange={(e) => handleChange('endDate', e.target.value)}
+                  value={fields?.end_date}
+                  onChange={(e) => handleChange('end_date', e.target.value)}
                 />
               </Form.Group>
-              {errorMessages?.endDate?.message && (
-                <span className="text-danger fs-13">{errorMessages?.endDate?.message}</span>
+              {errorMessages?.end_date?.message && (
+                <span className="text-danger fs-13">{errorMessages?.end_date?.message}</span>
               )}
             </div>
           </div>
@@ -226,59 +185,37 @@ const ProjectForm = ({ errorMessages, handleSubmit, handleChange, fields, handle
       <div className="row">
         <div className="col-md-12">
           <Form.Group controlId="formFirstName" className="mb-3 mt-3">
-            <Form.Label className="text-dark">Scope of Work</Form.Label>
-            <Editor onChange={(e) => handleChange('description', e)} onPaste={handlePaste} value={fields?.description} />
+            <Form.Label className="text-dark">Description</Form.Label>
+            <Editor
+              onChange={(e) => handleChange('description', e)}
+              onPaste={handlePaste}
+              value={fields?.description}
+            />
             {errorMessages?.description?.message && (
               <span className="text-danger fs-13">{errorMessages.description?.message}</span>
             )}
           </Form.Group>
         </div>
-      </div>  
+      </div>
 
       <div className="row">
         <div className="col-md-6">
-          <div className="row">
-            <div className="col-md-6">
-              <Form.Group controlId="formLastName" className="mb-3">
-                <Form.Label className="text-dark">Status</Form.Label>
-                <Form.Select
-                  className="border-dark"
-                  aria-label="Select Status"
-                  value={fields?.status}
-                  onChange={(e) => handleChange('status', e.target.value)}
-                >
-                  <option>Select status</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Progress">Progress</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Canceled">Canceled</option>
-                </Form.Select>
-                {errorMessages?.status?.message && (
-                  <span className="text-danger fs-13">{errorMessages?.status?.message}</span>
-                )}
-              </Form.Group>
-            </div>
-            <div className="col-md-6">
-              <Form.Group controlId="formEmail" className="mb-3">
-                <Form.Label className="text-dark">Priority</Form.Label>
-                <Form.Select
-                  className="border-dark"
-                  aria-label="Select Priority"
-                  value={fields?.priority}
-                  onChange={(e) => handleChange('priority', e.target.value)}
-                >
-                  <option>Select Priority</option>
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                </Form.Select>
-                {errorMessages?.priority?.message && (
-                  <span className="text-danger fs-13">{errorMessages?.priority?.message}</span>
-                )}
-              </Form.Group>
-            </div>
-          </div>
+          <Form.Group controlId="status" className="d-flex d-flex justify-content-start align-items-start">
+            <Form.Check
+              type="checkbox"
+              id="status"
+              className="border-dark"
+              checked={fields?.status}
+              value={fields?.status}
+              onChange={(e) => handleChange('status', e.target.checked)}
+            />
+            <Form.Label className="text-dark ms-1"> Status</Form.Label>
+            {errorMessages?.status?.message && (
+              <span className="text-danger fs-13">{errorMessages?.status?.message}</span>
+            )}
+          </Form.Group>
         </div>
+        <div className="col-md-6"> </div>
       </div>
 
       <div className="d-flex justify-content-start">
@@ -290,4 +227,4 @@ const ProjectForm = ({ errorMessages, handleSubmit, handleChange, fields, handle
   );
 };
 
-export default ProjectForm;
+export default EventForm;

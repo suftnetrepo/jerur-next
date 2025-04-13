@@ -8,11 +8,15 @@ import {
 } from '../../services/eventServices';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
@@ -44,8 +48,6 @@ export const GET = async (req) => {
     }
 
     if (action === 'top10') {
-      const userData = req.headers.get('x-user-data');
-      const user = userData ? JSON.parse(userData) : null;
       const { data } = await getTop10Events(user?.church);
       return NextResponse.json({ data, success: true });
     }
@@ -86,8 +88,11 @@ export const PUT = async (req) => {
 
 export const POST = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await req.json();
 
     const result = await creatEvent(user?.church, body);

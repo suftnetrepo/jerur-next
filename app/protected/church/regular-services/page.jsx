@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import Tooltip from '@mui/material/Tooltip';
 import RenderFormOffcanvas from './renderFormOffcanvas';
 import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
+import { getYesNoColorCode } from '@/utils/helpers';
 
 const Render = () => {
   const router = useRouter();
@@ -32,18 +33,7 @@ const Render = () => {
     handleReset,
     handleSelect
   } = useRegularService();
-
-  const getYesNoColorCode = (status) => {
-    switch (status) {
-      case true:
-        return 'bg-success';
-      case false:
-        return 'bg-danger';
-      default:
-        return 'bg-danger';
-    }
-  };
-
+ 
   const columns = useMemo(
     () => [
       { Header: 'Sn', accessor: 'sequency_no', sortType: 'basic' },
