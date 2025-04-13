@@ -10,18 +10,6 @@ const EventSchema = new mongoose.Schema(
       required: true,
       max: 100
     },
-    start_time: {
-      type: String,
-      trim: false,
-      required: true,
-      max: 10
-    },
-    end_time: {
-      type: String,
-      trim: false,
-      required: true,
-      max: 10
-    },
     start_date: {
       type: Date,
       required: true

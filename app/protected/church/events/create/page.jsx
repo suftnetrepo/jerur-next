@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { validate } from '../../../../../validator/validator';
-import { projectValidator } from '../../rules';
-import { useProjectEdit } from '../../../../../hooks/useProject';
+import { eventValidator } from '@/validator/rules';
+import { useEventEdit } from '../../../../../hooks/useEvent';
 import { ConfirmationDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import { useRouter } from 'next/navigation';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
@@ -11,19 +11,19 @@ import Button from 'react-bootstrap/Button';
 import { MdArrowBack } from 'react-icons/md';
 import dynamic from 'next/dynamic'
 
-const ProjectForm = dynamic(
-  () => import('../projectForm'),
+const Form = dynamic(
+  () => import('../form'),
   { ssr: false }
 );
 
 const CreateForm = () => {
   const router = useRouter();
   const [errorMessages, setErrorMessages] = useState({});
-  const { handleSave, fields, handleChange, success, handleReset, error, handleSelectedAddress } = useProjectEdit();
+  const { handleSave, fields, handleChange, success, handleReset, error, handleSelectedAddress } = useEventEdit();
 
   const handleSubmit = async () => {
     setErrorMessages({});
-    const validationResult = validate(fields, projectValidator.rules);
+    const validationResult = validate(fields, eventValidator.rules);
 
     if (validationResult.hasError) {
       setErrorMessages(validationResult.errors);
@@ -38,12 +38,12 @@ const CreateForm = () => {
       <div className="ms-5 me-10 mt-5">
         <div className="card-body">
           <div className="d-flex justify-content-start align-items-center mb-3">
-            <Button variant="outline-secondary" onClick={() => router.push(`/protected/integrator/project`)}>
+            <Button variant="outline-secondary" onClick={() => router.push(`/protected/church/events`)}>
               <MdArrowBack size={24} /> Back
             </Button>
-            <h3 className="card-title ms-2">New Project</h3>
+            <h3 className="card-title ms-2">Schedule New Event</h3>
           </div>
-          <ProjectForm
+          <Form
             handleChange={handleChange}
             fields={fields}
             handleSubmit={handleSubmit}
@@ -57,7 +57,7 @@ const CreateForm = () => {
           show={success}
           onClose={async () => {
             handleReset();
-            router.push(`/protected/integrator/project`);
+            router.push(`/protected/church/event`);
           }}
           onConfirm={() => handleReset()}
         />

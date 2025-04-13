@@ -130,3 +130,57 @@ export const regularServiceAgendaValidator = {
   }
 };
 
+export const eventValidator = {
+  rules: {
+    title: [
+      { pattern: /^.+$/, message: 'title is required' },
+      { pattern: /^.{0,250}$/, message: 'title must not exceed 150 characters' }
+    ],
+    description: [
+      { pattern: /^.+$/, message: 'description is required' },
+      { pattern: /^.{0,5000}$/, message: 'description must not exceed 1000 characters' }
+    ],
+    status: [
+      { pattern: /^.+$/, message: 'Status is required' }
+    ],
+    start_date: [
+      { pattern: /^.+$/, message: 'Start date is required' },
+      {
+        validate: (value, fields) => {
+          if (fields?.start_date && new Date(value) > new Date(fields?.start_date)) {
+            return 'Start date cannot be after end date';
+          }
+          return undefined;
+        }
+      }
+    ],
+    end_date: [
+      { pattern: /^.+$/, message: 'End date is required' },
+      {
+        validate: (value, fields) => {
+          if (fields.end_date && new Date(value) < new Date(fields.end_date)) {
+            return 'End date cannot be before start date';
+          }
+          return undefined;
+        }
+      }
+    ]
+  }, 
+  fields: {
+    title: '',
+    status: '',
+    description: null,
+    start_date: '',
+    end_date: '',
+    addressLine1: "",
+    county: "",
+    town: "",
+    country: "",
+    postcode: "",
+    completeAddress: "",
+    location: {
+      type: "Point",
+      coordinates: []
+    },
+  }
+};

@@ -323,10 +323,21 @@ const normalizeTime = (timeStr) => {
   return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
 };
 
-
 const generateKey = () => crypto.randomBytes(32).toString('hex');
 
+const getYesNoColorCode = (status) => {
+  switch (status) {
+    case true:
+      return 'bg-success';
+    case false:
+      return 'bg-danger';
+    default:
+      return 'bg-danger';
+  }
+};
+
 export {
+  getYesNoColorCode,
   normalizeTime,
   encrypt,
   decrypt,

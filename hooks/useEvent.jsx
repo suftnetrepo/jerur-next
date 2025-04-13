@@ -2,11 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import moment from 'moment';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
-import { PROJECT } from '../utils/apiUrl';
-import { projectValidator } from '../app/protected/church/rules';
-import { customStyles } from '../utils/helpers';
+import { EVENT } from '../utils/apiUrl';
+import { eventValidator } from '@/validator/rules';
 
-const useProject = (searchQuery) => {
+const useEvent = (searchQuery) => {
   const [state, setState] = useState({
     data: [],
     options: [],
@@ -28,18 +27,18 @@ const useProject = (searchQuery) => {
   };
 
   const handleDelete = async (id) => {
-    const { success, errorMessage } = await zat(PROJECT.removeOne, null, VERBS.DELETE, { id: id });
+    const { success, errorMessage } = await zat(EVENT.removeOne, null, VERBS.DELETE, { id: id });
 
     if (success) {
       setState((prevState) => ({
         ...prevState,
-        data: prevState.data.filter((project) => project._id !== id),
+        data: prevState.data.filter((j) => j._id !== id),
         totalCount: prevState.totalCount - 1,
         loading: false
       }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to delete the project.');
+      handleError(errorMessage || 'Failed to delete the event.');
       return false;
     }
   };
@@ -72,7 +71,7 @@ const useProject = (searchQuery) => {
     const sortOrder = sortBy.length > 0 ? (sortBy[0].desc ? 'desc' : 'asc') : 'null';
 
     try {
-      const { data, success, errorMessage, totalCount } = await zat(PROJECT.fetch, null, VERBS.GET, {
+      const { data, success, errorMessage, totalCount } = await zat(EVENT.fetch, null, VERBS.GET, {
         action: 'paginate',
         page: pageIndex === 0 ? 1 : pageIndex,
         limit: pageSize,
@@ -94,34 +93,26 @@ const useProject = (searchQuery) => {
         return false;
       }
     } catch (error) {
-      handleError('An unexpected error occurred while fetching projects.');
+      handleError('An unexpected error occurred while fetching events.');
       return false;
     }
   }, []);
 
   async function handleFetchSingle(id) {
     setState((prev) => ({ ...prev, loading: true }));
-    const { success, data, errorMessage } = await zat(PROJECT.fetchOne, null, VERBS.GET, {
+    const { success, data, errorMessage } = await zat(EVENT.fetchOne, null, VERBS.GET, {
       action: 'single',
       id: id
     });
 
-    const assignedToOptions =
-      data?.assignedTo.map((item) => {
-        return {
-          label: `${item.id.first_name} ${item.id.last_name}`,
-          value: item.id._id
-        };
-      }) || [];
-
     if (success) {
       setState((prevState) => ({
         ...prevState,
-        options: assignedToOptions,
+        data:data,
         loading: false
       }));
     } else {
-      handleError(errorMessage || 'Failed to fetch the project.');
+      handleError(errorMessage || 'Failed to fetch the event.');
     }
   }
 
@@ -136,14 +127,13 @@ const useProject = (searchQuery) => {
     handleReset,
     handleSelectedAddress,
     handleFetchSingle,
-    customStyles
   };
 };
 
-const useProjectEdit = (id) => {
+const useEventEdit = (id) => {
   const [state, setState] = useState({
     data: {},
-    fields: projectValidator.fields,
+    fields: eventValidator.fields,
     loading: false,
     error: null,
     success: false
@@ -174,9 +164,9 @@ const useProjectEdit = (id) => {
     setState({
       data: null,
       fields: {
-        ...projectValidator.fields,
-        startDate: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
-        endDate: moment(endDate).format('YYYY-MM-DDTHH:mm')
+        ...eventValidator.fields,
+        start_date: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
+        end_date: moment(endDate).format('YYYY-MM-DDTHH:mm')
       },
       error: null,
       loading: false,
@@ -209,7 +199,7 @@ const useProjectEdit = (id) => {
 
   async function handleSelect(id) {
     setState((prev) => ({ ...prev, loading: true }));
-    const { success, data, errorMessage } = await zat(PROJECT.fetchOne, null, VERBS.GET, {
+    const { success, data, errorMessage } = await zat(EVENT.fetchOne, null, VERBS.GET, {
       action: 'single',
       id: id
     });
@@ -220,19 +210,19 @@ const useProjectEdit = (id) => {
         fields: {
           ...prevState.fields,
           ...data,
-          startDate: moment(data.startDate).format('YYYY-MM-DDTHH:mm'),
-          endDate: moment(data.endDate).format('YYYY-MM-DDTHH:mm')
+          start_date: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
+          end_date: moment(endDate).format('YYYY-MM-DDTHH:mm')
         },
         loading: false
       }));
     } else {
-      handleError(errorMessage || 'Failed to fetch the project.');
+      handleError(errorMessage || 'Failed to fetch the event.');
     }
   }
 
   async function handleSave(body) {
     setState((prev) => ({ ...prev, loading: true }));
-    const { success, errorMessage } = await zat(PROJECT.createOne, body, VERBS.POST);
+    const { success, errorMessage } = await zat(EVENT.createOne, body, VERBS.POST);
 
     if (success) {
       setState((prevState) => ({
@@ -242,20 +232,20 @@ const useProjectEdit = (id) => {
       }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the project.');
+      handleError(errorMessage || 'Failed to update the event.');
       return false;
     }
   }
 
   async function handleEdit(body, id) {
     setState((prev) => ({ ...prev, loading: true }));
-    const { success, errorMessage } = await zat(PROJECT.updateOne, body, VERBS.PUT, { id: id });
+    const { success, errorMessage } = await zat(EVENT.updateOne, body, VERBS.PUT, { id: id });
 
     if (success) {
       setState((prev) => ({ ...prev, loading: false }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the project.');
+      handleError(errorMessage || 'Failed to update the event.');
       return false;
     }
   }
@@ -277,4 +267,4 @@ const useProjectEdit = (id) => {
   };
 };
 
-export { useProject, useProjectEdit };
+export { useEvent, useEventEdit };

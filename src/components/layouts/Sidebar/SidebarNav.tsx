@@ -42,7 +42,7 @@ const ChurchSidebarNav = () => {
       <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-services">
         Regular Service
       </SidebarNavItem>
-      <SidebarNavItem icon={faMoneyCheck} href="/protected/church/event-schedule">
+      <SidebarNavItem icon={faMoneyCheck} href="/protected/church/events">
         Event calendar
       </SidebarNavItem>
       <SidebarNavItem icon={faMoneyCheck} href="/protected/church/fellowship">
