@@ -250,7 +250,7 @@ async function getDonations({ suid, page = 1, limit = 10, sortField, sortOrder, 
 
     const [donations, totalCount] = await Promise.all([
       Donation.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
-      Donation.countDocuments({})
+      Donation.countDocuments({church:suid})
     ]);
 
     return {

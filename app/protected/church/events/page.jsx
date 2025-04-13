@@ -24,16 +24,6 @@ const Page = () => {
     () => [
       { Header: 'Title', accessor: 'title', sortType: 'basic' },
       {
-        Header: 'Status',
-        accessor: 'status',
-        headerClassName: { textAlign: 'center' },
-        Cell: ({ value }) => (
-          <div className="d-flex justify-content-start align-items-center">
-            <span className={`badge ${getYesNoColorCode(value)}`}>{value ? 'Yes' : 'No'}</span>
-          </div>
-        )
-      },
-      {
         Header: 'Start Date',
         accessor: 'start_date',
         Cell: ({ value }) => <div className="d-flex align-items-center">{dateFormatted(value)}</div>
@@ -42,6 +32,16 @@ const Page = () => {
         Header: 'End Date',
         accessor: 'end_date',
         Cell: ({ value }) => <div className="d-flex align-items-center">{dateFormatted(value)}</div>
+      },
+      {
+        Header: 'Status',
+        accessor: 'status',
+        headerClassName: { textAlign: 'center' },
+        Cell: ({ value }) => (
+          <div className="d-flex justify-content-start align-items-center">
+            <span className={`badge ${getYesNoColorCode(value)}`}>{value ? 'Yes' : 'No'}</span>
+          </div>
+        )
       },
       {
         Header: 'Actions',

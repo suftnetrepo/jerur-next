@@ -77,7 +77,8 @@ const useEvent = (searchQuery) => {
         limit: pageSize,
         ...(sortField && { sortField }),
         ...(sortOrder && { sortOrder }),
-        searchQuery
+        searchQuery,
+        status : false
       });
 
       if (success) {
@@ -101,7 +102,6 @@ const useEvent = (searchQuery) => {
   async function handleFetchSingle(id) {
     setState((prev) => ({ ...prev, loading: true }));
     const { success, data, errorMessage } = await zat(EVENT.fetchOne, null, VERBS.GET, {
-      action: 'single',
       id: id
     });
 
@@ -210,8 +210,8 @@ const useEventEdit = (id) => {
         fields: {
           ...prevState.fields,
           ...data,
-          start_date: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
-          end_date: moment(endDate).format('YYYY-MM-DDTHH:mm')
+          start_date: moment(data?.start_date).format('YYYY-MM-DDTHH:mm'),
+          end_date: moment(data?.end_date).format('YYYY-MM-DDTHH:mm')
         },
         loading: false
       }));
