@@ -242,7 +242,7 @@ const useEventEdit = (id) => {
     const { success, errorMessage } = await zat(EVENT.updateOne, body, VERBS.PUT, { id: id });
 
     if (success) {
-      setState((prev) => ({ ...prev, loading: false }));
+      setState((prev) => ({ ...prev, loading: false, success : true }));
       return true;
     } else {
       handleError(errorMessage || 'Failed to update the event.');

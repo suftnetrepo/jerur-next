@@ -139,3 +139,11 @@ export const EVENT = {
   paginate: `${HOST}event?action=paginate`,
   fetchOne: `${HOST}event`
 };
+
+export const EVENT_AGENDA = {
+  createOne: `${HOST}event/agenda`,
+  updateOne: `${HOST}event/agenda`,
+  fetchOne: `${HOST}event/agenda`,
+  fetch: `${HOST}event/agenda`,
+  removeOne: `${HOST}event/agenda/`
+};

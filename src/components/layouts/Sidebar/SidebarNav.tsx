@@ -1,11 +1,13 @@
 import {
-  faGauge,
+  faHome,
   faProjectDiagram,
   faCogs,
   faUser,
   faBuildingUser,
-  faComment,
-  faMoneyCheck
+  faCalendar,
+  faHomeUser,
+  faLocation,
+  faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import {} from 'react-icons/ti';
 import React from 'react';
@@ -14,7 +16,7 @@ import SidebarNavItem from './SidebarNavItem';
 export default function SidebarNav() {
   return (
     <ul className="list-unstyled mt-4">
-      <SidebarNavItem icon={faGauge} href="/protected/admin/dashboard">
+      <SidebarNavItem icon={faHome} href="/protected/admin/dashboard">
         Dashboard
       </SidebarNavItem>
       <SidebarNavItem icon={faUser} href="/protected/admin/users">
@@ -33,22 +35,22 @@ export default function SidebarNav() {
 const ChurchSidebarNav = () => {
   return (
     <ul className="list-unstyled mt-4">
-      <SidebarNavItem icon={faGauge} href="/protected/church/dashboard">
+      <SidebarNavItem icon={faHome} href="/protected/church/dashboard">
         Dashboard
       </SidebarNavItem>
-      <SidebarNavItem icon={faMoneyCheck} href="/protected/church/member">
+      <SidebarNavItem icon={faUsers} href="/protected/church/member">
         Member
       </SidebarNavItem>
       <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-services">
         Regular Service
       </SidebarNavItem>
-      <SidebarNavItem icon={faMoneyCheck} href="/protected/church/events">
-        Event calendar
+      <SidebarNavItem icon={faCalendar} href="/protected/church/events">
+        Event Schedule
       </SidebarNavItem>
-      <SidebarNavItem icon={faMoneyCheck} href="/protected/church/fellowship">
+      <SidebarNavItem icon={faLocation} href="/protected/church/fellowship">
         Fellowship
       </SidebarNavItem>
-      <SidebarNavItem icon={faBuildingUser} href="/protected/church/user">
+      <SidebarNavItem icon={faUser} href="/protected/church/user">
         User
       </SidebarNavItem>
       <SidebarNavItem icon={faCogs} href="/protected/church/settings">

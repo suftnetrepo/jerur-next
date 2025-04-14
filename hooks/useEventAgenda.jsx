@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
-import { REGULAR_SERVICE_AGENDA } from '../utils/apiUrl';
+import { EVENT_AGENDA } from '../utils/apiUrl';
 import { regularAgendaValidator } from '@/validator/rules';
 
-const useRegularServiceAgenda = () => {
+const useEventAgenda = () => {
   const [state, setState] = useState({
     data: [],
     loading: false,
@@ -44,7 +44,7 @@ const useRegularServiceAgenda = () => {
 
   async function handleSave(body) {
     setState((prev) => ({ ...prev, loading: true }));
-    const { success, errorMessage, data } = await zat(REGULAR_SERVICE_AGENDA.createOne, body, VERBS.POST);
+    const { success, errorMessage, data } = await zat(EVENT_AGENDA.createOne, body, VERBS.POST);
 
     if (success) {
       setState((prevState) => {
@@ -59,13 +59,13 @@ const useRegularServiceAgenda = () => {
       });
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the service agenda.');
+      handleError(errorMessage || 'Failed to update the event agenda.');
       return false;
     }
   }
 
   async function handleEdit(body, id, fields) {
-    const { success, errorMessage } = await zat(REGULAR_SERVICE_AGENDA.updateOne, body, VERBS.PUT, {
+    const { success, errorMessage } = await zat(EVENT_AGENDA.updateOne, body, VERBS.PUT, {
       id: id
     });
 
@@ -80,7 +80,7 @@ const useRegularServiceAgenda = () => {
       }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the service agenda.');
+      handleError(errorMessage || 'Failed to update the event agenda.');
       return false;
     }
   }
@@ -97,10 +97,10 @@ const useRegularServiceAgenda = () => {
     }));
   };
 
-  const handleDelete = async (id, serviceId) => {
-    const { success, errorMessage } = await zat(REGULAR_SERVICE_AGENDA.removeOne, null, VERBS.DELETE, {
+  const handleDelete = async (id, eventId) => {
+    const { success, errorMessage } = await zat(EVENT_AGENDA.removeOne, null, VERBS.DELETE, {
       id: id,
-      serviceId: serviceId
+      eventId
     });
 
     if (success) {
@@ -112,7 +112,7 @@ const useRegularServiceAgenda = () => {
       }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to delete the service agenda.');
+      handleError(errorMessage || 'Failed to delete the event agenda.');
       return false;
     }
   };
@@ -123,7 +123,7 @@ const useRegularServiceAgenda = () => {
       success,
       errorMessage,
       data = []
-    } = await zat(REGULAR_SERVICE_AGENDA.fetch, null, VERBS.GET, {
+    } = await zat(EVENT_AGENDA.fetch, null, VERBS.GET, {
       id
     });
 
@@ -132,7 +132,7 @@ const useRegularServiceAgenda = () => {
       setState((prev) => ({ ...prev, data: sorted, loading: false }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the service agenda.');
+      handleError(errorMessage || 'Failed to update the event agenda.');
       return false;
     }
   };
@@ -149,4 +149,4 @@ const useRegularServiceAgenda = () => {
   };
 };
 
-export { useRegularServiceAgenda };
+export { useEventAgenda };

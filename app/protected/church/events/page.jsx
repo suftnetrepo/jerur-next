@@ -6,6 +6,7 @@ import { Button } from 'react-bootstrap';
 import { useEvent } from '../../../../hooks/useEvent';
 import { MdDelete } from 'react-icons/md';
 import { TiEdit } from 'react-icons/ti';
+import { FaTasks } from 'react-icons/fa';
 import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
@@ -13,11 +14,14 @@ import { dateFormatted } from '../../../../utils/helpers';
 import { useRouter } from 'next/navigation';
 import Tooltip from '@mui/material/Tooltip';
 import { getYesNoColorCode } from '@/utils/helpers';
+import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
 
 const Page = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const [showAgenda, setShowAgenda] = useState(false);
+  const [eventId, setEventId] = useState(null);
   const { data, error, loading, totalCount, handleDelete, handleFetch } = useEvent(debouncedSearchQuery);
 
   const columns = useMemo(
@@ -74,6 +78,18 @@ const Page = () => {
                 </DeleteConfirmation>
               </span>
             </Tooltip>
+            <Tooltip title="View Service Agenda" arrow>
+              <span className="p-0">
+                <FaTasks
+                  size={30}
+                  className="pointer ms-2"
+                  onClick={async () => {
+                    setShowAgenda(true);
+                    setEventId(row.original._id);
+                  }}
+                />
+              </span>
+            </Tooltip>
           </div>
         )
       }
@@ -109,6 +125,7 @@ const Page = () => {
       </div>
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
+      {eventId && <RenderAgendaOffcanvas show={showAgenda} setShow={setShowAgenda} selectedEventId={eventId} />}
     </>
   );
 };

@@ -68,7 +68,7 @@ async function deleteEvent(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    await Event.findOneAndDelete(id);
+    await Event.findOneAndDelete({ _id: id });
     return true;
   } catch (error) {
     logger.error(error);

@@ -52,7 +52,8 @@ export const regularServiceValidator = {
       description: '',
       status: false,
       remote: false,
-      remote_link: ''
+      remote_link: '',
+      file : null
     };
   },
   fields: {
@@ -64,11 +65,12 @@ export const regularServiceValidator = {
     description: '',
     status: false,
     remote: false,
-    remote_link: ''
+    remote_link: '',
+    file : null
   }
 };
 
-export const regularServiceAgendaValidator = {
+export const regularAgendaValidator = {
   rules: {
     title: [
       {
@@ -166,6 +168,25 @@ export const eventValidator = {
       }
     ]
   }, 
+  reset: () => {
+    return {
+      title: '',
+      status: '',
+      description: null,
+      start_date: '',
+      end_date: '',
+      addressLine1: "",
+      county: "",
+      town: "",
+      country: "",
+      postcode: "",
+      completeAddress: "",
+      location: {
+        type: "Point",
+        coordinates: []
+      },
+    };
+  },
   fields: {
     title: '',
     status: '',

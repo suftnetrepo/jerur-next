@@ -1,8 +1,12 @@
 import {
-  addEventAgenda, updateEventAgenda, removeEventAgenda, getEventAgendasById 
+  addEventAgenda,
+  updateEventAgenda,
+  removeEventAgenda,
+  getEventAgendasById
 } from '../../../services/eventAgendaServices';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
@@ -13,7 +17,7 @@ export const GET = async (req) => {
     return NextResponse.json({ data, success: true });
 
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };
@@ -23,8 +27,8 @@ export const DELETE = async (req) => {
     const url = new URL(req.url);
 
     const id = url.searchParams.get('id');
-    const eventId = url.searchParams.get('eventId');
-    const deleted = await removeEventAgenda(id, eventId);
+    const serviceId = url.searchParams.get('eventId');
+    const deleted = await removeEventAgenda(id, serviceId);
 
     return NextResponse.json({ success: true, data: deleted });
   } catch (error) {
@@ -49,11 +53,15 @@ export const PUT = async (req) => {
 
 export const POST = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
     const body = await req.json();
 
-    const result = await addEventAgenda(user?.church , body);
+    const result = await addEventAgenda(body);
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     logger.error(error);
