@@ -3,21 +3,18 @@
 import React, { useMemo, useState, Suspense } from 'react';
 import { Table } from '@/components/elements/table/table';
 import { Button } from 'react-bootstrap';
-import { useRegularService } from '../../../../hooks/useRegularService';
+import { useFellowship } from '../../../../hooks/useFellowship';
 import { MdArrowBack } from 'react-icons/md';
 import { TiEdit } from 'react-icons/ti';
-import { FaTasks } from 'react-icons/fa';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import { useRouter } from 'next/navigation';
 import Tooltip from '@mui/material/Tooltip';
 import RenderFormOffcanvas from './renderFormOffcanvas';
-import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
 import { getYesNoColorCode } from '@/utils/helpers';
 
 const Render = () => {
   const router = useRouter();
   const [show, setShow] = useState(false);
-  const [showAgenda, setShowAgenda] = useState(false);
   const {
     data,
     error,
@@ -31,28 +28,22 @@ const Render = () => {
     handleEdit,
     handleSave,
     handleReset,
-    handleSelect
-  } = useRegularService();
+    handleSelect,
+    handleSelectedAddress
+  } = useFellowship();
  
   const columns = useMemo(
     () => [
-      { Header: 'Sn', accessor: 'sequency_no', sortType: 'basic' },
-      { Header: 'Title', accessor: 'title', sortType: 'basic' },
-      { Header: 'Start Time', accessor: 'start_time', sortType: 'basic' },
-      { Header: 'End Time', accessor: 'end_time', sortType: 'basic' },
+      { Header: 'Name', accessor: 'name', sortType: 'basic' },
+      { Header: 'Mobile', accessor: 'mobile', sortType: 'basic' },
+      { Header: 'Address', accessor: 'addressLine1', sortType: 'basic' },
+      { Header: 'Town', accessor: 'town', sortType: 'basic' },
+      { Header: 'County', accessor: 'county', sortType: 'basic' },
+      { Header: 'Postcode', accessor: 'postcode', sortType: 'basic' },
+      { Header: 'Country', accessor: 'country', sortType: 'basic' },
       {
         Header: 'Status',
         accessor: 'status',
-        headerClassName: { textAlign: 'center' },
-        Cell: ({ value }) => (
-          <div className="d-flex justify-content-start align-items-center">
-            <span className={`badge ${getYesNoColorCode(value)}`}>{value ? 'Yes' : 'No'}</span>
-          </div>
-        )
-      },
-      {
-        Header: 'Remote',
-        accessor: 'remote',
         headerClassName: { textAlign: 'center' },
         Cell: ({ value }) => (
           <div className="d-flex justify-content-start align-items-center">
@@ -78,18 +69,6 @@ const Render = () => {
                 />
               </span>
             </Tooltip>
-            <Tooltip title="View Service Agenda" arrow>
-              <span className="p-0">
-                <FaTasks
-                  size={30}
-                  className="pointer ms-2"
-                  onClick={async () => {
-                    setShowAgenda(true);
-                    await handleSelect(row.original);
-                  }}
-                />
-              </span>
-            </Tooltip>
           </div>
         )
       }
@@ -100,10 +79,10 @@ const Render = () => {
   return (
     <div className="ms-5 me-5 ">
       <div className="d-flex justify-content-start align-items-center mb-3">
-        <Button variant="outline-secondary" onClick={() => router.push(`/protected/church/regular-services`)}>
+        <Button variant="outline-secondary" onClick={() => router.push(`/protected/church/fellowship`)}>
           <MdArrowBack size={24} /> Back
         </Button>
-        <h3 className="card-title ms-2">Regular Services</h3>
+        <h3 className="card-title ms-2">Fellowship</h3>
       </div>
       <div className={` mt-2 ${!loading ? 'overlay__block' : null}`}>
         <div className="card-body">
@@ -136,8 +115,8 @@ const Render = () => {
         success={success}
         error={error}
         setShow={setShow}
+        handleSelectedAddress={handleSelectedAddress}
       />
-      {fields._id && <RenderAgendaOffcanvas show={showAgenda} setShow={setShowAgenda} selectedServiceId={fields._id} />}
     </div>
   );
 };

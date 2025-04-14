@@ -147,3 +147,10 @@ export const EVENT_AGENDA = {
   fetch: `${HOST}event/agenda`,
   removeOne: `${HOST}event/agenda/`
 };
+
+export const FELLOWSHIP = {
+  createOne: `${HOST}fellowship/create`,
+  updateOne: `${HOST}fellowship/update`,
+  fetch: `${HOST}fellowship/`,
+  removeOne: `${HOST}fellowship/delete`
+};

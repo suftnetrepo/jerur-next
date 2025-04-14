@@ -1,4 +1,4 @@
-import Fellowship from '../models';
+import Fellowship from '../models/fellowship';
 import { identifierValidator } from '../validation/identifierValidator';
 import { fellowshipValidator } from '../validation/fellowshipValidator';
 import { logger } from '../../utils/logger';
@@ -69,7 +69,7 @@ async function deleteFellowship(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    await Fellowship.findByIdAndRemove(id);
+    await Fellowship.findByIdAndDelete(id);
     return true;
   } catch (error) {
     logger.error(error);
@@ -108,7 +108,7 @@ async function getAllFellowships(suid) {
     });
     return allFellowships;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error fetching all fellowship');
   }
 }
