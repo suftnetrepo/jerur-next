@@ -7,12 +7,12 @@ import { ConfirmationDialogue, OkDialogue } from '../../../../src/components/ele
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import dynamic from 'next/dynamic';
 import { regularAgendaValidator } from '@/validator/rules';
-import { useRegularServiceAgenda } from '@/hooks/useRegularServiceAgenda';
+import { useEventAgenda } from '@/hooks/useEventAgenda';
 import { IoCloseCircle } from 'react-icons/io5';
 import AgendaTable from './agendaTable';
 const Form = dynamic(() => import('./agendaForm'), { ssr: false });
 
-const RenderAgendaOffcanvas = ({ show, setShow, selectedServiceId }) => {
+const RenderAgendaOffcanvas = ({ show, setShow, selectedEventId }) => {
   const [errorMessages, setErrorMessages] = useState({});
   const {
     handleChange,
@@ -26,11 +26,11 @@ const RenderAgendaOffcanvas = ({ show, setShow, selectedServiceId }) => {
     error,
     fields,
     success
-  } = useRegularServiceAgenda();
+  } = useEventAgenda();
 
   useEffect(() => {
-    selectedServiceId && handleFetch(selectedServiceId);
-  }, [selectedServiceId]);
+    selectedEventId && handleFetch(selectedEventId);
+  }, [selectedEventId]);
 
   const handleSubmit = async () => {
     setErrorMessages({});
@@ -55,7 +55,7 @@ const RenderAgendaOffcanvas = ({ show, setShow, selectedServiceId }) => {
     if (fields?._id) {
       await handleEdit(body, fields._id, fields);
     } else {
-      await handleSave({ serviceId: selectedServiceId, ...body });
+      await handleSave({ eventId: selectedEventId, ...body });
     }
   };
 
@@ -67,7 +67,7 @@ const RenderAgendaOffcanvas = ({ show, setShow, selectedServiceId }) => {
       style={{ width: '32%', backgroundColor: 'white' }}
     >
       <Offcanvas.Header className="d-flex flex-row justify-content-between align-items-center">
-        <h4>Service Agenda</h4>
+        <h4>Event Agenda</h4>
         <IoCloseCircle size={48} color="#333333" className="pointer ms-2" onClick={() => setShow(false)} />
       </Offcanvas.Header>
       <Offcanvas.Body>
@@ -75,7 +75,7 @@ const RenderAgendaOffcanvas = ({ show, setShow, selectedServiceId }) => {
         <div className="m-4"></div>
         <AgendaTable
           agenda={data}
-          serviceId={selectedServiceId}
+          eventId={selectedEventId}
           handleSelect={handleSelect}
           handleDelete={handleDelete}
         />
@@ -108,7 +108,7 @@ const RenderAgendaOffcanvas = ({ show, setShow, selectedServiceId }) => {
         <ErrorDialogue
           showError={error}
           onClose={() => {
-            handleReset();
+            
            
           }}
         />

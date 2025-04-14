@@ -9,13 +9,14 @@ import {
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
 import { getUserSession } from '@/utils/generateToken';
+import { parseEventFormData } from '../shared/parseEventFormData';
 
 export const GET = async (req) => {
   try {
     const user = await getUserSession(req);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const url = new URL(req.url);
@@ -38,19 +39,17 @@ export const GET = async (req) => {
         searchQuery,
         status
       });
-      return NextResponse.json({ data, success: true , totalCount });
+      return NextResponse.json({ data, success: true, totalCount });
     }
 
-    console.log("......................action", action)
-
-    if (action === "single") {
+    if (action === 'single') {
       const id = url.searchParams.get('id');
-      const  data  = await getEventById(id);
+      const data = await getEventById(id);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'top10') {
-      const  data  = await getTop10Events(user?.church);
+      const data = await getTop10Events(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
@@ -78,9 +77,10 @@ export const PUT = async (req) => {
   try {
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
-    const body = await req.json();
 
-    const updated = await editEvent(id, body);
+    const eventData = await parseEventFormData(req); 
+    const updated = await editEvent(id, eventData);
+
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     logger.error(error);
@@ -93,12 +93,12 @@ export const POST = async (req) => {
     const user = await getUserSession(req);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const body = await req.json();
 
-    const result = await creatEvent(user?.church, body);
-    return NextResponse.json({ success: true, data: result });
+    const eventData = await parseEventFormData(req);
+    const data = await creatEvent(user.church, eventData);
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

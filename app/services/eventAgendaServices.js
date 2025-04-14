@@ -1,19 +1,13 @@
 import { eventAgendaValidator } from '../validation/eventValidator';
 import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
-import Event from '../models';
+import Event from '../models/event';
 import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-const addEventAgenda = async ( suid , body) => {
+const addEventAgenda = async (body) => {
   try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
 
     const bodyErrors = eventAgendaValidator(body);
     if (bodyErrors.length) {
@@ -31,7 +25,7 @@ const addEventAgenda = async ( suid , body) => {
     const newAgenda = event.agenda[event.agenda.length - 1];
     return newAgenda;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error adding event agenda');
   }
 };
@@ -110,7 +104,7 @@ const getEventAgendasById = async (eventId) => {
     const agendas = event.agenda.sort((a, b) => a.sequency_no - b.sequency_no);
     return agendas;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error fetching agendas');
   }
 };

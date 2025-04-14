@@ -5,8 +5,14 @@ import { Form, Button } from 'react-bootstrap';
 import Editor from '../../../../src/components/reuseable/editor';
 import 'react-datetime/css/react-datetime.css';
 import FindAddress from '../../../share/findAddress';
+import { ImageUploader } from '@/components/elements/image';
 
 const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSelectedAddress }) => {
+
+  const handleImageChange = (file) => {
+    handleChange('file', file);
+  };
+
   const handlePaste = (e) => {
     const pastedText = e.clipboardData.getData('text');
     handleChange('description', pastedText);
@@ -45,8 +51,10 @@ const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSe
                 <Form.Control
                   type="datetime-local"
                   value={fields?.start_date}
-                  onChange={(e) => { handleChange('start_date', e.target.value) }}
-                  onBlur={(e)=>   e.target.blur()}
+                  onChange={(e) => {
+                    handleChange('start_date', e.target.value);
+                  }}
+                  onBlur={(e) => e.target.blur()}
                 />
               </Form.Group>
               {errorMessages?.start_date?.message && (
@@ -60,7 +68,7 @@ const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSe
                   type="datetime-local"
                   value={fields?.end_date}
                   onChange={(e) => handleChange('end_date', e.target.value)}
-                  onBlur={(e)=>   e.target.blur()}
+                  onBlur={(e) => e.target.blur()}
                 />
               </Form.Group>
               {errorMessages?.end_date?.message && (
@@ -182,6 +190,16 @@ const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSe
             </div>
           </>
         )}
+      </div>
+
+      <div className="row">
+        <div className="col-md-12">
+          <ImageUploader
+            onImageChange={handleImageChange}
+            initialImage={fields?.secure_url}
+            maxSizeMB={2} 
+          />
+        </div>
       </div>
 
       <div className="row">
