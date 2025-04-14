@@ -6,7 +6,6 @@ import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialo
 import { normalizeTime } from '@/utils/helpers';
 
 const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleChange, fields }) => {
-  console.log('..............fields', fields);
 
   const handlePaste = (e) => {
     const pastedText = e.clipboardData.getData('text');

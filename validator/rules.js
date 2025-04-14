@@ -53,7 +53,7 @@ export const regularServiceValidator = {
       status: false,
       remote: false,
       remote_link: '',
-      file : null
+      file: null
     };
   },
   fields: {
@@ -66,7 +66,7 @@ export const regularServiceValidator = {
     status: false,
     remote: false,
     remote_link: '',
-    file : null
+    file: null
   }
 };
 
@@ -107,7 +107,7 @@ export const regularAgendaValidator = {
         pattern: /^.+$/,
         message: 'sequency no is required'
       }
-    ],
+    ]
   },
 
   reset: () => {
@@ -118,7 +118,7 @@ export const regularAgendaValidator = {
       end_time: '',
       sequency_no: '',
       description: '',
-      status: false,
+      status: false
     };
   },
   fields: {
@@ -128,7 +128,7 @@ export const regularAgendaValidator = {
     end_time: '',
     sequency_no: '',
     description: '',
-    status: false,
+    status: false
   }
 };
 
@@ -142,9 +142,7 @@ export const eventValidator = {
       { pattern: /^.+$/, message: 'description is required' },
       { pattern: /^.{0,5000}$/, message: 'description must not exceed 1000 characters' }
     ],
-    status: [
-      { pattern: /^.+$/, message: 'Status is required' }
-    ],
+    status: [{ pattern: /^.+$/, message: 'Status is required' }],
     start_date: [
       { pattern: /^.+$/, message: 'Start date is required' },
       {
@@ -167,7 +165,7 @@ export const eventValidator = {
         }
       }
     ]
-  }, 
+  },
   reset: () => {
     return {
       title: '',
@@ -175,16 +173,16 @@ export const eventValidator = {
       description: null,
       start_date: '',
       end_date: '',
-      addressLine1: "",
-      county: "",
-      town: "",
-      country: "",
-      postcode: "",
-      completeAddress: "",
+      addressLine1: '',
+      county: '',
+      town: '',
+      country: '',
+      postcode: '',
+      completeAddress: '',
       location: {
-        type: "Point",
+        type: 'Point',
         coordinates: []
-      },
+      }
     };
   },
   fields: {
@@ -193,15 +191,86 @@ export const eventValidator = {
     description: null,
     start_date: '',
     end_date: '',
-    addressLine1: "",
-    county: "",
-    town: "",
-    country: "",
-    postcode: "",
-    completeAddress: "",
+    addressLine1: '',
+    county: '',
+    town: '',
+    country: '',
+    postcode: '',
+    completeAddress: '',
     location: {
-      type: "Point",
+      type: 'Point',
+      coordinates: []
+    }
+  }
+};
+
+export const fellowshipValidator = {
+  rules: {
+    name: [
+      { pattern: /^.+$/, message: 'name is required' },
+      {
+        pattern: /^.{0,100}$/,
+        message: 'name must be no more than 50 characters'
+      }
+    ],
+    mobile: [
+      { pattern: /^.+$/, message: 'mobile number is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'mobile number must be no more than 20 characters'
+      }
+    ],
+    addressLine1: [
+      {
+        pattern: /^.+$/,
+        message: 'street address is required'
+      }
+    ],
+    town: [
+      {
+        pattern: /^.+$/,
+        message: 'town is required'
+      }
+    ],
+    country: [
+      {
+        pattern: /^.+$/,
+        message: 'country is required'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      _id: '',
+      name: '',
+      mobile: '',
+      addressLine1: '',
+      county: '',
+      town: '',
+      country: '',
+      postcode: '',
+      completeAddress: '',
+      location: {
+        type: '',
+        coordinates: []
+      },
+      status: false
+    };
+  },
+  fields: {
+    _id: '',
+    name: '',
+    mobile: '',
+    addressLine1: '',
+    county: '',
+    town: '',
+    country: '',
+    postcode: '',
+    completeAddress: '',
+    location: {
+      type: '',
       coordinates: []
     },
+    status: false
   }
 };

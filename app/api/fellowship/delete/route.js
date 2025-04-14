@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 
 export const DELETE = async (req) => {
   try {
-  
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
     const  data= await deleteFellowship( id );

@@ -5,22 +5,28 @@ import {
 } from '../../services/fellowshipService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
 
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    console.log("......................user?.church", user?.church)
+    
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
 
     if (action === 'getAll') {
-      const { data } = await getAllFellowships(user?.church);
+      const data = await getAllFellowships(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'count') {
-      const { data } = await countInFellowshipCollection(user?.church);
+      const data = await countInFellowshipCollection(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
@@ -28,7 +34,7 @@ export const GET = async (req) => {
       const latitude = url.searchParams.get('latitude');
       const longitude = url.searchParams.get('longitude');
       const radius = url.searchParams.get('radius');
-      const { data } = await searchFellowshipWithinRadius(user?.church, latitude, longitude, radius);
+      const data = await searchFellowshipWithinRadius(user?.church, latitude, longitude, radius);
       return NextResponse.json({ data, success: true });
     }
 
