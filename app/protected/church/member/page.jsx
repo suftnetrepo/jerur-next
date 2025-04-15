@@ -3,33 +3,35 @@
 import React, { useMemo, useState } from 'react';
 import { Table } from '../../../../src/components/elements/table/table';
 import { Button } from 'react-bootstrap';
-import { useUser } from '../../../../hooks/useUser';
-import Badge from 'react-bootstrap/Badge';
+import { useMember } from '../../../../hooks/useMember';
 import { MdDelete } from 'react-icons/md';
 import { TiEdit } from 'react-icons/ti';
 import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
-import RenderUserOffcanvas from './renderUserOffcanvas';
+import RenderUserOffcanvas from './renderOffcanvas';
 import Tooltip from '@mui/material/Tooltip';
+import { capitalizeFirstLetter, getStatusBadgeClass } from '@/utils/helpers';
 
-const User = () => { 
+const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [show, setShow] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const {
     data,
     error,
-    editData,
+    fields,
+    success,
     loading,
     totalCount,
-    handleFetchUsers,
-    handleDeleteUser,
+    handleFetch,
+    handleDelete,
     handleEdit,
-    handleEditUser,
-    handleSaveUser,
-    handleReset
-  } = useUser(debouncedSearchQuery);
+    handleSave,
+    handleReset,
+    handleChange,
+    handleSelect
+  } = useMember(debouncedSearchQuery);
 
   const handleClose = () => {
     handleReset();
@@ -46,21 +48,23 @@ const User = () => {
       { Header: 'Lastname', accessor: 'last_name', sortType: 'basic' },
       { Header: 'Mobile', accessor: 'mobile', sortType: 'basic' },
       { Header: 'Email', accessor: 'email' },
-      { Header: 'Role', accessor: 'role' },
       {
-        Header: 'Status',
-        accessor: 'user_status',
+        Header: 'Role',
+        accessor: 'role',
+        headerClassName: { textAlign: 'center' },
         Cell: ({ value }) => (
           <div className="d-flex justify-content-start align-items-center">
-            {value ? (
-              <Badge bg="success" className="p-2">
-                Yes
-              </Badge>
-            ) : (
-              <Badge bg="danger" className="p-2">
-                No
-              </Badge>
-            )}
+            <span >{capitalizeFirstLetter(value)}</span>
+          </div>
+        )
+      },
+      {
+        Header: 'Status',
+        accessor: 'status',
+        headerClassName: { textAlign: 'center' },
+        Cell: ({ value }) => (
+          <div className="d-flex justify-content-start align-items-center">
+            <span className={`badge ${getStatusBadgeClass(value)}`}>{capitalizeFirstLetter(value)}</span>
           </div>
         )
       },
@@ -70,23 +74,23 @@ const User = () => {
         className: 'center',
         Cell: ({ row }) => (
           <div className="d-flex justify-content-center align-items-center">
-            <Tooltip title="Edit User" arrow>
+            <Tooltip title="Edit Member" arrow>
               <span className="p-0">
                 <TiEdit
                   size={30}
                   className="pointer me-2"
                   onClick={() => {
                     handleShow();
-                    handleEdit(row.original);
+                    handleSelect(row.original);
                   }}
                 />
               </span>
             </Tooltip>
-            <Tooltip title="Delete User" arrow>
+            <Tooltip title="Delete Member" arrow>
               <span className="p-0">
                 <DeleteConfirmation
                   onConfirm={async (id) => {
-                    handleDeleteUser(id);
+                    handleDelete(id);
                   }}
                   onCancel={() => {}}
                   itemId={row.original._id}
@@ -106,7 +110,7 @@ const User = () => {
     <>
       <div className={`ms-5 me-5 mt-2 ${!loading ? 'overlay__block' : null}`}>
         <div className="card-body">
-          <h5 className="card-title ms-2 mb-2">Users</h5>
+          <h5 className="card-title ms-2 mb-2">Members</h5>
           <div className="d-flex justify-content-between align-items-center mb-3">
             {/* Search Box */}
             <input
@@ -123,23 +127,27 @@ const User = () => {
                 handleShow();
               }}
             >
-              + Add User
+              + Add Member
             </Button>
           </div>
-          <Table data={data} columns={columns} pageCount={totalCount} loading={loading} fetchData={handleFetchUsers} />
+          <Table data={data} columns={columns} pageCount={totalCount} loading={loading} fetchData={handleFetch} />
         </div>
       </div>
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
       <RenderUserOffcanvas
         handleClose={handleClose}
+        handleChange={handleChange}
         show={show}
-        userData={editData}
-        handleEditUser={handleEditUser}
-        handleSaveUser={handleSaveUser}
+        setShow={setShow}
+        fields={fields}
+        success={success}
+        handleReset={handleReset}
+        handleEdit={handleEdit}
+        handleSave={handleSave}
       />
     </>
   );
 };
 
-export default User;
+export default Page;

@@ -42,7 +42,49 @@ const generateToken = (currentUser, expiresIn) => {
   };
   return { token, member };
 };
-function getMembers( suid ) {
+
+async function getMembers({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
+  const skip = (page - 1) * limit;
+
+  try {
+    const sortOptions = {};
+    if (sortField) {
+      sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
+    }
+
+    const searchFilter = searchQuery
+      ? {
+          $or: [
+            { first_name: { $regex: searchQuery, $options: 'i' } },
+            { last_name: { $regex: searchQuery, $options: 'i' } },
+            { mobile: { $regex: searchQuery, $options: 'i' } },
+            { status: { $regex: searchQuery, $options: 'i' } },
+            { email: { $regex: searchQuery, $options: 'i' } },
+          ]
+        }
+      : {};
+
+    const query = {
+      church:suid,
+      ...searchFilter
+    };
+
+    const [members, totalCount] = await Promise.all([
+      Member.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
+      Member.countDocuments({church:suid})
+    ]);
+
+    return {
+      data: members,
+      totalCount
+    };
+  } catch (error) {
+    logger.error(error);
+    throw new Error('An unexpected error occurred. Please try again.');
+  }
+}
+
+async function getMemberCount( suid ) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -50,24 +92,10 @@ function getMembers( suid ) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    return Member.find({ church: suid }).sort({ createdAt: -1 });
-  } catch (error) {
-    logger.error(error);
-    throw new Error('An unexpected error occurred. Please try again.');
-  }
-}
-async function getMemberCount( suid ) {
-  try {
-    // const identifierValidateResult = identifierValidator(suid);
-    // if (identifierValidateResult.length) {
-    //   const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-    //   error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-    //   throw error;
-    // }
-    const members = await Member.find({ });
+    const members = await Member.countDocuments({church:suid})
     return members?.length ;
   } catch (error) {
-    console.error('Error getting member count:', error);
+    logger.error('Error getting member count:', error);
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }

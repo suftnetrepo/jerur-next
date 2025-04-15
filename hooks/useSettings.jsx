@@ -2,17 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
-import { INTEGRATOR, USER } from '../utils/apiUrl';
-import { integratorValidator } from '../app/protected/church/rules';
+import { CHURCH, USER } from '../utils/apiUrl';
+import { churchValidator } from '@/validator/rules';
 
 const useSettings = () => {
   const [state, setState] = useState({
     data: [],
     loading: false,
-    fields: integratorValidator.fields,
+    fields: churchValidator.fields,
     error: null,
     success: false,
-    rules: integratorValidator.rules
+    rules: churchValidator.rules
   });
 
   const handleChange = (name, value) => {
@@ -43,26 +43,30 @@ const useSettings = () => {
     });
   }; 
 
-  const handleFetchIntegrator = async () => {
-    const { data, success, errorMessage } = await zat(INTEGRATOR.fetchSingle, null, VERBS.GET);
+  const handleFetch = async () => {
+    const { data, success, errorMessage } = await zat(CHURCH.fetchOne, null, VERBS.GET ,{
+      action:"one"
+    });
 
     if (success) {
       setState((prevState) => ({
         ...prevState,
         fields: {
           ...prevState.fields,
-          ...data.data          
+          ...data          
         },
         loading: false
       }));
     } else {
-      handleError(errorMessage || 'Failed to fetch the project.');
+      handleError(errorMessage || 'Failed to fetch the settings.');
     }
   };
 
   const handleSave = async (body)=> {
     setState((prev) => ({ ...prev, loading: true, success : false }));
-    const { success, errorMessage } = await zat(INTEGRATOR.uploadOne, body, VERBS.POST);
+    const { success, errorMessage } = await zat(CHURCH.uploadOne, body, VERBS.PUT, {
+      action:'one'
+    });
 
     if (success) {
       setState((prevState) => ({
@@ -72,7 +76,7 @@ const useSettings = () => {
       }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the project.');
+      handleError(errorMessage || 'Failed to update the settings.');
       return false;
     }
   }
@@ -89,18 +93,18 @@ const useSettings = () => {
       }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the project.');
+      handleError(errorMessage || 'Failed to update the settings.');
       return false;
     }
   }
 
   useEffect(() => {
-     handleFetchIntegrator();
+    handleFetch();
   }, []);
 
   return {
     ...state,  
-    handleFetchIntegrator,  
+    handleFetch,  
     handleReset,
     handleSelect,
     handleChange,

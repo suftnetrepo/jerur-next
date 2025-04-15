@@ -28,7 +28,7 @@ const FindAddress = ({ handleSelectedAddress }) => {
   return (
     <>
       <Form.Group>
-        <div className="d-flex align-items-center justify-content-start mt-2 mb-3">
+        <div className="d-flex align-items-center justify-content-start">
           <Form.Check
             type="switch"
             id="custom-switch"
@@ -58,7 +58,7 @@ const FindAddress = ({ handleSelectedAddress }) => {
             </Button>
           </div>
           {searchResults?.length !== 0 && (
-            <div className="row mb-2">
+            <div className="row">
               <div className="col-md-12">
                 <Form.Group controlId="formName" className="mb-1">
                   <Form.Select

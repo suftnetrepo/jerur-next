@@ -96,7 +96,7 @@ const Render = () => {
                 handleReset();
               }}
             >
-              + Add Service
+              + Add Fellowship
             </Button>
           </div>
           <Table data={data} columns={columns} pageCount={totalCount} loading={loading} fetchData={handleFetch} />

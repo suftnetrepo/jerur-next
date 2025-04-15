@@ -6,12 +6,11 @@ import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialo
 import FindAddress from '@/share/findAddress';
 
 const FellowshipForm = ({ errorMessages, handleDelete, handleSubmit, handleChange, fields, handleSelectedAddress }) => {
-
   return (
     <Form>
       <div className="row">
         <div className="col-md-6">
-        <Form.Group controlId="formName" className="mb-3">
+          <Form.Group controlId="formName" className="mb-3">
             <Form.Label className="text-dark"> Name</Form.Label>
             <Form.Control
               type="text"
@@ -46,120 +45,108 @@ const FellowshipForm = ({ errorMessages, handleDelete, handleSubmit, handleChang
         </div>
       </div>
 
-      <div className="row mt-1">
-        <div className="col-md-12">
-          <div className="row">
-            <div className="col-md-6">
-              <FindAddress handleSelectedAddress={handleSelectedAddress} />
-              {fields?.completeAddress && <span>{fields.completeAddress}</span>}
-            </div>
-          </div>
+      <div className="row">
+        <div className="col-md-12 mt-2">
+          <FindAddress handleSelectedAddress={handleSelectedAddress} />
+       
         </div>
+        {fields?.completeAddress && <span className='text-dark fs-15 p-4'>{fields.completeAddress}</span>}
+      </div>
 
-        {fields?.completeAddress && (
-          <>
-            <div className="col-md-12">
-              <div className="col-md-6">
-                <div className="mb-3">
-                  <Form.Group controlId="formAddressLine1" className="mb-3">
-                    <Form.Label className="text-dark">AddressLine1</Form.Label>
+      {fields?.completeAddress && (
+        <div className="row">
+          <div className="col-md-12">
+              <div className="">
+                <Form.Group controlId="formAddressLine1" className="mb-3">
+                  <Form.Label className="text-dark">AddressLine1</Form.Label>
+                  <Form.Control
+                    type="addressLine1"
+                    placeholder="Enter addressLine1"
+                    name="addressLine1"
+                    value={fields?.addressLine1}
+                    onChange={(e) => handleChange('addressLine1', e.target.value)}
+                    className="border-dark"
+                  />
+                  {errorMessages?.addressLine1?.message && (
+                    <span className="text-danger fs-13">{errorMessages?.addressLine1?.message}</span>
+                  )}
+                </Form.Group>
+              </div>
+            </div>
+
+            <div className="row">
+                <div className="col-md-6">
+                  <Form.Group controlId="formTown" className="mb-3">
+                    <Form.Label className="text-dark">Town</Form.Label>
                     <Form.Control
-                      type="addressLine1"
-                      placeholder="Enter addressLine1"
-                      name="addressLine1"
-                      value={fields?.addressLine1}
-                      onChange={(e) => handleChange('addressLine1', e.target.value)}
+                      type="town"
+                      placeholder="Enter town"
+                      name="town"
+                      value={fields?.town}
+                      onChange={(e) => handleChange('town', e.target.value)}
                       className="border-dark"
                     />
-                    {errorMessages?.addressLine1?.message && (
-                      <span className="text-danger fs-13">{errorMessages?.addressLine1?.message}</span>
+                    {errorMessages?.town?.message && (
+                      <span className="text-danger fs-13">{errorMessages?.town?.message}</span>
+                    )}
+                  </Form.Group>
+                </div>
+                <div className="col-md-6">
+                  <Form.Group controlId="formCounty" className="mb-3">
+                    <Form.Label className="text-dark">County</Form.Label>
+                    <Form.Control
+                      type="county"
+                      placeholder="Enter county"
+                      name="county"
+                      value={fields?.county}
+                      onChange={(e) => handleChange('county', e.target.value)}
+                      className="border-dark"
+                    />
+                    {errorMessages?.county?.message && (
+                      <span className="text-danger fs-13">{errorMessages?.county?.message}</span>
                     )}
                   </Form.Group>
                 </div>
               </div>
-            </div>
 
-            <div className="col-md-12">
-              <div className="col-md-6">
-                <div className="row">
-                  <div className="col-md-6">
-                    <Form.Group controlId="formTown" className="mb-3">
-                      <Form.Label className="text-dark">Town</Form.Label>
-                      <Form.Control
-                        type="town"
-                        placeholder="Enter town"
-                        name="town"
-                        value={fields?.town}
-                        onChange={(e) => handleChange('town', e.target.value)}
-                        className="border-dark"
-                      />
-                      {errorMessages?.town?.message && (
-                        <span className="text-danger fs-13">{errorMessages?.town?.message}</span>
-                      )}
-                    </Form.Group>
-                  </div>
-                  <div className="col-md-6">
-                    <Form.Group controlId="formCounty" className="mb-3">
-                      <Form.Label className="text-dark">County</Form.Label>
-                      <Form.Control
-                        type="county"
-                        placeholder="Enter county"
-                        name="county"
-                        value={fields?.county}
-                        onChange={(e) => handleChange('county', e.target.value)}
-                        className="border-dark"
-                      />
-                      {errorMessages?.county?.message && (
-                        <span className="text-danger fs-13">{errorMessages?.county?.message}</span>
-                      )}
-                    </Form.Group>
-                  </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <Form.Group controlId="formPostcode" className="mb-3">
+                    <Form.Label className="text-dark">Post code</Form.Label>
+                    <Form.Control
+                      type="postcode"
+                      placeholder="Enter postcode"
+                      name="postcode"
+                      value={fields?.postcode}
+                      onChange={(e) => handleChange('postcode', e.target.value)}
+                      className="border-dark"
+                    />
+                    {errorMessages?.postcode?.message && (
+                      <span className="text-danger fs-13">{errorMessages?.postcode?.message}</span>
+                    )}
+                  </Form.Group>
+                </div>
+                <div className="col-md-6">
+                  <Form.Group controlId="formCountry" className="mb-3">
+                    <Form.Label className="text-dark">Country</Form.Label>
+                    <Form.Control
+                      type="country"
+                      placeholder="Enter country"
+                      name="country"
+                      value={fields?.country}
+                      onChange={(e) => handleChange('country', e.target.value)}
+                      className="border-dark"
+                    />
+                    {errorMessages?.country?.message && (
+                      <span className="text-danger fs-13">{errorMessages?.country?.message}</span>
+                    )}
+                  </Form.Group>
                 </div>
               </div>
-            </div>
-            <div className="col-md-12">
-              <div className="col-md-6">
-                <div className="row">
-                  <div className="col-md-6">
-                    <Form.Group controlId="formPostcode" className="mb-3">
-                      <Form.Label className="text-dark">Post code</Form.Label>
-                      <Form.Control
-                        type="postcode"
-                        placeholder="Enter postcode"
-                        name="postcode"
-                        value={fields?.postcode}
-                        onChange={(e) => handleChange('postcode', e.target.value)}
-                        className="border-dark"
-                      />
-                      {errorMessages?.postcode?.message && (
-                        <span className="text-danger fs-13">{errorMessages?.postcode?.message}</span>
-                      )}
-                    </Form.Group>
-                  </div>
-                  <div className="col-md-6">
-                    <Form.Group controlId="formCountry" className="mb-3">
-                      <Form.Label className="text-dark">Country</Form.Label>
-                      <Form.Control
-                        type="country"
-                        placeholder="Enter country"
-                        name="country"
-                        value={fields?.country}
-                        onChange={(e) => handleChange('country', e.target.value)}
-                        className="border-dark"
-                      />
-                      {errorMessages?.country?.message && (
-                        <span className="text-danger fs-13">{errorMessages?.country?.message}</span>
-                      )}
-                    </Form.Group>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="row">
+      <div className="row mt-2">
         <div className="col-md-6">
           <Form.Group controlId="status" className="d-flex d-flex justify-content-start align-items-start">
             <Form.Check

@@ -274,3 +274,134 @@ export const fellowshipValidator = {
     status: false
   }
 };
+
+const userValidator = {
+  rules: {
+    first_name: [
+      {
+        pattern: /^.+$/,
+        message: 'first name is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'first name must not be more than 50 characters'
+      }
+    ],
+    last_name: [
+      { pattern: /^.+$/, message: 'last name is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'last name must not be more than 50 characters'
+      }
+    ],
+    email: [
+      { pattern: /.+/, message: 'email address is required' },
+      {
+        pattern: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+        message: 'Please enter a valid email address'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'email address must not be more than 50 characters'
+      }
+    ],
+    mobile: [
+      { pattern: /^.+$/, message: 'mobile is required' },      
+      {
+        pattern: /^.{0,50}$/,
+        message: 'mobile number must not be more than 20 characters'
+      }
+    ],
+    role: [{ pattern: /^.+$/, message: 'role is required' }]
+  },
+  reset: () => {
+    return {
+      ...userValidator.fields
+    }
+
+  },
+  fields: {
+    first_name: '',
+    last_name: '',
+    email: '',
+    mobile: '',
+    user_status: false,
+    role: '',
+  }
+};
+
+export const memberValidator = {
+  rules: {
+    first_name: [
+      {
+        pattern: /^.+$/,
+        message: 'first name is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'first name must not be more than 50 characters'
+      }
+    ],
+    last_name: [
+      { pattern: /^.+$/, message: 'last name is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'last name must not be more than 50 characters'
+      }
+    ],
+    role: [{ pattern: /^.+$/, message: 'role is required' }]
+  },
+  reset: () => {
+    return {
+      ...userValidator.fields
+    }
+
+  },
+  fields: {
+    first_name: '',
+    last_name: '',
+    email: '',
+    mobile: '',
+    role: ''
+  }
+};
+
+export const churchValidator = {
+  rules: {
+    name: [
+      { pattern: /^.+$/, message: 'Name is required' },
+      { pattern: /^.{0,250}$/, message: 'Name must not exceed 100 characters' }
+    ],
+    email: [
+      { pattern: /.+/, message: 'email address is required' },
+      {
+        pattern: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+        message: 'Please enter a valid email address'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'email address must not be more than 50 characters'
+      }
+    ],
+    mobile: [
+      { pattern: /^.+$/, message: 'mobile is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'mobile number must not be more than 20 characters'
+      }
+    ],
+  },
+  fields: {
+    description: '',
+    name: '',
+    email: '',
+    mobile: '',
+    secure_url: '',
+    public_id: '',
+    status : '',
+    startDate: '',
+    endDate: '',
+    password :'',
+    confirm_password: ''
+  }
+};
