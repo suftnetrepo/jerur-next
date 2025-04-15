@@ -21,7 +21,7 @@ const memberSchema = new Schema(
       default: ''
     },
     status: { type: String, enum: ["active", "provisional", "inactive", "under discipline"], required: true },
-    email: { type: String, unique: true, lowercase: true },
+    email: { type: String, unique: false, lowercase: true },
     pin: {
       type: Number,
       default: 0

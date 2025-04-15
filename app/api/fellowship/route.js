@@ -14,8 +14,6 @@ export const GET = async (req) => {
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    console.log("......................user?.church", user?.church)
     
     const url = new URL(req.url);
     const action = url.searchParams.get('action');

@@ -41,11 +41,11 @@ const ChurchSidebarNav = () => {
       <SidebarNavItem icon={faUsers} href="/protected/church/member">
         Member
       </SidebarNavItem>
-      <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-services">
-        Regular Service
+      <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-service">
+       Service
       </SidebarNavItem>
-      <SidebarNavItem icon={faCalendar} href="/protected/church/events">
-        Event Schedule
+      <SidebarNavItem icon={faCalendar} href="/protected/church/event">
+        Event 
       </SidebarNavItem>
       <SidebarNavItem icon={faLocation} href="/protected/church/fellowship">
         Fellowship

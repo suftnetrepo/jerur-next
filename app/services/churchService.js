@@ -101,7 +101,7 @@ async function deleteChurch(id) {
     throw new Error('Error deleting church');
   }
 }
-async function getChurchById(id) {
+async function getChurch(id) {
   try {
     const identifierValidateResult = identifierValidator(id);
     if (identifierValidateResult.length) {
@@ -125,20 +125,7 @@ async function getChurchByIdentifier(id) {
       throw error;
     }
 
-    const church = await Church.findById(id, {
-      name: 1,
-      mobile: 1,
-      email: 1,
-      address: 1,
-      contacts: 1,
-      sliders: 1,
-      secure_url: 1,
-      public_id: 1,
-      logo_url: 1,
-      logo_id: 1,
-      currency: 1,
-      description: 1
-    });
+    const church = await Church.findById(id);
     return church;
   } catch (error) {
     logger.error(error);
@@ -154,7 +141,7 @@ async function getChurchesByName(churchName) {
     throw new Error('Error fetching churches');
   }
 }
-async function updateBulk({ suid }, body) {
+async function updateBulk(suid , body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -165,7 +152,7 @@ async function updateBulk({ suid }, body) {
     await Church.findByIdAndUpdate(suid, body);
     return true;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error updating contacts');
   }
 }
@@ -389,7 +376,7 @@ export {
   updateChurchStatus,
   updateChurchAddress,
   deleteChurch,
-  getChurchById,
+  getChurch,
   getChurchesByName,
   updateBulk,
   updateOneChurch,

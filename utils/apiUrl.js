@@ -43,9 +43,9 @@ export const TASK_COMMENTS = {
 };
 
 export const CHURCH = {
-  fetchChurches: `${HOST}admin`,
-  fetchSingle: `${HOST}church/fetchSingle`,
-  uploadOne: `${HOST}church/updateOne`
+  fetch: `${HOST}admin`,
+  fetchOne: `${HOST}church`,
+  uploadOne: `${HOST}church/update/`
 };
 
 export const SUBSCRIBER = {
@@ -154,3 +154,11 @@ export const FELLOWSHIP = {
   fetch: `${HOST}fellowship/`,
   removeOne: `${HOST}fellowship/delete`
 };
+
+export const MEMBER = {
+  createOne: `${HOST}member/create`,
+  updateOne: `${HOST}member/update`,
+  fetch: `${HOST}member/`,
+  removeOne: `${HOST}member/delete`
+};
+

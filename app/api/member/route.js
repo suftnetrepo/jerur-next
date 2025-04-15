@@ -1,4 +1,10 @@
-import { getMember, getMembers, getMemberCount, getRecentMembers, aggregateMemberByRole } from '../../services/memberService';
+import {
+  getMember,
+  getMembers,
+  getMemberCount,
+  getRecentMembers,
+  aggregateMemberByRole
+} from '../../services/memberService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
 import { getUserSession } from '@/utils/generateToken';
@@ -8,15 +14,29 @@ export const GET = async (req) => {
     const user = await getUserSession(req);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
 
     if (action === 'getAll') {
-      const data = await getMembers(user?.church);
-      return NextResponse.json({ data, success: true });
+      const sortField = url.searchParams.get('sortField');
+      const sortOrder = url.searchParams.get('sortOrder');
+      const searchQuery = url.searchParams.get('searchQuery');
+      const page = parseInt(url.searchParams.get('page') || '1', 10);
+      const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+
+      const { data, totalCount } = await getMembers({
+        suid: user?.church,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+        searchQuery
+      });
+
+      return NextResponse.json({ data, success: true, totalCount }, { status: 200 });
     }
 
     if (action === 'count') {
@@ -25,7 +45,7 @@ export const GET = async (req) => {
     }
 
     if (action === 'recent') {
-      const data  = await getRecentMembers(user?.church);
+      const data = await getRecentMembers(user?.church);
       return NextResponse.json({ data, success: true });
     }
 

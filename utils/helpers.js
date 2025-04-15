@@ -336,7 +336,29 @@ const getYesNoColorCode = (status) => {
   }
 };
 
+function capitalizeFirstLetter(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function getStatusBadgeClass(status) {
+  switch (status) {
+    case 'active':
+      return 'bg-success'; // Green
+    case 'provisional':
+      return 'bg-warning text-dark'; // Yellow
+    case 'inactive':
+      return 'bg-secondary'; // Gray
+    case 'under discipline':
+      return 'bg-danger'; // Red
+    default:
+      return 'bg-light text-dark'; // Default/fallback
+  }
+}
+
 export {
+  capitalizeFirstLetter,
+  getStatusBadgeClass,
   getYesNoColorCode,
   normalizeTime,
   encrypt,

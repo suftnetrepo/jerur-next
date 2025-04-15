@@ -33,7 +33,7 @@ const RenderFormOffcanvas = ({
       return;
     }
 
-    const { name, mobile, addressLine1, town, county, status, country, postcode } = fields;
+    const { name, mobile, addressLine1, town, county, status, country, postcode, location, completeAddress } = fields;
 
     const body = {
       name,
@@ -43,7 +43,9 @@ const RenderFormOffcanvas = ({
       county,
       status,
       country,
-      postcode
+      postcode,
+      location,
+      completeAddress
     };
 
     if (fields?._id) {
@@ -102,7 +104,8 @@ const RenderFormOffcanvas = ({
         <ErrorDialogue
           showError={error}
           onClose={() => {
-            setShow(false);
+           
+            handleReset();
           }}
         />
       )}
