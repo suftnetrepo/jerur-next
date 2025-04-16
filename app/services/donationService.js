@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import Donation from '../models';
+import Donation from '../models/donation';
 import { donationValidator } from '../validation/donationValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
@@ -22,6 +22,9 @@ async function addDonation( suid , body) {
       error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
       throw error;
     }
+
+    delete body._id
+
     const newDonation = new Donation({
       suid,
       ...body
@@ -30,7 +33,7 @@ async function addDonation( suid , body) {
     const savedDonation = await newDonation.save();
     return savedDonation;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error adding donation');
   }
 }
@@ -69,7 +72,7 @@ async function deleteDonation(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    await Donation.findByIdAndRemove(id);
+    await Donation.findByIdAndDelete(id);
     return true;
   } catch (error) {
     logger.error(error);
@@ -238,19 +241,19 @@ async function getDonations({ suid, page = 1, limit = 10, sortField, sortOrder, 
             { donation_type: { $regex: searchQuery, $options: 'i' } },
             { first_name: { $regex: searchQuery, $options: 'i' } },
             { last_name: { $regex: searchQuery, $options: 'i' } },
-            { online: { $regex: searchQuery, $options: 'i' } }
+        
           ]
         }
       : {};
 
     const query = {
-      church:suid,
+      suid,
       ...searchFilter
     };
 
     const [donations, totalCount] = await Promise.all([
       Donation.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
-      Donation.countDocuments({church:suid})
+      Donation.countDocuments({suid})
     ]);
 
     return {
@@ -258,7 +261,7 @@ async function getDonations({ suid, page = 1, limit = 10, sortField, sortOrder, 
       totalCount
     };
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }

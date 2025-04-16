@@ -5,7 +5,7 @@ import {
   faUser,
   faBuildingUser,
   faCalendar,
-  faHomeUser,
+  faDonate,
   faLocation,
   faUsers
 } from '@fortawesome/free-solid-svg-icons';
@@ -49,6 +49,9 @@ const ChurchSidebarNav = () => {
       </SidebarNavItem>
       <SidebarNavItem icon={faLocation} href="/protected/church/fellowship">
         Fellowship
+      </SidebarNavItem>
+      <SidebarNavItem icon={faDonate} href="/protected/church/donation">
+        Donation
       </SidebarNavItem>
       <SidebarNavItem icon={faUser} href="/protected/church/user">
         User

@@ -7,11 +7,15 @@ import {
 } from '../../services/donationService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
@@ -35,17 +39,17 @@ export const GET = async (req) => {
     }
 
     if (action === 'aggregateByMonth') {
-      const { data } = await getDonationByMonthlyAggregates(user?.church);
+      const data  = await getDonationByMonthlyAggregates(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'aggregateByType') {
-      const { data } = await getByDonationTypeAggregates(user?.church);
+      const  data  = await getByDonationTypeAggregates(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'aggregateByDailyDate') {
-      const { data } = await getDonationByDailyAggregates(user?.church);
+      const data  = await getDonationByDailyAggregates(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
@@ -53,7 +57,7 @@ export const GET = async (req) => {
       const startDate = url.searchParams.get('startDate');
       const endDate = url.searchParams.get('endDate');
       const donation_type = url.searchParams.get('donation_type');
-      const { data } = await filterDonationsByDate(user?.church, startDate, endDate, donation_type);
+      const data  = await filterDonationsByDate(user?.church, startDate, endDate, donation_type);
       return NextResponse.json({ data, success: true });
     }
 

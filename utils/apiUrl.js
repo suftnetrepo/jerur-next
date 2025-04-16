@@ -162,3 +162,9 @@ export const MEMBER = {
   removeOne: `${HOST}member/delete`
 };
 
+export const DONATION = {
+  createOne: `${HOST}donation/create`,
+  updateOne: `${HOST}donation/update`,
+  fetch: `${HOST}donation/`,
+  removeOne: `${HOST}donation/delete`
+};

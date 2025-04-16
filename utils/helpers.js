@@ -244,7 +244,7 @@ const reverseGeocode = async (latitude, longitude) => {
   } catch (error) {}
 };
 
-function formatCurrency(currencySymbol, amount) {
+function formatCurrency(currencySymbol ='£', amount) {
   const numericAmount = parseFloat(amount);
 
   if (isNaN(numericAmount)) {
