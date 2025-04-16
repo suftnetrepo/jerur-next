@@ -306,7 +306,7 @@ const userValidator = {
       }
     ],
     mobile: [
-      { pattern: /^.+$/, message: 'mobile is required' },      
+      { pattern: /^.+$/, message: 'mobile is required' },
       {
         pattern: /^.{0,50}$/,
         message: 'mobile number must not be more than 20 characters'
@@ -316,9 +316,13 @@ const userValidator = {
   },
   reset: () => {
     return {
-      ...userValidator.fields
-    }
-
+      first_name: '',
+      last_name: '',
+      email: '',
+      mobile: '',
+      user_status: false,
+      role: ''
+    };
   },
   fields: {
     first_name: '',
@@ -326,7 +330,7 @@ const userValidator = {
     email: '',
     mobile: '',
     user_status: false,
-    role: '',
+    role: ''
   }
 };
 
@@ -353,9 +357,12 @@ export const memberValidator = {
   },
   reset: () => {
     return {
-      ...userValidator.fields
-    }
-
+      first_name: '',
+      last_name: '',
+      email: '',
+      mobile: '',
+      role: ''
+    };
   },
   fields: {
     first_name: '',
@@ -389,7 +396,22 @@ export const churchValidator = {
         pattern: /^.{0,50}$/,
         message: 'mobile number must not be more than 20 characters'
       }
-    ],
+    ]
+  },
+  reset: () => {
+    return {
+      description: '',
+      name: '',
+      email: '',
+      mobile: '',
+      secure_url: '',
+      public_id: '',
+      status: '',
+      startDate: '',
+      endDate: '',
+      password: '',
+      confirm_password: ''
+    };
   },
   fields: {
     description: '',
@@ -398,10 +420,63 @@ export const churchValidator = {
     mobile: '',
     secure_url: '',
     public_id: '',
-    status : '',
+    status: '',
     startDate: '',
     endDate: '',
-    password :'',
+    password: '',
     confirm_password: ''
+  }
+};
+
+export const donationValidator = {
+  rules: {
+    amount: [
+      { pattern: /^.+$/, message: 'amount is required' },
+      {
+        pattern: /^\d+(\.\d{2})?$/,
+        message: 'amount should be a number with at least 2 decimal places.'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      _id: '',
+      amount: '',
+      date_donated: '',
+      online: false,
+      email: '',
+      last_name: '',
+      first_name: '',
+      donation_type: ''
+    };
+  },
+  fields: {
+    _id: '',
+    amount: '',
+    date_donated: '',
+    online: false,
+    email: '',
+    last_name: '',
+    first_name: '',
+    donation_type: ''
+  }
+};
+
+export const filterDonationValidator = {
+  donation: {
+    startDateStr: [{ pattern: /^.+$/, message: 'start date is required' }],
+    endDateStr: [{ pattern: /^.+$/, message: 'end date is required' }]
+  },
+  reset: () => {
+    return {
+      startDateStr: '',
+      endDateStr: '',
+      donation_type: ''
+    };
+  },
+  fields: {
+    startDateStr: '',
+    endDateStr: '',
+    donation_type: ''
   }
 };
