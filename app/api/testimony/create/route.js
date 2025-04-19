@@ -1,11 +1,15 @@
 import { createTestimony } from '../../../services/testimoniesService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const POST = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+     const user = await getUserSession(req);
+  
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
 
     const body = await req.json();
     const data = await createTestimony(user.church, body);

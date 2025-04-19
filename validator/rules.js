@@ -480,3 +480,46 @@ export const filterDonationValidator = {
     donation_type: ''
   }
 };
+
+export const testimoniesValidator = {
+  rules: {
+    first_name: [
+      {
+        pattern: /^.+$/,
+        message: 'first name is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'first name must not be more than 50 characters'
+      }
+    ],
+    last_name: [
+      { pattern: /^.+$/, message: 'last name is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'last name must not be more than 50 characters'
+      }
+    ],
+    description: [
+      { pattern: /^.+$/, message: 'description is required' },
+      {
+        pattern: /^.{0,1000}$/,
+        message: 'description must not be more than 1000 characters'
+      }
+    ],
+  },
+  reset: () => {
+    return {
+      first_name: '',
+      last_name: '',
+      description: '',
+      status: false
+    };
+  },
+  fields: {
+    first_name: '',
+    last_name: '',
+    description: '',
+    status: false
+  }
+};

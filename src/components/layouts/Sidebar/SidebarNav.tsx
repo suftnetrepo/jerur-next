@@ -53,6 +53,9 @@ const ChurchSidebarNav = () => {
       <SidebarNavItem icon={faDonate} href="/protected/church/donation">
         Donation
       </SidebarNavItem>
+      <SidebarNavItem icon={faDonate} href="/protected/church/testimony">
+        Testimony
+      </SidebarNavItem>
       <SidebarNavItem icon={faUser} href="/protected/church/user">
         User
       </SidebarNavItem>
