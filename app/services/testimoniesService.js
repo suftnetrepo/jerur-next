@@ -1,4 +1,4 @@
-/* eslint-disable space-before-function-paren */
+
 import { testimoniesValidator } from '../validation/userValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import Testimonies from '../models/testimonies';
@@ -7,16 +7,40 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-function getTestimonies(suid) {
-  const identifierValidateResult = identifierValidator(suid);
+async function getTestimonies({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
+  const skip = (page - 1) * limit;
 
   try {
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
+    const sortOptions = {};
+    if (sortField) {
+      sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
     }
-    return Testimonies.find({ church: suid }).sort({ createdAt: -1 }).limit(50);
+
+    const searchFilter = searchQuery
+      ? {
+          $or: [
+            { first_name: { $regex: searchQuery, $options: 'i' } },
+            { last_name: { $regex: searchQuery, $options: 'i' } },
+            { mobile: { $regex: searchQuery, $options: 'i' } },
+            { status: { $regex: searchQuery, $options: 'i' } },
+          ]
+        }
+      : {};
+
+    const query = {
+      church:suid,
+      ...searchFilter
+    };
+
+    const [testimonies, totalCount] = await Promise.all([
+      Testimonies.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
+      Testimonies.countDocuments({church:suid})
+    ]);
+
+    return {
+      data: testimonies,
+      totalCount
+    };
   } catch (error) {
     logger.error(error);
     throw new Error('An unexpected error occurred. Please try again.');
@@ -79,7 +103,7 @@ async function updateTestimonies(id, body) {
 
     return true;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }

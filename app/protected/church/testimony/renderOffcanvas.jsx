@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Offcanvas, Button, Form } from 'react-bootstrap';
 import { validate } from '../../../../validator/validator';
 import { ConfirmationDialogue, OkDialogue } from '../../../../src/components/elements/ConfirmDialogue';
-import { memberValidator } from '@/validator/rules';
+import { testimoniesValidator } from '@/validator/rules';
 
-const RenderUserOffcanvas = ({
+const RenderTestimonyOffcanvas = ({
   show,
   setShow,
   handleClose,
@@ -17,11 +17,17 @@ const RenderUserOffcanvas = ({
 }) => {
   const [errorMessages, setErrorMessages] = useState({});
 
+  const handlePaste = (e) => {
+    const pastedText = e.clipboardData.getData('text');
+    handleChange('description', pastedText);
+    e.preventDefault();
+  };
+
   const resetFields = () => {};
 
   const handleSubmit = async () => {
     setErrorMessages({});
-    const validationResult = validate(fields, memberValidator.rules);
+    const validationResult = validate(fields, testimoniesValidator.rules);
 
     if (validationResult.hasError) {
       setErrorMessages(validationResult.errors);
@@ -82,33 +88,21 @@ const RenderUserOffcanvas = ({
           </div>
 
           <div className="row">
-            <div className="col-md-6">
-              <Form.Group controlId="formEmail" className="mb-3">
-                <Form.Label className="text-dark">Email</Form.Label>
+            <div className="col-md-12">
+              <Form.Group className="mb-3">
+                <Form.Label className="text-dark">Description</Form.Label>
                 <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  name="email"
-                  value={fields.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
+                  as="textarea"
+                  rows={3}
+                  placeholder="Ente description"
+                  value={fields.description}
+                  onPaste={handlePaste}
+                  onChange={(e) => handleChange('description', e.target.value)}
                   className="border-dark"
+                  maxLength={1000}
                 />
-                {errorMessages.email?.message && <span className="text-danger">{errorMessages.email?.message}</span>}
-              </Form.Group>
-            </div>
-            <div className="col-md-6">
-              <Form.Group controlId="formMobile" className="mb-3">
-                <Form.Label className="text-dark">Mobile</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter mobile number"
-                  name="mobile"
-                  value={fields.mobile}
-                  onChange={(e) => handleChange('mobile', e.target.value)}
-                  className="border-dark"
-                />
-                {errorMessages.mobile?.message && (
-                  <span className="text-danger alert-danger">{errorMessages.mobile?.message}</span>
+                {errorMessages?.description?.message && (
+                  <span className="text-danger fs-13">{errorMessages.description?.message}</span>
                 )}
               </Form.Group>
             </div>
@@ -116,41 +110,22 @@ const RenderUserOffcanvas = ({
 
           <div className="row">
             <div className="col-md-6">
-              <Form.Group controlId="formRole" className="mb-3">
-                <Form.Label className="text-dark">Role</Form.Label>
-                <Form.Select
-                  name="role"
-                  value={fields.role}
+              <Form.Group controlId="status" className="d-flex d-flex justify-content-start align-items-start">
+                <Form.Check
+                  type="checkbox"
+                  id="status"
                   className="border-dark"
-                  onChange={(e) => handleChange('role', e.target.value)}
-                >
-                  <option value="">Select a role</option>
-                  <option value="member">member</option>
-                  <option value="volunteer">volunteer</option>
-                  <option value="leader">leader</option>
-                  <option value="pastor">pastor</option>
-                </Form.Select>
-                {errorMessages.role?.message && <span className="text-danger">{errorMessages.role?.message}</span>}
+                  checked={fields?.status}
+                  value={fields?.status}
+                  onChange={(e) => handleChange('status', e.target.checked)}
+                />
+                <Form.Label className="text-dark ms-1"> Status</Form.Label>
+                {errorMessages?.status?.message && (
+                  <span className="text-danger fs-13">{errorMessages?.status?.message}</span>
+                )}
               </Form.Group>
             </div>
-            <div className="col-md-6">
-              <Form.Group controlId="formStatus" className="mb-3">
-                <Form.Label className="text-dark">Status</Form.Label>
-                <Form.Select
-                  name="status"
-                  value={fields.status}
-                  className="border-dark"
-                  onChange={(e) => handleChange('status', e.target.value)}
-                >
-                  <option value="">Select a status</option>
-                  <option value="active">active</option>
-                  <option value="inactive">inactive</option>
-                  <option value="provisional">provisional</option>
-                  <option value="under discipline">under discipline</option>
-                </Form.Select>
-                {errorMessages.status?.message && <span className="text-danger">{errorMessages.status?.message}</span>}
-              </Form.Group>
-            </div>
+            <div className="col-md-6"> </div>
           </div>
 
           <div className="d-flex justify-content-start">
@@ -192,4 +167,4 @@ const RenderUserOffcanvas = ({
   );
 };
 
-export default RenderUserOffcanvas;
+export default RenderTestimonyOffcanvas;

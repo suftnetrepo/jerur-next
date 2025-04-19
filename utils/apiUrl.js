@@ -168,3 +168,10 @@ export const DONATION = {
   fetch: `${HOST}donation/`,
   removeOne: `${HOST}donation/delete`
 };
+
+export const TESTIMONY = {
+  createOne: `${HOST}testimony/create`,
+  updateOne: `${HOST}testimony/update`,
+  fetch: `${HOST}testimony/`,
+  removeOne: `${HOST}testimony/delete`
+};
