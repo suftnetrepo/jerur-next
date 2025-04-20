@@ -122,10 +122,15 @@ const ChurchSchema = new mongoose.Schema(
           trim: true,
           default: ''
         },
-        fullNames: {
+        first_name: {
           type: String,
           trim: true,
-          default: ''
+          required: true
+        },
+        last_name: {
+          type: String,
+          trim: true,
+          required: true
         },
         phone: {
           type: String,
