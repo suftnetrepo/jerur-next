@@ -68,7 +68,7 @@ const RenderAgendaOffcanvas = ({ show, setShow, selectedEventId }) => {
     >
       <Offcanvas.Header className="d-flex flex-row justify-content-between align-items-center">
         <h4>Event Agenda</h4>
-        <IoCloseCircle size={48} color="#333333" className="pointer ms-2" onClick={() => setShow(false)} />
+        <IoCloseCircle size={48} color="#333333" className="pointer ms-2 me-4" onClick={() => setShow(false)} />
       </Offcanvas.Header>
       <Offcanvas.Body>
         <Form handleChange={handleChange} fields={fields} handleSubmit={handleSubmit} errorMessages={errorMessages} />

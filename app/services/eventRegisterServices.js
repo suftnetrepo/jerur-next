@@ -1,24 +1,23 @@
 import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
-import Event from '../models';
+import Event from '../models/event';
 import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-const addEventRegister = async ( suid , body) => {
+const addEventRegister = async (body) => {
   try {
-    const identifierValidateResult = identifierValidator(suid);
-    if (identifierValidateResult.length) {
-      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
-      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
-      throw error;
-    }
+    const event = await Event.findOneAndUpdate(
+      { _id: body.eventId },
+      { $push: { register: body } },
+      { new: true }
+    ).exec();
 
-    await Event.findOneAndUpdate({ _id: body.eventId }, { $push: { register: body } }, { new: true }).exec();
-    return true;
+    const newARegister = event.register[event.register.length - 1];
+    return newARegister;
   } catch (error) {
     logger.error(error);
-    throw new Error('Error adding event agenda');
+    throw new Error('Error adding event register');
   }
 };
 

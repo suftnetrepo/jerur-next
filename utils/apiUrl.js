@@ -175,3 +175,10 @@ export const TESTIMONY = {
   fetch: `${HOST}testimony/`,
   removeOne: `${HOST}testimony/delete`
 };
+
+export const EVENT_REGISTER = {
+  createOne: `${HOST}event/register`,
+  updateOne: `${HOST}event/register`,
+  fetch: `${HOST}event/register`,
+  removeOne: `${HOST}event/register/`
+};
