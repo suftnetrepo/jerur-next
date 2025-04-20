@@ -93,7 +93,7 @@ async function getMemberCount( suid ) {
       throw error;
     }
     const members = await Member.countDocuments({church:suid})
-    return members?.length ;
+    return members ;
   } catch (error) {
     logger.error('Error getting member count:', error);
     throw new Error('An unexpected error occurred. Please try again.');

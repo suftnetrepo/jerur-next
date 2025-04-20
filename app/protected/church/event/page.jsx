@@ -6,7 +6,7 @@ import { Button } from 'react-bootstrap';
 import { useEvent } from '../../../../hooks/useEvent';
 import { MdDelete } from 'react-icons/md';
 import { TiEdit } from 'react-icons/ti';
-import { FaTasks } from 'react-icons/fa';
+import { FaUsers, FaTasks } from 'react-icons/fa';
 import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
@@ -15,12 +15,14 @@ import { useRouter } from 'next/navigation';
 import Tooltip from '@mui/material/Tooltip';
 import { getYesNoColorCode } from '@/utils/helpers';
 import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
+import RenderRegisterOffcanvas from './renderRegisterOffcanvas';
 
 const Page = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [showAgenda, setShowAgenda] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [eventId, setEventId] = useState(null);
   const { data, error, loading, totalCount, handleDelete, handleFetch } = useEvent(debouncedSearchQuery);
 
@@ -59,7 +61,7 @@ const Page = () => {
                   size={30}
                   className="pointer me-2"
                   onClick={() => {
-                    router.push(`/protected/church/events/${row.original._id}/edit`);
+                    router.push(`/protected/church/event/${row.original._id}/edit`);
                   }}
                 />
               </span>
@@ -78,13 +80,25 @@ const Page = () => {
                 </DeleteConfirmation>
               </span>
             </Tooltip>
-            <Tooltip title="View Service Agenda" arrow>
+            <Tooltip title="View Event Agenda" arrow>
               <span className="p-0">
                 <FaTasks
                   size={30}
                   className="pointer ms-2"
                   onClick={async () => {
                     setShowAgenda(true);
+                    setEventId(row.original._id);
+                  }}
+                />
+              </span>
+            </Tooltip>
+            <Tooltip title="View Register Members" arrow>
+              <span className="p-0">
+                <FaUsers
+                  size={30}
+                  className="pointer ms-2"
+                  onClick={async () => {
+                    setShowRegister(true);
                     setEventId(row.original._id);
                   }}
                 />
@@ -114,7 +128,7 @@ const Page = () => {
               type="submit"
               size="sm"
               onClick={() => {
-                router.push('/protected/church/events/create');
+                router.push('/protected/church/event/create');
               }}
             >
               + Add Event
@@ -126,6 +140,7 @@ const Page = () => {
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
       {eventId && <RenderAgendaOffcanvas show={showAgenda} setShow={setShowAgenda} selectedEventId={eventId} />}
+      {eventId && <RenderRegisterOffcanvas show={showRegister} setShow={setShowRegister} selectedEventId={eventId} />}
     </>
   );
 };

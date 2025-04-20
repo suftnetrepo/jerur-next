@@ -378,7 +378,31 @@ const SettingsPage = () => {
                 selectedMenu === 'profile' ? 'active-menu' : ''
               }`}
             >
-              Profile
+              About us
+            </div>
+            <div
+              onClick={() => setSelectedMenu('contact')}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
+                selectedMenu === 'contact' ? 'active-menu' : ''
+              }`}
+            >
+              Contact
+            </div>
+            <div
+              onClick={() => setSelectedMenu('slider')}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
+                selectedMenu === 'slider' ? 'active-menu' : ''
+              }`}
+            >
+              Slider
+            </div>
+            <div
+              onClick={() => setSelectedMenu('push_notification')}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
+                selectedMenu === 'push_notification' ? 'active-menu' : ''
+              }`}
+            >
+              Push Notification
             </div>
             <div
               onClick={() => setSelectedMenu('Subscription')}

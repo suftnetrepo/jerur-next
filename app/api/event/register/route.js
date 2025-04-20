@@ -1,17 +1,21 @@
-import {
-  addEventRegister, getEventRegisterById, deleteEventRegister
-} from '../../../services/eventRegisterServices';
+import { addEventRegister, getEventRegisterById, deleteEventRegister } from '../../../services/eventRegisterServices';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url);
-    const id = url.searchParams.get('id')
+    const id = url.searchParams.get('id');
 
-    const  data  = await getEventRegisterById(id);
+    const data = await getEventRegisterById(id);
     return NextResponse.json({ data, success: true });
-
   } catch (error) {
     logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -35,11 +39,10 @@ export const DELETE = async (req) => {
 
 export const POST = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+   
     const body = await req.json();
 
-    const result = await addEventRegister(user?.church , body);
+    const result = await addEventRegister(body);
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     logger.error(error);
