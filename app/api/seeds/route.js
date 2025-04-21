@@ -87,7 +87,8 @@ const generateRandomChurch = () => {
     })),
     contacts: Array.from({ length: 5 }, () => ({
       title: faker.person.jobTitle(),
-      fullNames: faker.person.fullName(),
+      first_name: faker.person.firstName(),
+      last_name: faker.person.lastName(),
       phone: faker.phone.number(),
       status: faker.datatype.boolean()
     })),

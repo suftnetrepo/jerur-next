@@ -182,3 +182,10 @@ export const EVENT_REGISTER = {
   fetch: `${HOST}event/register`,
   removeOne: `${HOST}event/register/`
 };
+
+export const CONTACT = {
+  createOne: `${HOST}contact/create`,
+  updateOne: `${HOST}contact/update`,
+  fetch: `${HOST}contact/`,
+  removeOne: `${HOST}contact/delete`
+};

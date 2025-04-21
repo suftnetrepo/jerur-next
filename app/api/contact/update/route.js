@@ -1,15 +1,20 @@
 import { updateContact } from '../../../services/contactService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const PUT = async (req) => {
   try {
-    const userData = req.headers.get('x-user-data');
-    const user = userData ? JSON.parse(userData) : null;
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const body = await req.json();
     const id = url.searchParams.get('id');
-    const data  = await updateContact(id, body, user.church );
+    const data = await updateContact(id, body, user.church);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);
