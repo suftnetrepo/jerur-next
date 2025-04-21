@@ -506,7 +506,7 @@ export const testimoniesValidator = {
         pattern: /^.{0,1000}$/,
         message: 'description must not be more than 1000 characters'
       }
-    ],
+    ]
   },
   reset: () => {
     return {
@@ -562,5 +562,60 @@ export const registerValidator = {
     first_name: '',
     last_name: '',
     mobile: ''
+  }
+};
+
+export const contactValidator = {
+  rules: {
+    title: [
+      {
+        pattern: /^.+$/,
+        message: 'title is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'title must not be more than 50 characters'
+      }
+    ],
+    first_name: [
+      {
+        pattern: /^.+$/,
+        message: 'first name is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'first name must not be more than 50 characters'
+      }
+    ],
+    last_name: [
+      { pattern: /^.+$/, message: 'last name is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'last name must not be more than 50 characters'
+      }
+    ],
+    phone: [
+      { pattern: /^.+$/, message: 'phone is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'phone number must not be more than 20 characters'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      first_name: '',
+      last_name: '',
+      phone: '',
+      title: '',
+      status: false
+    };
+  },
+  fields: {
+    title: '',
+    first_name: '',
+    last_name: '',
+    phone: '',
+    status: false
   }
 };

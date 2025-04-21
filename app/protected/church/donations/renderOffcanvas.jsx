@@ -13,6 +13,7 @@ const RenderUserOffcanvas = ({
   handleReset,
   handleSave,
   handleEdit,
+  handleReset,
   fields
 }) => {
   const [errorMessages, setErrorMessages] = useState({});

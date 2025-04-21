@@ -39,29 +39,29 @@ const ChurchSidebarNav = () => {
       <SidebarNavItem icon={faHome} href="/protected/church/dashboard">
         Dashboard
       </SidebarNavItem>
-      <SidebarNavItem icon={faUsers} href="/protected/church/member">
-        Member
+      <SidebarNavItem icon={faUsers} href="/protected/church/members">
+        Members
       </SidebarNavItem>
-      <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-service">
-       Service
+      <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-services">
+       Services
       </SidebarNavItem>
-      <SidebarNavItem icon={faCalendar} href="/protected/church/event">
-        Event 
+      <SidebarNavItem icon={faCalendar} href="/protected/church/events">
+        Events
       </SidebarNavItem>
-      <SidebarNavItem icon={faLocation} href="/protected/church/fellowship">
-        Fellowship
+      <SidebarNavItem icon={faLocation} href="/protected/church/fellowships">
+        Fellowships
       </SidebarNavItem>
-      <SidebarNavItem icon={faDonate} href="/protected/church/donation">
-        Donation
+      <SidebarNavItem icon={faDonate} href="/protected/church/donations">
+        Donations
       </SidebarNavItem>
-      <SidebarNavItem icon={faFileImage} href="/protected/church/testimony">
-        Testimony
+      <SidebarNavItem icon={faFileImage} href="/protected/church/testimonies">
+      Testimonies
       </SidebarNavItem>
-      <SidebarNavItem icon={faUser} href="/protected/church/user">
-        User
+      <SidebarNavItem icon={faUser} href="/protected/church/users">
+        Users
       </SidebarNavItem>
       <SidebarNavItem icon={faCogs} href="/protected/church/settings">
-        Setting
+        Settings
       </SidebarNavItem>
     </ul>
   );

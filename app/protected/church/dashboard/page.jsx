@@ -11,7 +11,7 @@ import AttendanceAnalysis from '../chart/attendance_analysis';
 const Dashboard = () => {
   const { recentData, memberCount, chartData, trentData } = useChurchDashboard();
 
-  console.log("....................memberCount", memberCount)
+  console.log("....................memberCount", memberCount.data)
   return (
     <>
       <div className="row p-1">
@@ -27,7 +27,7 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <span className="d-block">Members</span>
-                    <span className="fs-16 fw-semibold">{memberCount}</span>
+                    <span className="fs-16 fw-semibold">{memberCount?.data}</span>
                   </div>
                 </div>
                 <div>

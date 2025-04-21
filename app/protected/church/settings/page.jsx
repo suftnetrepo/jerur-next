@@ -8,6 +8,7 @@ import { validate } from '../../../../validator/validator';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import { OkDialogue } from '../../../../src/components/elements/errorDialogue';
 import { useSubscriber } from '../../../../hooks/useSubscriber';
+import Contact from './contact';
 
 const SettingsPage = () => {
   const { handleSave, handleChange, rules, loading, error, fields, success, handleSaveChangePassword } = useSettings();
@@ -295,7 +296,6 @@ const SettingsPage = () => {
             </div>
           </Form>
         );
-
       case 'ChangePassword':
         return (
           <Form>
@@ -362,6 +362,8 @@ const SettingsPage = () => {
             </div>
           </Form>
         );
+      case 'contact':
+        return <Contact />;
       default:
         return <h4>Select an option</h4>;
     }

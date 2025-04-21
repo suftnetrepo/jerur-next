@@ -1,12 +1,12 @@
 import { contactValidator } from '../validation/contactValidator';
 import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
-import Church from '../models';
+import Church from '../models/church';
 import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-const addContact = async (suid , body) => {
+const addContact = async (suid, body) => {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -32,8 +32,8 @@ const addContact = async (suid , body) => {
   }
 };
 
-const updateContact = async (contactId, body,  suid ) => {
-  const { title, status, fullNames, phone } = body;
+const updateContact = async (contactId, body, suid) => {
+  const { title, status, first_name,last_name, phone } = body;
 
   try {
     const identifierValidateResult = identifierValidator(suid);
@@ -53,7 +53,8 @@ const updateContact = async (contactId, body,  suid ) => {
       { suid, 'contacts._id': contactId },
       {
         $set: {
-          'contacts.$.fullNames': fullNames,
+          'contacts.$.first_name': first_name,
+          'contacts.$.last_name': last_name,
           'contacts.$.title': title,
           'contacts.$.phone': phone,
           'contacts.$.status': status
@@ -63,7 +64,7 @@ const updateContact = async (contactId, body,  suid ) => {
 
     return true;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error updating contact');
   }
 };
@@ -87,7 +88,7 @@ const removeContact = async (suid, contactId) => {
 const getFilteredAndSortedContacts = (contacts) =>
   contacts.filter((contact) => contact.status === true).sort((a, b) => b.createdAt - a.createdAt);
 
-const getAllContacts = async ({ suid, status = false }) => {
+const getAllContacts = async (suid, status = false) => {
   const identifierValidationErrors = identifierValidator(suid);
   if (identifierValidationErrors.length) {
     const error = new Error(identifierValidationErrors.map((it) => it.message).join(','));
@@ -96,16 +97,13 @@ const getAllContacts = async ({ suid, status = false }) => {
   }
 
   try {
-    const church = await Church.findOne({ _id: suid });
+    const church = await Church.findById(suid);
 
-    if (!church) {
-      throw new Error('Church not found');
-    }
-
-    return status ? getFilteredAndSortedContacts(church.contacts) : church.contacts.sort((a, b) => b.createdAt - a.createdAt);
-
+    return status
+      ? getFilteredAndSortedContacts(church.contacts)
+      : church.contacts.sort((a, b) => b.createdAt - a.createdAt);
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error fetching contacts');
   }
 };
