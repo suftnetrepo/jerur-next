@@ -9,6 +9,8 @@ import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import { OkDialogue } from '../../../../src/components/elements/errorDialogue';
 import { useSubscriber } from '../../../../hooks/useSubscriber';
 import Contact from './contact';
+import Slider from './slider';
+import Notification from './notification';
 
 const SettingsPage = () => {
   const { handleSave, handleChange, rules, loading, error, fields, success, handleSaveChangePassword } = useSettings();
@@ -362,8 +364,12 @@ const SettingsPage = () => {
             </div>
           </Form>
         );
+      case 'slider':
+        return <Slider />;
       case 'contact':
         return <Contact />;
+      case 'push_notification':
+        return <Notification />;
       default:
         return <h4>Select an option</h4>;
     }

@@ -619,3 +619,73 @@ export const contactValidator = {
     status: false
   }
 };
+
+export const sliderValidator = {
+  rules: {
+    title: [
+      {
+        pattern: /^.+$/,
+        message: 'title is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'title must not be more than 50 characters'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      message: '',
+      secure_url: '',
+      public_id: '',
+      title: '',
+      imageOnly: false,
+      status: false
+    };
+  },
+  fields: {
+    title: '',
+    message: '',
+    secure_url: '',
+    public_id: '',
+    imageOnly: false,
+    status: false
+  }
+};
+
+export const pushNotificationValidator = {
+  rules: {
+    title: [
+      {
+        pattern: /^.+$/,
+        message: 'title is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'title must not be more than 50 characters'
+      }
+    ],
+    message: [
+      {
+        pattern: /^.+$/,
+        message: 'message is required'
+      },
+      {
+        pattern: /^.{0,200}$/,
+        message: 'message must not be more than 200 characters'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      message: '',
+      title: '',
+      status: false
+    };
+  },
+  fields: {
+    message: '',
+    title: '',
+    status: false
+  }
+};

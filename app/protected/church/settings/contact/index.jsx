@@ -14,7 +14,7 @@ import { capitalizeFirstLetter } from '@/utils/helpers';
 
 
 const Contact = () => {
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const {
     handleChange,
     handleEdit,
