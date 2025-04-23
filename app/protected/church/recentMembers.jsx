@@ -2,8 +2,7 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 import { dateFormatted } from '../../../utils/helpers';
 
-const RecentProjects = ({ data }) => {
-  console.log('......................................data', data);
+const RecentMembers = ({ data }) => {
 
   const getStatusColorCode = (status) => {
     const colors = {
@@ -48,4 +47,4 @@ const RecentProjects = ({ data }) => {
   );
 };
 
-export default RecentProjects;
+export default RecentMembers;

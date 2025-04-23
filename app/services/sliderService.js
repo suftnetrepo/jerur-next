@@ -63,7 +63,7 @@ const updateSlider = async (sliderId, body,  suid ) => {
       }
     ).exec();
 
-    return true;
+    return {secure_url, public_id};
   } catch (error) {
     logger.error(error);
     throw new Error('Error updating slider');

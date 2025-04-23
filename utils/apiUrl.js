@@ -86,10 +86,6 @@ export const PROJECT = {
   chart: `${HOST}project?action=chart`
 };
 
-export const PUSH_NOTIFICATION = {
-  notify: `${HOST}notify`
-};
-
 export const DOCUMENT = {
   uploadOne: `${HOST}project_document`,
   fetch: `${HOST}project_document/`,
@@ -188,4 +184,18 @@ export const CONTACT = {
   updateOne: `${HOST}contact/update`,
   fetch: `${HOST}contact/`,
   removeOne: `${HOST}contact/delete`
+};
+
+export const SLIDER = {
+  createOne: `${HOST}slider/create`,
+  updateOne: `${HOST}slider/update`,
+  fetch: `${HOST}slider/`,
+  removeOne: `${HOST}slider/delete`
+};
+
+export const PUSH_NOTIFICATION = {
+  createOne: `${HOST}push_notification/create`,
+  updateOne: `${HOST}push_notification/update`,
+  fetch: `${HOST}push_notification`,
+  removeOne: `${HOST}push_notification/delete`
 };

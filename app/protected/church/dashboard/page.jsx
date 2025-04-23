@@ -10,8 +10,6 @@ import AttendanceAnalysis from '../chart/attendance_analysis';
 
 const Dashboard = () => {
   const { recentData, memberCount, chartData, trentData } = useChurchDashboard();
-
-  console.log("....................memberCount", memberCount.data)
   return (
     <>
       <div className="row p-1">

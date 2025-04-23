@@ -1,8 +1,8 @@
 import { pushNotificationValidator } from '../validation/pushNotificationValidator';
 import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
-import Church from '../models';
-import { sendNotification } from '../../utils/push-notification';
+import Church from '../models/church';
+// import { sendNotification } from '../../utils/push-notification';
 import { MESSAGE_TYPE_ENUMS } from '../../utils/enums';
 import { mongoConnect } from '@/utils/connectDb';
 
@@ -35,7 +35,7 @@ const addPushNotification = async (suid , body) => {
     const pushNotifications = church.push_notifications[church.push_notifications.length - 1];
 
     if (send_notification) {
-      await sendNotification(title, message, suid, MESSAGE_TYPE_ENUMS.NOTIFY);
+      // await sendNotification(title, message, suid, MESSAGE_TYPE_ENUMS.NOTIFY);
     }
 
     return pushNotifications;
@@ -74,7 +74,7 @@ const updatePushNotification = async (notificationId, body,  suid ) => {
     ).exec();
 
     if (send_notification) {
-      await sendNotification(title, message, suid, MESSAGE_TYPE_ENUMS.NOTIFY);
+      // await sendNotification(title, message, suid, MESSAGE_TYPE_ENUMS.NOTIFY);
     }
 
     return true;

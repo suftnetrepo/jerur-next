@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
-import { PUSH_NOTIFICATION } from '../utils/apiUrl';
-import { pushNotificationValidator } from '@/validator/rules';
+import { SLIDER } from '../utils/apiUrl';
+import { sliderValidator } from '@/validator/rules';
 
-const usePushNotification = (searchQuery= '') => {
+const useSlider = (searchQuery= '') => {
   const [state, setState] = useState({
     data: [],
     loading: false,
     error: null,
-    fields: pushNotificationValidator.fields,
+    fields: sliderValidator.fields,
     totalCount: 0,
     success: false
   });
@@ -45,7 +45,7 @@ const usePushNotification = (searchQuery= '') => {
 
   async function handleSave(body) {
     setState((prev) => ({ ...prev, loading: true }));
-    const { success, errorMessage, data } = await zat(PUSH_NOTIFICATION.createOne, body, VERBS.POST);
+    const { success, errorMessage, data } = await zat(SLIDER.createOne, body, VERBS.POST);
 
     if (success) {
       setState((prevState) => {
@@ -58,7 +58,7 @@ const usePushNotification = (searchQuery= '') => {
       });
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the push notification.');
+      handleError(errorMessage || 'Failed to update the slider.');
       return false;
     }
   }
@@ -67,7 +67,7 @@ const usePushNotification = (searchQuery= '') => {
     setState((prevState) => ({
       ...prevState,
       fields: {
-        ...pushNotificationValidator.reset()
+        ...sliderValidator.reset()
       },
       error: null,
       loading: false,
@@ -76,7 +76,7 @@ const usePushNotification = (searchQuery= '') => {
   };
 
   const handleDelete = async (id) => {
-    const { success, errorMessage } = await zat(PUSH_NOTIFICATION.removeOne, null, VERBS.DELETE, {
+    const { success, errorMessage } = await zat(SLIDER.removeOne, null, VERBS.DELETE, {
       id: id
     });
 
@@ -88,7 +88,7 @@ const usePushNotification = (searchQuery= '') => {
       }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to delete the push notification.');
+      handleError(errorMessage || 'Failed to delete the slider.');
       return false;
     }
   };
@@ -99,7 +99,7 @@ const usePushNotification = (searchQuery= '') => {
       success,
       errorMessage,
       data = []
-    } = await zat(PUSH_NOTIFICATION.fetch, null, VERBS.GET, {
+    } = await zat(SLIDER.fetch, null, VERBS.GET, {
       status: false
     });
 
@@ -107,25 +107,25 @@ const usePushNotification = (searchQuery= '') => {
       setState((prev) => ({ ...prev, data: data, totalCount: data?.lenght, loading: false }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the push notification.');
+      handleError(errorMessage || 'Failed to update the slider.');
       return false;
     }
   }, []);
 
-    async function handleEdit(body, id) {
+    async function handleEdit(body, fields, id) {
       setState((prev) => ({ ...prev, loading: true, error: null }));
-      const { success, errorMessage } = await zat(PUSH_NOTIFICATION.updateOne, body, VERBS.PUT, { id: id });
+      const { success, errorMessage, data } = await zat(SLIDER.updateOne, body, VERBS.PUT, { id: id });
   
       if (success) {
         setState((prevState) => ({
           ...prevState,
-          data: prevState.data.map((j) => (j._id === id ? body : j)),
+          data: prevState.data.map((j) => (j._id === id ? {...fields, ...data} : j)),
           loading: false,
           success:true
         }));
         return true;
       } else {
-        handleError(errorMessage || 'Failed to update the push notification.');
+        handleError(errorMessage || 'Failed to update the slider.');
         return false;
       }
     }
@@ -146,4 +146,4 @@ const usePushNotification = (searchQuery= '') => {
   };
 };
 
-export { usePushNotification };
+export { useSlider };
