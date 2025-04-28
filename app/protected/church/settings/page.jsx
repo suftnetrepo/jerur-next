@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Form, Button, Image, InputGroup } from 'react-bootstrap';
+import { Row, Col, Form, Button, Image, InputGroup, Tabs, Tab } from 'react-bootstrap';
 import { dateFormatted } from '../../../../utils/helpers';
 import { useSettings } from '../../../../hooks/useSettings';
 import { validate } from '../../../../validator/validator';
@@ -11,15 +11,19 @@ import { useSubscriber } from '../../../../hooks/useSubscriber';
 import Contact from './contact';
 import Slider from './slider';
 import Notification from './notification';
+import BankTransfer from './bank-transfer';
+import SocialMedia from './social_media';
+import Features from './features';
 
 const SettingsPage = () => {
-  const { handleSave, handleChange, rules, loading, error, fields, success, handleSaveChangePassword } = useSettings();
+  const { handleSave, handleChange, rules, loading, error, data, fields, success, handleSaveChangePassword } =
+    useSettings();
   const { handleCustomerPortalSession } = useSubscriber();
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedMenu, setSelectedMenu] = useState('profile');
   const [errorMessages, setErrorMessages] = useState({});
   const [file, setFile] = useState(null);
-
+  const [key, setKey] = useState('bank_transfer');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -370,6 +374,20 @@ const SettingsPage = () => {
         return <Contact />;
       case 'push_notification':
         return <Notification />;
+      case 'general':
+        return (
+          <Tabs id="controlled-tab-example" activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
+            <Tab eventKey="bank_transfer" title="Bank Transfer">
+              <BankTransfer data={data} />
+            </Tab>
+            <Tab eventKey="social_media" title="Social Media">
+              <SocialMedia data={data} />
+            </Tab>
+            <Tab eventKey="feature" title="Mobile Features">
+              <Features data={data} />
+            </Tab>
+          </Tabs>
+        );
       default:
         return <h4>Select an option</h4>;
     }
@@ -380,6 +398,14 @@ const SettingsPage = () => {
       <Row>
         <Col md={2} className="bg-light border-end vh-100 d-flex flex-column align-items-center py-3">
           <div className="w-100 text-center">
+            <div
+              onClick={() => setSelectedMenu('general')}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
+                selectedMenu === 'general' ? 'active-menu' : ''
+              }`}
+            >
+              General
+            </div>
             <div
               onClick={() => setSelectedMenu('profile')}
               className={`py-1 ps-8 d-flex justify-content-start menu-item ${

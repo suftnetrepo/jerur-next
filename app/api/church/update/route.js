@@ -32,8 +32,9 @@ export const PUT = async (req) => {
     const action = url.searchParams.get('action');
 
     if (action === 'bulk') {
+      const body = await req.json();
       const updated = await updateBulk(user?.church, body);
-      return NextResponse.json({ success: true, data: updated });
+      return NextResponse.json({ success: true, data:updated });
     }
 
     if (action === 'one') {
@@ -114,7 +115,7 @@ export const PUT = async (req) => {
 
     return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

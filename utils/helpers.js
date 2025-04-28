@@ -355,8 +355,67 @@ function getStatusBadgeClass(status) {
       return 'bg-light text-dark'; // Default/fallback
   }
 }
+ const FEATURES = [  
+  {
+    name: 'House fellowship nearby',
+    color: '#4338ca',
+    icon: 'house',
+    id: '2'   
+  },
+  {
+    name: 'Campaigns',
+    color: '#0e7490',
+    icon: 'wallet-giftcard',
+    id: '3'  
+  },
+  {
+    name: 'Giving',
+    color: '#a16207',
+    icon: 'money',
+    id: '4' 
+  },
+  {
+    name: 'Hymns',
+    color: '#44403c',
+    icon: 'library-music',
+    id: '5'
+  },
+  {
+    name: 'Register Member',
+    color: '#0284c7',
+    icon: 'library-books',
+    id: '6'   
+  },  
+  {
+    name: 'Testimony',
+    color: '#808000',
+    icon: 'account-box',
+    id: '7'
+  },
+  {
+    name: 'Prayer Request',
+    color: '#248f8f',
+    icon: 'request-page',
+    id: '8'
+  },
+  {
+    name: 'Donations',
+    color: '#0e7490',
+    icon: 'wallet-giftcard',
+    id: '9'
+  },
+
+];
+
+const featuresOptions = FEATURES.map(feature => ({
+  value: feature.id,
+  label: feature.name
+}));
+
 
 export {
+  FEATURES,
+  featuresOptions,
   capitalizeFirstLetter,
   getStatusBadgeClass,
   getYesNoColorCode,

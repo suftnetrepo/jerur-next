@@ -10,8 +10,6 @@ import ErrorDialogue from '@/src/components/elements/errorDialogue';
 import DeleteConfirmation from '@/src/components/elements/ConfirmDialogue';
 import Tooltip from '@mui/material/Tooltip';
 import RenderContactOffcanvas from './render';
-import { capitalizeFirstLetter } from '@/utils/helpers';
-
 
 const Contact = () => {
   const [show, setShow] = useState(false);
