@@ -153,7 +153,7 @@ async function updateBulk(suid , body) {
     return true;
   } catch (error) {
     console.error(error);
-    throw new Error('Error updating contacts');
+    throw new Error('Error updating church settings');
   }
 }
 async function updateOneChurch(suid, name, value) {

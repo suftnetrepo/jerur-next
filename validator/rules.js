@@ -275,7 +275,7 @@ export const fellowshipValidator = {
   }
 };
 
-const userValidator = {
+export const userValidator = {
   rules: {
     first_name: [
       {
@@ -687,5 +687,92 @@ export const pushNotificationValidator = {
     message: '',
     title: '',
     status: false
+  }
+};
+
+export const bankTransferValidator = {
+  rules: {
+    bank_name: [
+      {
+        pattern: /^.+$/,
+        message: 'Bank name is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'Bank name must not be more than 50 characters'
+      }
+    ],
+    account_number: [
+      {
+        pattern: /^.+$/,
+        message: 'Account number is required'
+      },
+      {
+        pattern: /^.{0,20}$/,
+        message: 'Account number must not be more than 20 characters'
+      }
+    ],
+    sort_code: [
+      {
+        pattern: /^.+$/,
+        message: 'Sort code is required'
+      },
+      {
+        pattern: /^.{0,20}$/,
+        message: 'Sort code must not be more than 20 characters'
+      }
+    ],
+    reference: [
+      {
+        pattern: /^.+$/,
+        message: 'Reference is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'Reference must not be more than 50 characters'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      bank_name: '',
+      account_number: '',
+      sort_code: '',
+      reference: ''
+    };
+  },
+  fields: {
+    bank_name: '',
+    account_number: '',
+    sort_code: '',
+    reference: ''
+  }
+};
+
+export const socialMediaValidator = {
+  rules: {},
+  reset: () => {
+    return {
+      facebook_url: '',
+      instagram_url: '',
+      youtube_url: ''
+    };
+  },
+  fields: {
+    facebook_url: '',
+    instagram_url: '',
+    youtube_url: ''
+  }
+};
+
+export const featuresValidator = {
+  rules: {},
+  reset: () => {
+    return {
+     features :[]
+    };
+  },
+  fields: {
+    features :[]
   }
 };
