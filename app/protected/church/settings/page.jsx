@@ -14,13 +14,14 @@ import Notification from './notification';
 import BankTransfer from './bank-transfer';
 import SocialMedia from './social_media';
 import Features from './features';
+import ConfigPage from './config';
 
 const SettingsPage = () => {
   const { handleSave, handleChange, rules, loading, error, data, fields, success, handleSaveChangePassword } =
     useSettings();
   const { handleCustomerPortalSession } = useSubscriber();
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [selectedMenu, setSelectedMenu] = useState('profile');
+  const [selectedMenu, setSelectedMenu] = useState('general');
   const [errorMessages, setErrorMessages] = useState({});
   const [file, setFile] = useState(null);
   const [key, setKey] = useState('bank_transfer');
@@ -95,56 +96,50 @@ const SettingsPage = () => {
             <Row className="mb-3">
               <Col xs={12} md={4}>
                 <div className="d-flex flex-column justify-content-start align-items-start">
-                  {previewUrl ? (
-                    <Image
-                      src={previewUrl}
-                      width={150}
-                      height={150}
-                      layout="fill"
-                      alt="Avatar"
-                      roundedCircle
-                      className="mb-3"
-                    />
-                  ) : (
-                    <>
-                      {!fields.secure_url && (
-                        <div
-                          style={{
-                            width: 150,
-                            height: 150,
-                            borderRadius: '50%',
-                            backgroundColor: '#ccc',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          150 x 150
-                        </div>
-                      )}
-                    </>
-                  )}
-                  {fields.secure_url && (
-                    <div className="d-flex align-items-center">
+                  <div
+                    style={{
+                      width: 150,
+                      height: 150,
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      backgroundColor: '#ccc',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative'
+                    }}
+                    className="mb-3"
+                  >
+                    {previewUrl ? (
+                      <img
+                        src={previewUrl}
+                        alt="Avatar Preview"
+                        className="img-fluid rounded-circle"
+                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                      />
+                    ) : fields.secure_url ? (
                       <img
                         src={fields.secure_url}
-                        alt="Avata"
-                        className="rounded-circle me-2"
-                        width="150"
-                        height="150"
+                        alt="Avatar"
+                        className="img-fluid rounded-circle"
+                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = '/img/blank.png';
                         }}
                       />
-                    </div>
-                  )}
-                  <Button variant="success" className="mb-2 mt-3" onClick={() => handleImageClick()}>
+                    ) : (
+                      <span>150 x 150</span>
+                    )}
+                  </div>
+
+                  <Button variant="success" className="mb-2 mt-3" onClick={handleImageClick}>
                     Change picture
                   </Button>
                 </div>
               </Col>
             </Row>
+
             <Row>
               <Col md={6}>
                 <Row className="mb-1">
@@ -385,6 +380,9 @@ const SettingsPage = () => {
             </Tab>
             <Tab eventKey="feature" title="Mobile Features">
               <Features data={data} />
+            </Tab>
+            <Tab eventKey="config" title="Configs">
+              <ConfigPage data={data} />
             </Tab>
           </Tabs>
         );

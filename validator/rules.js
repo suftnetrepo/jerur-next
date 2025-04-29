@@ -776,3 +776,21 @@ export const featuresValidator = {
     features :[]
   }
 };
+
+export const configValidator = {
+  rules: {},
+  reset: () => {
+    return {
+      currency: '',
+      isSearchable: false,
+      prayer_request_email: '',
+      giving_url: ''
+    };
+  },
+  fields: {
+    currency: '',
+    isSearchable: false,
+    prayer_request_email: '',
+    giving_url: ''
+  }
+};

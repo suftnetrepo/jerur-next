@@ -23,7 +23,7 @@ const SocialMedia = ({data}) => {
 
 
   return (
-    <div style={{ width: '30%', backgroundColor: 'white' }}>
+    <div style={{ marginLeft: 25, width: '40%', backgroundColor: 'white' }}>
       <Form>
         <div className="row">
           <div className="col-md-12">
