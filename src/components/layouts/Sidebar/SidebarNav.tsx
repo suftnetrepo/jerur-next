@@ -35,7 +35,7 @@ export default function SidebarNav() {
 
 const ChurchSidebarNav = () => {
   return (
-    <ul className="list-unstyled mt-4">
+    <ul className="list-unstyled mt-0">
       <SidebarNavItem icon={faHome} href="/protected/church/dashboard">
         Dashboard
       </SidebarNavItem>

@@ -30,7 +30,7 @@ const BankTransfer = ({data}) => {
   };
 
   return (
-    <div style={{ width: '50%', backgroundColor: 'white' }}>
+    <div style={{ marginLeft: 25, width: '40%', backgroundColor: 'white' }}>
       <Form>
         <div className="row">
           <div className="col-md-12">

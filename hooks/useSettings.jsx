@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { CHURCH, USER } from '../utils/apiUrl';
-import { churchValidator, bankTransferValidator, socialMediaValidator, featuresValidator } from '@/validator/rules';
+import { churchValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '@/validator/rules';
 import { FEATURES } from '@/utils/helpers';
 
 
@@ -332,4 +332,74 @@ const useFeatures = () => {
   };
 };
 
-export { useSettings, useBankTransfer, useSocialMedia, useFeatures };
+const useConfig = () => {
+  const [state, setState] = useState({
+    data: {},
+    loading: false,
+    fields: configValidator.fields,
+    error: null,
+    success: false,
+  });
+
+  const handleChange = (name, value) => {
+    setState((prevState) => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+        [name]: value
+      }
+    }));
+  };
+
+  const handleSelect = (data) => {
+    const { currency,prayer_request_email, giving_url,isSearchable}= data
+    setState((prevState) => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+        currency,prayer_request_email, giving_url,isSearchable
+      }
+    }));
+  };
+
+  const handleError = (error) => {
+    setState((pre) => {
+      return { ...pre, error: error, loading: false };
+    });
+  };
+
+  const handleReset = () => {
+    setState((pre) => {
+      return { ...pre, data: FEATURES, error: null };
+    });
+  };
+
+  const handleSave = async (body) => {
+    setState((prev) => ({ ...prev, loading: true, success: false }));
+    const { success, errorMessage } = await zat(CHURCH.uploadOne, body, VERBS.PUT, {
+      action: 'bulk'
+    });
+
+    if (success) {
+      setState((prevState) => ({
+        ...prevState,
+        success: true,
+        loading: false
+      }));
+      return true;
+    } else {
+      handleError(errorMessage || 'Failed to update the settings.');
+      return false;
+    }
+  };
+
+  return {
+    ...state,
+    handleReset,
+    handleSelect,
+    handleChange,
+    handleSave
+  };
+};
+
+export { useSettings,useConfig, useBankTransfer, useSocialMedia, useFeatures };
