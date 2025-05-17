@@ -6,13 +6,13 @@ import Link from 'next/link';
 import Topbar from '@/components/elements/Topbar';
 import { Footer } from '@/components/blocks/footer';
 import Features from '@/components/blocks/service';
+import Testimonial from '@/components/blocks/testimonial';
 
 const Feature: NextPage = () => {
   return (
     <Fragment>
       <PageProgress />
 
-      <Topbar />
       <header className="wrapper bg-light">
         <Navbar
           info
@@ -30,10 +30,11 @@ const Feature: NextPage = () => {
         <section className="wrapper bg-soft-primary">
           <div className="container pt-10  pt-md-14 pb-md-14 text-center">
             <div className="row">
-              <div className="col-sm-9 col-md-7 col-lg-7 mx-auto">
+              <div className="col-sm-12 col-md-12 col-lg-12 mx-auto">
                 <h1 className="display-1 mb-3">Features</h1>
                 <p className="lead mb-0 px-xl-10 px-xxl-13">
-                  Your needs drive our purpose – tailored solutions just for you.
+                  We exist to strengthen churches through technology that understands ministry. With features like
+                  automated follow-ups and giving analytics, we help turn your God-given vision into measurable impact.
                 </p>
               </div>
             </div>
@@ -44,6 +45,12 @@ const Feature: NextPage = () => {
           <div className="container pb-14 pb-md-16">
             <Features show={false} />
           </div>
+          <div className='bg-gray'>
+          <div className=" container  pt-15 pt-md-17 pb-13 pb-md-15 mb-n14">
+            <Testimonial />
+          </div>
+          </div>
+         
         </section>
       </main>
       <Footer />

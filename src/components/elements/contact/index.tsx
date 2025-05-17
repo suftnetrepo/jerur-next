@@ -3,7 +3,7 @@ import Email from '@/icons/lineal/Email';
 
 const Contact: FC = () => {
   return (
-    <section className="wrapper bg-light">
+    <section className="wrapper bg-white">
       <div className=" ">
         <div className="card bg-soft-primary ">
           <div className="card-body p-12 container">
@@ -12,8 +12,7 @@ const Contact: FC = () => {
                 <Email />
                 <h2 className="display-4 mb-3 pe-lg-10">Need help choosing a plan?.</h2>
                 <p className="lead pe-lg-12 mb-0">
-                  We’re here to assist you in selecting the subscription that works best for you. Send us a message, and
-                  we’ll respond shortly.
+                Have a question we didn’t cover? Use the contact form to talk to us.
                 </p>
               </div>
 

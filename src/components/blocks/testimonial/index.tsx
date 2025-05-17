@@ -1,22 +1,32 @@
-import { FC } from 'react';
-import TestimonialCard from './testimonial-card';
+import { Fragment } from "react";
+import { Tiles3 } from "@/components/elements/tiles/title3";
+import Carousel from "@/components/reuseable/Carousel";
+import TestimonialCard2 from "./testimonial-card";
+import { testimonialList2 } from "../../../data/testimonial-list";
 
-const Testimonial: FC = () => {
-    return (
-        <div className="position-relative mt-n18 mt-md-n23 mb-16 mb-md-18">
-            <div
-                className="shape rounded-circle bg-line primary rellax w-18 h-18"
-                style={{ zIndex: 0, top: '-2rem', right: '-2.7rem' }}
-            />
+export default function Testimonial() {
+  return (
+    <Fragment>
+      <h3 className="display-4 mb-3 text-center">What People Say About Us</h3>
+      <p className="lead fs-lg mb-10 text-center">
+        Don't take our word for it. See what clients are saying about us.
+      </p>
 
-            <div
-                className="shape rounded-circle bg-soft-primary rellax w-18 h-18"
-                style={{ zIndex: 0, left: '-3rem', bottom: '-1rem' }}
-            />
-
-            <TestimonialCard />
+      <div className="row gx-lg-8 gx-xl-12 gy-6 mb-14 align-items-center">
+        <div className="col-lg-7">
+          <Tiles3 />
         </div>
-    );
-};
 
-export default Testimonial;
+        <div className="col-lg-5 mt-5">
+          <div className="swiper-container dots-closer mb-6">
+            <Carousel grabCursor slidesPerView={1} navigation={false}>
+              {testimonialList2.map((item, i) => (
+                <TestimonialCard2 key={i} {...item} />
+              ))}
+            </Carousel>
+          </div>
+        </div>
+      </div>
+    </Fragment>
+  );
+}

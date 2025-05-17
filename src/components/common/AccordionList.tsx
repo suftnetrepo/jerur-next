@@ -5,26 +5,26 @@ const accordions = [
   {
     no: '1',
     expand: true,
-    heading: 'Comprehensive Features',
-    body: 'From Project setup to Task scheduling, Snatchi offers all the tools you need to manage AV projects efficiently.'
+    heading: 'All-in-One Platform',
+    body: 'Manage everything from service planning to media content, member engagement, and online giving—seamlessly in one place.'
   },
   {
     no: '2',
     expand: false,
-    heading: 'Enhanced Collaboration',
-    body: 'Real-time updates and integrated communication tools keep your team, clients, and stakeholders on the same page.'
+    heading: 'Member-Centric Tools',
+    body: 'Designed to support pastors, AV teams, admin staff, and volunteers—collaborate and communicate with ease.'
   },
   {
     no: '3',
     expand: false,
-    heading: 'User-Friendly Design',
-    body: 'Intuitive interfaces and customizable dashboards make Snatchi easy to use, saving time and boosting productivity.'
+    heading: 'Intuitive and Accessible',
+    body: 'No steep learning curve. Jerur is easy to navigate for everyone, from tech teams to first-time users.'
   },
   {
     no: '4',
     expand: false,
-    heading: 'Exceptional Customer Support',
-    body: 'Our dedicated support team is always ready to assist you. Whether you need technical guidance, troubleshooting, or personalized training, Snatchi ensures you never face challenges alone.'
+    heading: 'Responsive Support',
+    body: 'We walk with you every step of the way—from onboarding to ongoing support—so your church never feels alone.'
   }
 ];
 

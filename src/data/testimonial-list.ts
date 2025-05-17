@@ -28,31 +28,34 @@ export const testimonialList1 = [
 
 export const testimonialList2 = [
   {
-    name: 'Coriss Ambady',
-    image: '/img/avatars/te7.jpg',
-    designation: 'Financial Analyst',
-    review: `Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-      Vestibulum ligula porta felis euismod semper. Cras justo odio.`
+    name: 'Elijah Thompson',
+    image: '/img/avatars/te11.jpg',
+    designation: 'Church Administrator',
+    review: `Jerur has revolutionized the way we manage our church operations. From coordinating volunteer schedules to tracking attendance and managing donations, every feature is intuitive and tailored for church needs. It's truly a blessing to have such a reliable tool supporting our ministry.`
   },
   {
-    name: 'Cory Zamora',
-    image: '/img/avatars/te8.jpg',
-    designation: 'Marketing Specialist',
-    review: `Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-      Vestibulum ligula porta felis euismod semper. Cras justo odio.`
+    name: 'Grace Adebayo',
+    image: '/img/avatars/te12.jpg',
+    designation: 'Youth Pastor',
+    review: `What I love most about Jerur is how easy it is to communicate with my team and organize youth events. The platform helps us stay on track, plan better, and engage more effectively with our young members. It’s a must-have for any church leader.`
   },
   {
-    name: 'Barclay Widerski',
-    image: '/img/avatars/te9.jpg',
-    designation: 'Sales Specialist',
-    review: `Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-      Vestibulum ligula porta felis euismod semper. Cras justo odio.`
+    name: 'David Mensah',
+    image: '/img/avatars/te13.jpg',
+    designation: 'Lead Pastor',
+    review: `Jerur has simplified the way we run our church—from planning services to managing pastoral care. It's user-friendly, secure, and designed with ministry in mind. We’ve saved time and stayed more organized than ever before.`
   },
   {
-    name: 'Jackie Sanders',
-    image: '/img/avatars/te10.jpg',
-    designation: 'Investment Planner',
-    review: `Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum ligula porta felis euismod semper. Cras justo odio.`
+    name: 'Linda Okoro',
+    image: '/img/avatars/te14.jpg',
+    designation: 'Media & AV Director',
+    review: `We use Jerur weekly to schedule our AV team and livestream setup. The project tools help us prepare ahead, avoid confusion, and keep everything running smoothly during service. It’s made our tech ministry more efficient and stress-free.`
+  },
+  {
+    name: 'Joseph Kalu',
+    image: '/img/avatars/te15.jpg',
+    designation: 'Welfare Coordinator',
+    review: `Jerur makes it easier to track outreach, coordinate food drives, and support members in need. It’s more than just software—it’s become part of how we care for our church family. Highly recommended!`
   }
 ];
 

@@ -16,7 +16,6 @@ const ContactTwo: NextPage = () => {
     <Fragment>
       <PageProgress />
 
-      <Topbar />
       <header className="wrapper bg-light">
         <Navbar
           info
@@ -48,7 +47,7 @@ const ContactTwo: NextPage = () => {
                   <div>
                     <h5 className="mb-1">Address</h5>
                     <address>
-                      113 -115 Fonthill Road, Finsbury Park, London, N4 3HH <br className="d-none d-md-block" />
+                      The Gatehouse 453 Cranbrook Road, Woodford Green IG2 6EW. <br className="d-none d-md-block" />
                       London, United Kingdom
                     </address>
                   </div>
@@ -63,7 +62,7 @@ const ContactTwo: NextPage = () => {
 
                   <div>
                     <h5 className="mb-1">Phone</h5>
-                    <p>+44 7404 522 280 </p>
+                    <p>(+44)-020 8144 3161 </p>
                   </div>
                 </div>
 
@@ -77,8 +76,8 @@ const ContactTwo: NextPage = () => {
                   <div>
                     <h5 className="mb-1">E-mail</h5>
                     <p className="mb-0">
-                      <a href="mailto:info@snatchi.com" className="link-body">
-                        info@snatchi.com
+                      <a href="mailto:info@suftnet.com" className="link-body">
+                        info@suftnet.com
                       </a>
                     </p>
                   </div>
