@@ -30,7 +30,8 @@ const FAQ: FC = () => {
    ];
  
   return (
-    <div className="container pt-15 pt-md-17 pb-13 pb-md-15">
+    <div className="bg-gray pt-15 pt-md-17 pb-13 pb-md-15">
+      <div className='container '>
       <h2 className="fs-15 text-uppercase text-muted mb-3 text-center">FAQ</h2>
       <h3 className="display-4 mb-10 px-lg-12 px-xl-15 text-center">
         If you don't see an answer to your question, you can send us an email from our contact form.
@@ -38,13 +39,15 @@ const FAQ: FC = () => {
 
       <div className="accordion-wrapper" id="accordion">
         <div className="row justify-content-center">
-          <div className="col-md-8">
+          <div className="col-md-10">
             {accordions.map((item) => (
               <Accordion key={item.no} {...item} />
             ))}
           </div>
         </div>
       </div>
+      </div>
+     
     </div>
   );
 };

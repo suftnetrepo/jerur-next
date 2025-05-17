@@ -4,7 +4,7 @@ import { Fragment } from 'react';
 import type { NextPage } from 'next';
 import PageProgress from '@/components/common/PageProgress';
 import { Footer } from '@/components/blocks/footer';
-import  Hero2  from '@/components/blocks/hero/Hero2';
+import  Hero2  from '@/components/blocks/hero/Hero';
 import useLightBox from '@/hooks/useLightBox';
 import { Navbar } from '@/components/blocks/navbar';
 import FAQ from '@/components/blocks/faq';
@@ -14,6 +14,8 @@ import Features from '@/components/blocks/service';
 import Steps from '@/components/blocks/steps';
 import Pricing from '@/components/blocks/pricing';
 import Contact from '@/components/elements/contact';
+import Testimonial from '@/components/blocks/testimonial';
+
 
 const Home: NextPage = () => {
   useLightBox();
@@ -45,6 +47,9 @@ const Home: NextPage = () => {
           <Steps />
           <div className="pt-15 pt-md-17 bg-light">
             <Pricing />          
+          </div>
+          <div className="container pt-15 pt-md-17 pb-13 pb-md-15 mb-n14">
+          <Testimonial />
           </div>
           <FAQ />
           <Contact />

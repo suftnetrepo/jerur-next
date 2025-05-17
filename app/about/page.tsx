@@ -23,7 +23,7 @@ const About: NextPage = () => {
     <Fragment>
       <PageProgress />
 
-      <Topbar />
+      {/* <Topbar /> */}
       <header className="wrapper bg-light">
         <Navbar
           info
