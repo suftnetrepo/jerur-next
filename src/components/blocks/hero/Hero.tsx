@@ -9,9 +9,9 @@ const Hero: FC = () => {
     autoStart: true,
     strings: [
       'grow your church',
-      'serve your community',
-      'manage with ease',
-      'build stronger connections',
+      'inspire your members',
+      'reach new hearts',
+      'nurture discipleship',
       'lead with confidence'
     ]
   };
@@ -36,20 +36,16 @@ const Hero: FC = () => {
               <span style={slideInDownAnimate('1200ms')}>
                 <NextLink title="Get Started" href="/pricing" className="btn btn-lg btn-primary rounded me-2" />
               </span>
-
-             
             </div>
           </div>
 
           <div className="col-lg-7">
-          <div className="col-12 col-lg-12 d-flex justify-content-end align-items-center" style={zoomInAnimate('3ms')}>
-              <img
-                    className=" img-fluid "
-                    src="/img/photos/sa16.jpg"
-                    srcSet="/img/hero/right_image.png"
-                    alt="demo"
-                  />
-              </div>
+            <div
+              className="col-12 col-lg-12 d-flex justify-content-end align-items-center"
+              style={zoomInAnimate('3ms')}
+            >
+              <img className=" img-fluid " src="/img/photos/sa16.jpg" srcSet="/img/hero/right_image.png" alt="demo" />
+            </div>
           </div>
         </div>
       </div>
