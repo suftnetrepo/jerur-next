@@ -6,7 +6,6 @@ import { CHURCH, USER } from '../utils/apiUrl';
 import { churchValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '@/validator/rules';
 import { FEATURES } from '@/utils/helpers';
 
-
 const useSettings = () => {
   const [state, setState] = useState({
     data: {},
@@ -401,5 +400,16 @@ const useConfig = () => {
     handleSave
   };
 };
+
+export const single = async (id) => {
+  const { data, success, errorMessage } = await zat(CHURCH.single, null, VERBS.GET, {
+    id
+  });
+  if (success) {
+    return data;
+  } else {
+    throw new Error(errorMessage);
+  }
+}
 
 export { useSettings,useConfig, useBankTransfer, useSocialMedia, useFeatures };
