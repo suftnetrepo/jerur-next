@@ -45,6 +45,7 @@ export const TASK_COMMENTS = {
 export const CHURCH = {
   fetch: `${HOST}admin`,
   fetchOne: `${HOST}church`,
+  single: `${HOST}church/single/`,
   uploadOne: `${HOST}church/update/`
 };
 

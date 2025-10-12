@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { AuthService } from './lib/AuthService';
 import { getToken } from 'next-auth/jwt';
+import { single } from '@/hooks/useSettings';
+import { decrypt } from '@/utils/helpers';
 
 const isApiRoute = (pathname) => pathname.startsWith('/api');
 
@@ -29,6 +31,22 @@ export async function middleware(req) {
       }
     }
 
+    const key = req.headers.get('x-api-key');
+    if (key) {
+      try {
+      const identifier = decrypt(key);
+      const result = await single(identifier);
+
+      if (!result) {
+        return NextResponse.json({ error: 'Unauthorized', message: 'Invalid API Key' }, { status: 403 });
+      }
+      const response = NextResponse.next();
+      response.headers.set('Authorization', `Bearer ${accessToken}`);
+      return response } catch (error) {
+        return NextResponse.json({ error: 'Unauthorized', message: 'Invalid API Key' }, { status: 401 });
+      }
+    }
+
     if (isApiRoute(pathname)) {
       return NextResponse.json(
         { error: 'Unauthorized', message: message || 'Authentication required' },
@@ -50,16 +68,6 @@ export const config = {
     '/protected/:path*',
 
     // Protected API routes
-    '/api/project/:path*',
-    '/api/project_document/:path*',
-    '/api/project_team/:path*',
-    '/api/admin/:path*',
-    '/api/task/:path*',
-    '/api/task_comment/:path*',
-    '/api/task_document/:path*',
-    '/api/task_team/:path*',
-    '/api/user/:path*',
-    '/api/integrator/:path*',
-    '/api/invoice/:path*'
+    '/api/church/:path*'
   ]
 };
