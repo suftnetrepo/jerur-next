@@ -1,4 +1,4 @@
-import Church from '../models';
+import Church from '../models/church';
 import { churchValidator } from '../validation/churchValidator';
 import { logger } from '../../utils/logger';
 import { mongoConnect } from '@/utils/connectDb';

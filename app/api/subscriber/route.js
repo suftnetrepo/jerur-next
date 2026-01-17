@@ -1,5 +1,4 @@
 import { mongoConnect } from '../../../utils/connectDb';
-import { errorHandler } from '../../../utils/errors';
 import { createUser } from '../../services/userServices';
 import { createChurch } from '../../services/subscriberServices';
 import { NextResponse } from 'next/server';
@@ -13,19 +12,20 @@ export async function POST(req) {
     
     const userPayload = {
       ...body,
+      church: church._id,
       role: 'admin',
       user_status: true,
       visible: 'private'
     };
   
-    await createUser(church._id, userPayload);
+    await createUser(userPayload);
     const response = NextResponse.json({ data: true }, { status: 200 });
     
     return response;
   } catch (err) {
     return NextResponse.json(
       {
-        error: errorHandler(err)
+        error: null
       },
       { status: 400 }
     );

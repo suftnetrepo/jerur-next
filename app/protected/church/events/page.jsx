@@ -61,7 +61,7 @@ const Page = () => {
                   size={30}
                   className="pointer me-2"
                   onClick={() => {
-                    router.push(`/protected/church/event/${row.original._id}/edit`);
+                    router.push(`/protected/church/events/${row.original._id}/edit`);
                   }}
                 />
               </span>
@@ -128,7 +128,7 @@ const Page = () => {
               type="submit"
               size="sm"
               onClick={() => {
-                router.push('/protected/church/event/create');
+                router.push('/protected/church/events/create');
               }}
             >
               + Add Event

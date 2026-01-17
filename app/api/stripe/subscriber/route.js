@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { logger } from '../../utils/logger';
+import { logger } from '@/utils/logger';
 const { NextResponse } = require('next/server');
 
 // POST handler for creating a subscription

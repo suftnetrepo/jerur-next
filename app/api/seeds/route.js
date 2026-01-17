@@ -40,8 +40,8 @@ export async function GET() {
 
 const clearSeeds = async () => {
   try {
-    await Church.deleteMany({});
-    await User.deleteMany({});
+    // await Church.deleteMany({});
+    // await User.deleteMany({});
     await Campaign.deleteMany({});
     await Attendance.deleteMany({});
     await Donation.deleteMany({});
@@ -446,37 +446,63 @@ const generateAttendanceForChurch = (churchId, serviceTimes, options = {}) => {
 
 const seedDatabase = async () => {
   try {
-    const churches = Array.from({ length: 5 }, () => generateRandomChurch());
-    const savedChurches = await Church.insertMany(churches);
+    // const churches = Array.from({ length: 5 }, () => generateRandomChurch());
+    const savedChurches = [{ _id: '696b72e203ad97f1331f2976' }];
 
-    const users = (await Promise.all(savedChurches.map((church) => generateUsersForChurch(church._id)))).flat();
-    await User.insertMany(users);
+    // const users = (await Promise.all(savedChurches.map((church) => generateUsersForChurch(church._id)))).flat();
+    // await User.insertMany(users);
 
-    const serviceTimes = savedChurches.flatMap((church) => generateServiceTimesForChurch(church._id));
-    await ServiceTime.insertMany(serviceTimes);
+    const allServiceTimes = [];
+    
+    for (const church of savedChurches) {
+      const serviceTimes = generateServiceTimesForChurch(church._id);
+      allServiceTimes.push(...serviceTimes);
+    }
+    
+    if (allServiceTimes.length > 0) {
+      await ServiceTime.insertMany(allServiceTimes);
+    }
 
     const events = savedChurches.flatMap((church) => generateEventsForChurch(church._id));
-    await Event.insertMany(events);
+    if (events.length > 0) {
+      await Event.insertMany(events);
+    }
 
     const members = savedChurches.flatMap((church) => generateMembersForChurch(church._id));
-    await Member.insertMany(members);
+    if (members.length > 0) {
+      await Member.insertMany(members);
+    }
 
     const fellowships = savedChurches.flatMap((church) => generateFellowshipsForChurch(church._id));
-    await Fellowship.insertMany(fellowships);
+    if (fellowships.length > 0) {
+      await Fellowship.insertMany(fellowships);
+    }
 
     const testimonies = savedChurches.flatMap((church) => generateTestimoniesForChurch(church._id));
-    await Testimonies.insertMany(testimonies);
+    if (testimonies.length > 0) {
+      await Testimonies.insertMany(testimonies);
+    }
 
     const campaigns = savedChurches.flatMap((church) => generateCampaignsForChurch(church._id));
-    await Campaign.insertMany(campaigns);
+    if (campaigns.length > 0) {
+      await Campaign.insertMany(campaigns);
+    }
 
     const donations = savedChurches.flatMap((church) => generateDonationsForChurch(church._id));
-    await Donation.insertMany(donations);
+    if (donations.length > 0) {
+      await Donation.insertMany(donations);
+    }
 
-    const attendances = savedChurches.flatMap((church) => generateAttendanceForChurch(church._id, serviceTimes));
-    await Attendance.insertMany(attendances);
+    const attendances = savedChurches.flatMap((church) => {
+      const churchServiceTimes = allServiceTimes.filter((st) => st.suid.toString() === church._id.toString());
+      return generateAttendanceForChurch(church._id, churchServiceTimes);
+    });
+    
+    if (attendances.length > 0) {
+      await Attendance.insertMany(attendances);
+    }
 
-    console.log('10 Users and 5 Churches successfully inserted');
+    console.log('Database seeded successfully');
   } catch (error) {
     console.error('Error seeding database:', error);
     throw error;

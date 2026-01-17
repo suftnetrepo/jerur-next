@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { logger } from '../../../../../utils/logger'
+import { logger } from '@/utils/logger';
 import { checkAmount } from '@/util/helper'
 import { addContribution } from '@/services/campaignContributionService'
 
