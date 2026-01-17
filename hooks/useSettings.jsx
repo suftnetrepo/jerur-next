@@ -1,8 +1,10 @@
+'use client';
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
-import { CHURCH, USER } from '../utils/apiUrl';
+import { CHURCH, USER, SEED_DATA } from '../utils/apiUrl';
 import { churchValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '@/validator/rules';
 import { FEATURES } from '@/utils/helpers';
 
@@ -64,6 +66,15 @@ const useSettings = () => {
     }
   };
 
+    const handleSeeds = async () => {
+    const { success, errorMessage } = await zat(SEED_DATA.fetch, null, VERBS.GET);
+
+    if (success) {
+    } else {
+      handleError(errorMessage || 'Failed to fetch the settings.');
+    }
+  };
+
   const handleSave = async (body) => {
     setState((prev) => ({ ...prev, loading: true, success: false }));
     const { success, errorMessage } = await zat(CHURCH.uploadOne, body, VERBS.PUT, {
@@ -111,7 +122,8 @@ const useSettings = () => {
     handleSelect,
     handleChange,
     handleSave,
-    handleSaveChangePassword
+    handleSaveChangePassword,
+    handleSeeds
   };
 };
 

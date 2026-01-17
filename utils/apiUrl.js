@@ -200,3 +200,7 @@ export const PUSH_NOTIFICATION = {
   fetch: `${HOST}push_notification`,
   removeOne: `${HOST}push_notification/delete`
 };
+
+export const SEED_DATA = {
+  fetch: `${HOST}seeds/`
+};

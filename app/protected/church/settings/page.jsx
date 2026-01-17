@@ -17,7 +17,7 @@ import Features from './features';
 import ConfigPage from './config';
 
 const SettingsPage = () => {
-  const { handleSave, handleChange, rules, loading, error, data, fields, success, handleSaveChangePassword } =
+  const { handleSave, handleChange, handleSeeds, rules, loading, error, data, fields, success, handleSaveChangePassword } =
     useSettings();
   const { handleCustomerPortalSession } = useSubscriber();
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -214,6 +214,10 @@ const SettingsPage = () => {
             <div className="d-flex justify-content-start">
               <Button type="button" variant="primary" onClick={() => onSubmit()}>
                 Save Changes
+              </Button>
+              <div className='me-2'></div>
+               <Button type="button" variant="secondary" onClick={() => handleSeeds()}>
+                Seeds
               </Button>
             </div>
           </Form>

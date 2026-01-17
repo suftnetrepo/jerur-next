@@ -4,15 +4,13 @@ import { useState, useEffect } from 'react';
 import NextLink from '@/components/reuseable/links/NextLink';
 import Button from 'react-bootstrap/Button';
 import { useRouter } from 'next/navigation';
-import { signIn, getCsrfToken, getSession } from 'next-auth/react';
+import { signIn, getCsrfToken } from 'next-auth/react';
 import { loginValidator } from '../../../../validator/loginValidator';
 import { validate } from '../../../../validator/validator';
 import { useSecure } from '../../../../hooks/useSecure';
 import LoadingButton from '../button';
-import { useUserChat } from '../../../../hooks/useChat';
 
 const LoginForm = () => {
-  const { handleChatSignIn } = useUserChat();
   const [validationError, setValidationError] = useState({});
   const [fields, setFields] = useState({ email: '', password: '' });
   const [visiblePassword, setVisiblePassword] = useState(false);
@@ -37,24 +35,17 @@ const LoginForm = () => {
       redirect: false,
       email: fields.email,
       csrfToken,
-      password: fields.password
+      password: fields.password,
+      callbackUrl: '/protected/church/dashboard'
     });
 
-    if (!result?.ok) {
-      handleError(result.error);
+    if (result?.error) {
+      handleError('Invalid email or password');
       return;
-    }
-
-    try {
-      await handleChatSignIn(fields.email, '12345!');
-    } catch (chatError) {
-      console.error('Chat sign-in failed:', chatError);
     }
 
     const urlParams = new URLSearchParams(window.location.search);
     const returnUrl = urlParams.get('returnUrl');
-
-    const updatedSession = await getSession();
 
     let redirectPath;
     if (returnUrl) {
