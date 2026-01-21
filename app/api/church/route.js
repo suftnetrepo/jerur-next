@@ -10,7 +10,6 @@ export const GET = async (req) => {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
     const data = await getChurchByIdentifier(user.church);
     return NextResponse.json({ data, success: true });
   } catch (error) {

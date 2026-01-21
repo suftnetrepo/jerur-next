@@ -31,7 +31,7 @@ export async function middleware(req) {
       }
     }
 
-    const key = req.headers.get('x-api-key');
+    const key = req.headers.get('nj-api-key');
     if (key) {
       try {
       const identifier = decrypt(key);
@@ -41,7 +41,7 @@ export async function middleware(req) {
         return NextResponse.json({ error: 'Unauthorized', message: 'Invalid API Key' }, { status: 403 });
       }
       const response = NextResponse.next();
-      response.headers.set('Authorization', `Bearer ${accessToken}`);
+      response.headers.set('nj-client-id', String(result?._id));
       return response } catch (error) {
         return NextResponse.json({ error: 'Unauthorized', message: 'Invalid API Key' }, { status: 401 });
       }

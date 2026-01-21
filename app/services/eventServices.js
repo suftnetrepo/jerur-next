@@ -143,7 +143,7 @@ async function getTop10Events(suid) {
   currentDate.setHours(0, 0, 0, 0);
 
   try {
-    const campaigns = await Event.find({
+    const result = await Event.find({
       suid,
       status: true,
       end_date: { $gte: currentDate }
@@ -151,8 +151,8 @@ async function getTop10Events(suid) {
       .sort({
         start_date: -1
       })
-      .limit(10);
-    return campaigns;
+      .limit(20);
+    return result;
   } catch (error) {
     logger.error(error);
     throw new Error('Error fetching all events');
