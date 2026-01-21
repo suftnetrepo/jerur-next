@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+
+const IV_LENGTH = 16; // For AES, this is always 16
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -296,26 +299,34 @@ function checkAmount(amount) {
 }
 
 function encrypt(text) {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const keyBuffer = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
-  const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv);
-  let encrypted = cipher.update(text);
+  try {
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const keyBuffer = Buffer.from(process.env.ENCRYPTION_KEY || '946acb540311776067cadad0976d65c086673babcd8e8298b323ae85823f34b3', 'hex');
+    const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
 
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-
-  return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
+    return `${iv.toString('hex')}:${encrypted}`;
+  } catch (error) {
+    console.error('Encryption error:', error);
+    return text;
+  }
 }
 
 function decrypt(text) {
-  const textParts = text.split(':');
-  const iv = Buffer.from(textParts.shift(), 'hex');
-  const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(process.env.ENCRYPTION_KEY), iv);
-  let decrypted = decipher.update(encryptedText);
+  try {
+    const textParts = text.split(':');
+    const iv = Buffer.from(textParts.shift(), 'hex');
+    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(process.env.ENCRYPTION_KEY || '946acb540311776067cadad0976d65c086673babcd8e8298b323ae85823f34b3', 'hex'), iv);
+    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
 
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-
-  return decrypted.toString();
+    return decrypted;
+  } catch (error) {
+    console.error('Decryption error:', error);
+    return text;
+  }
 }
 
 const normalizeTime = (timeStr) => {

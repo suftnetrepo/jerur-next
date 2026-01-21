@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { zat } from '../utils/api';
+import { bzat } from '../utils/axios';
 import { VERBS } from '../config';
 import { CHURCH, USER, SEED_DATA } from '../utils/apiUrl';
 import { churchValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '@/validator/rules';
@@ -47,9 +48,7 @@ const useSettings = () => {
   };
 
   const handleFetch = async () => {
-    const { data, success, errorMessage } = await zat(CHURCH.fetchOne, null, VERBS.GET, {
-      action: 'one'
-    });
+    const { data, success, errorMessage } = await bzat(CHURCH.fetchOne, null, VERBS.GET, null, { 'nj-api-key': '3054b88110ed6df272d3189b1db8af58:07a83a26131d54f028cac57e9a24ba2927ab94927f670d98d0d18edccc351080'});
 
     if (success) {
       setState((prevState) => ({
