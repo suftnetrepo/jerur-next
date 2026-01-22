@@ -37,7 +37,6 @@ async function updateChurchContact(suid, body) {
     throw new Error('Error updating church contact');
   }
 }
-
 async function updateFeatures(suid, features) {
   try {
     const validateResult = updateFeatureValidator({ features });
@@ -54,7 +53,6 @@ async function updateFeatures(suid, features) {
     throw new Error('Error while trying to update church features.');
   }
 }
-
 async function updateChurchAddress(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
@@ -85,7 +83,6 @@ async function updateChurchAddress(suid, body) {
     throw new Error('Error updating church address');
   }
 }
-
 async function deleteChurch(id) {
   try {
     const identifierValidateResult = identifierValidator(id);
@@ -109,8 +106,8 @@ async function getChurch(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    const church = await Church.findById(id);
-    return church;
+    const data = await Church.findById(id).select('name mobile email address features sliders contacts currency bank_name account_number sort_code currency tax_rate')
+    return data;
   } catch (error) {
     logger.error(error);
     throw new Error('Error fetching church');
@@ -177,7 +174,6 @@ async function updateOneChurch(suid, name, value) {
     throw new Error('Error updating church');
   }
 }
-
 async function getChurchesByCountryCode(countryCode) {
   try {
     const churches = await Church.find({
@@ -220,7 +216,6 @@ async function searchChurchesWithinRadius(latitude, longitude, radius) {
     throw new Error('Error searching for churches');
   }
 }
-
 const getAggregateChurchStatus = async () => {
   try {
     const result = await Church.aggregate([
@@ -240,7 +235,6 @@ const getAggregateChurchStatus = async () => {
     throw new Error('Error aggregating churches status. Please try again.');
   }
 };
-
 const getRecentChurches = async (limit = 10) => {
   try {
     const recentChurches = await Church.find({}).sort({ createdAt: -1 }).limit(limit);
@@ -251,7 +245,6 @@ const getRecentChurches = async (limit = 10) => {
     throw new Error('Error fetching recent churches. Please try again.');
   }
 };
-
 async function getChurches({ page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
   const skip = (page - 1) * limit;
 
