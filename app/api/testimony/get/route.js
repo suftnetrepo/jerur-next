@@ -1,22 +1,22 @@
 import { getTestimonies } from '../../../services/testimoniesService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import { decrypt } from '@/utils/helpers';
 
-export const GET = async () => {
+export const GET = async (req) => {
   try {
-    const h = headers();
-   
-    const suid = h.get('nj-client-id');
 
-    if (!suid) {
+    const clientId = req.headers.get('nj-client-id');
+
+    if (!clientId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const data = await getTestimonies(suid, 1, 100);
+    const identifier = decrypt(clientId);
+    const data = await getTestimonies(identifier, 1, 100);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

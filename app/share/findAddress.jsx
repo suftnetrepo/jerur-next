@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { Form, Button } from 'react-bootstrap';

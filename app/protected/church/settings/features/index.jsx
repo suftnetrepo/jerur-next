@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { OkDialogue } from '@/src/components/elements/ConfirmDialogue';

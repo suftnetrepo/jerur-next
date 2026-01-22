@@ -419,7 +419,8 @@ export const single = async (id) => {
   if (success) {
     return data;
   } else {
-    throw new Error(errorMessage);
+    console.log("..................errorMessage", errorMessage)
+   // throw new Error(errorMessage);
   }
 }
 

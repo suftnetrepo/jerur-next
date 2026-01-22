@@ -2,6 +2,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Form, Button, Image, InputGroup, Tabs, Tab } from 'react-bootstrap';
+import dynamic from 'next/dynamic';
 import { dateFormatted, encrypt, decrypt } from '../../../../utils/helpers';
 import { useSettings } from '../../../../hooks/useSettings';
 import { validate } from '../../../../validator/validator';
@@ -15,6 +16,7 @@ import BankTransfer from './bank-transfer';
 import SocialMedia from './social_media';
 import Features from './features';
 import ConfigPage from './config';
+const AddressForm = dynamic(() => import('./address'), { ssr: false });
 
 const SettingsPage = () => {
   const { handleSave, handleChange, handleSeeds, rules, loading, error, data, fields, success, handleSaveChangePassword } =
@@ -29,7 +31,7 @@ const SettingsPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   console.log("...............................data", encrypt(data?._id))
-    console.log("...............................data", decrypt('443d4762f5dbd5802d79954944d0bbca:025dab65d4bc3a9fc4232a1c8a3a83f4cd4d1488b46d98db6c2e0d30740965f3'))
+  console.log("...............................data", decrypt('443d4762f5dbd5802d79954944d0bbca:025dab65d4bc3a9fc4232a1c8a3a83f4cd4d1488b46d98db6c2e0d30740965f3'))
   console.log("...............................data", data)
 
   useEffect(() => {
@@ -220,7 +222,7 @@ const SettingsPage = () => {
                 Save Changes
               </Button>
               <div className='me-2'></div>
-               <Button type="button" variant="secondary" onClick={() => handleSeeds()}>
+              <Button type="button" variant="secondary" onClick={() => handleSeeds()}>
                 Seeds
               </Button>
             </div>
@@ -375,6 +377,8 @@ const SettingsPage = () => {
         return <Slider />;
       case 'contact':
         return <Contact />;
+      case 'address':
+        return <AddressForm address={data?.address} />;
       case 'push_notification':
         return <Notification />;
       case 'general':
@@ -406,57 +410,57 @@ const SettingsPage = () => {
           <div className="w-100 text-center">
             <div
               onClick={() => setSelectedMenu('general')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
-                selectedMenu === 'general' ? 'active-menu' : ''
-              }`}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'general' ? 'active-menu' : ''
+                }`}
             >
               General
             </div>
             <div
               onClick={() => setSelectedMenu('profile')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
-                selectedMenu === 'profile' ? 'active-menu' : ''
-              }`}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'profile' ? 'active-menu' : ''
+                }`}
             >
               About us
             </div>
             <div
               onClick={() => setSelectedMenu('contact')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
-                selectedMenu === 'contact' ? 'active-menu' : ''
-              }`}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'contact' ? 'active-menu' : ''
+                }`}
             >
               Contact
             </div>
             <div
+              onClick={() => setSelectedMenu('address')}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'address' ? 'active-menu' : ''
+                }`}
+            >
+              Address
+            </div>
+            <div
               onClick={() => setSelectedMenu('slider')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
-                selectedMenu === 'slider' ? 'active-menu' : ''
-              }`}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'slider' ? 'active-menu' : ''
+                }`}
             >
               Slider
             </div>
             <div
               onClick={() => setSelectedMenu('push_notification')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
-                selectedMenu === 'push_notification' ? 'active-menu' : ''
-              }`}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'push_notification' ? 'active-menu' : ''
+                }`}
             >
               Push Notification
             </div>
             <div
               onClick={() => setSelectedMenu('Subscription')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
-                selectedMenu === 'Subscription' ? 'active-menu' : ''
-              }`}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'Subscription' ? 'active-menu' : ''
+                }`}
             >
               Subscription
             </div>
             <div
               onClick={() => setSelectedMenu('ChangePassword')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${
-                selectedMenu === 'ChangePassword' ? 'active-menu' : ''
-              }`}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'ChangePassword' ? 'active-menu' : ''
+                }`}
             >
               Change Password
             </div>
@@ -469,8 +473,8 @@ const SettingsPage = () => {
       </Row>
       <input type="file" id="file-input" accept="image/*" onChange={handleFileChange} hidden />
       {!loading && <span className="overlay__block" />}
-      {success && <OkDialogue showSuccess={success} onClose={() => {}} />}
-      {error && <ErrorDialogue showError={error} onClose={() => {}} />}
+      {success && <OkDialogue showSuccess={success} onClose={() => { }} />}
+      {error && <ErrorDialogue showError={error} onClose={() => { }} />}
     </>
   );
 };

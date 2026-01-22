@@ -31,10 +31,6 @@ const Render = () => {
     handleSelect,
     handleSelectedAddress
   } = useFellowship();
-
-
-  console.log("...................totalCount", totalCount)
-    console.log("...................data", data)
  
   const columns = useMemo(
     () => [

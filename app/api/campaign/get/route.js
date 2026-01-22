@@ -1,13 +1,12 @@
 import { getTop10Campaigns } from '../../../services/campaignService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import { decrypt } from '@/utils/helpers';
 
-export const GET = async () => {
+export const GET = async (req) => {
   try {
-    const h = headers();
-   
-    const clientId = h.get('nj-client-id');
+
+    const clientId = req.headers.get('nj-client-id');
 
     if (!clientId) {
       return NextResponse.json(
@@ -16,7 +15,8 @@ export const GET = async () => {
       );
     }
 
-    const data = await getTop10Campaigns(clientId);
+    const identifier = decrypt(clientId);
+    const data = await getTop10Campaigns(identifier);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

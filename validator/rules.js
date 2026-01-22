@@ -275,6 +275,57 @@ export const fellowshipValidator = {
   }
 };
 
+export const addressValidator = {
+  rules: {
+    addressLine1: [
+      {
+        pattern: /^.+$/,
+        message: 'street address is required'
+      }
+    ],
+    town: [
+      {
+        pattern: /^.+$/,
+        message: 'town is required'
+      }
+    ],
+    country: [
+      {
+        pattern: /^.+$/,
+        message: 'country is required'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      mobile: '',
+      addressLine1: '',
+      county: '',
+      town: '',
+      country: '',
+      postcode: '',
+      completeAddress: '',
+      location: {
+        type: '',
+        coordinates: []
+      },
+    };
+  },
+  fields: {
+    mobile: '',
+    addressLine1: '',
+    county: '',
+    town: '',
+    country: '',
+    postcode: '',
+    completeAddress: '',
+    location: {
+      type: '',
+      coordinates: []
+    },
+  }
+};
+
 export const userValidator = {
   rules: {
     first_name: [
