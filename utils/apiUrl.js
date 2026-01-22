@@ -49,6 +49,10 @@ export const CHURCH = {
   uploadOne: `${HOST}church/update/`
 };
 
+export const ADDRESS = {
+  url: `${HOST}church/address/`,
+};
+
 export const SUBSCRIBER = {
   createIntegrator: `${HOST}subscriber`
 };

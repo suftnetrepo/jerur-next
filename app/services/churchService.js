@@ -106,11 +106,12 @@ async function getChurch(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    const data = await Church.findById(id).select('name mobile email address features sliders contacts currency bank_name account_number sort_code currency tax_rate')
+
+    const data = await Church.findById(id).select('name mobile email description address features sliders contacts currency bank_name account_number sort_code tax_rate').lean();
     return data;
   } catch (error) {
     logger.error(error);
-    throw new Error('Error fetching church');
+    throw new Error(error.message || 'Error fetching church');
   }
 }
 async function getChurchByIdentifier(id) {

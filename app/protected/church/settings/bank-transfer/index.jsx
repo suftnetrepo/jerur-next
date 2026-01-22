@@ -40,7 +40,7 @@ const BankTransfer = ({data}) => {
                 type="text"
                 placeholder="Enter bank name"
                 name="bank_name"
-                value={fields.bank_name}
+                value={fields?.bank_name?? ''}
                 onChange={(e) => handleChange('bank_name', e.target.value)}
                 className="border-dark"
                 maxLength={50}
@@ -60,7 +60,7 @@ const BankTransfer = ({data}) => {
                 type="text"
                 placeholder="Enter sort code"
                 name="sort_code"
-                value={fields.sort_code}
+                value={fields?.sort_code}
                 onChange={(e) => handleChange('sort_code', e.target.value)}
                 className="border-dark"
                 maxLength={50}
@@ -77,7 +77,7 @@ const BankTransfer = ({data}) => {
                 type="text"
                 placeholder="Enter account number"
                 name="last_name"
-                value={fields.account_number}
+                value={fields?.account_number}
                 onChange={(e) => handleChange('account_number', e.target.value)}
                 className="border-dark"
                 maxLength={50}
@@ -97,7 +97,7 @@ const BankTransfer = ({data}) => {
                 type="text"
                 placeholder="Enter reference"
                 name="reference"
-                value={fields.reference}
+                value={fields?.reference}
                 onChange={(e) => handleChange('reference', e.target.value)}
                 className="border-dark"
                 maxLength={50}

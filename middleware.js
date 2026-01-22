@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { AuthService } from './lib/AuthService';
 import { getToken } from 'next-auth/jwt';
-import { single } from '@/hooks/useSettings';
-import { decrypt } from '@/utils/helpers';
 
 const isApiRoute = (pathname) => pathname.startsWith('/api');
 
@@ -34,14 +32,8 @@ export async function middleware(req) {
     const key = req.headers.get('nj-api-key');
     if (key) {
       try {
-      const identifier = decrypt(key);
-      const result = await single(identifier);
-
-      if (!result) {
-        return NextResponse.json({ error: 'Unauthorized', message: 'Invalid API Key' }, { status: 403 });
-      }
       const response = NextResponse.next();
-      response.headers.set('nj-client-id', String(result?._id));
+      response.headers.set('nj-client-id', key);
       return response } catch (error) {
         return NextResponse.json({ error: 'Unauthorized', message: 'Invalid API Key' }, { status: 401 });
       }

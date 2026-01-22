@@ -1,5 +1,12 @@
+'use client'
+
 import React, { useEffect, useState } from 'react';
-import Select from 'react-select';
+
+import dynamic from 'next/dynamic';
+
+const Select = dynamic(() => import('react-select'), {
+  ssr: false,
+});
 
 const customStyles = {
   control: (provided, state) => ({
