@@ -1,5 +1,5 @@
 import { getTop10Events } from '../../../services/eventServices';
-import { logger } from '../../../utils/logger';
+import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 
