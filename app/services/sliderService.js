@@ -26,7 +26,7 @@ const addSlider = async ( suid , body) => {
     const newAgenda = church.sliders[church.sliders.length - 1];
     return newAgenda;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error adding slider');
   }
 };

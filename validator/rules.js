@@ -845,3 +845,106 @@ export const configValidator = {
     giving_url: ''
   }
 };
+
+export const pastorValidator = {
+  rules: {
+    title: [
+      {
+        pattern: /^.+$/,
+        message: 'title is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'title must not be more than 50 characters'
+      }
+    ],
+    first_name: [
+      {
+        pattern: /^.+$/,
+        message: 'first name is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'first name must not be more than 50 characters'
+      }
+    ],
+    last_name: [
+      { pattern: /^.+$/, message: 'last name is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'last name must not be more than 50 characters'
+      }
+    ],
+    mobile: [
+      { pattern: /^.+$/, message: 'mobile is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'mobile number must not be more than 20 characters'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      title: '',
+      first_name: '',
+      last_name: '',
+      mobile: '',
+      description: '',
+      secure_url: '',
+      public_id: '',
+    };
+  },
+  fields: {
+    title: '',
+    first_name: '',
+    last_name: '',
+    mobile: '',
+    description: '',
+    secure_url: '',
+    public_id: '',
+  }
+};
+
+export const propheticValidator = {
+  rules: {
+    month: [
+      {
+        pattern: /^.+$/,
+        message: 'month is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'month must not be more than 20 characters'
+      }
+    ],
+    verse: [
+      {
+        pattern: /^.+$/,
+        message: 'verse is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'verse must not be more than 20 characters'
+      }
+    ],
+    description: [
+      { pattern: /^.+$/, message: 'description is required' },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'description must not be more than 50 characters'
+      }
+    ],
+  },
+  reset: () => {
+    return {
+      month: '',
+      verse: '',
+      description: '',
+    };
+  },
+  fields: {
+     month: '',
+      verse: '',
+      description: '',
+  }
+};

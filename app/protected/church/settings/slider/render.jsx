@@ -74,7 +74,7 @@ const RenderSliderOffcanvas = ({
                 <Form.Label className="text-dark">Title</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter event title"
+                  placeholder="Enter title"
                   name="title"
                   value={fields?.title}
                   onChange={(e) => handleChange('title', e.target.value)}
@@ -96,7 +96,6 @@ const RenderSliderOffcanvas = ({
                   rows={3}
                   placeholder="Enter description"
                   value={fields.message}
-                  onPaste={handlePaste}
                   onChange={(e) => handleChange('message', e.target.value)}
                   className="border-dark"
                   maxLength={200}

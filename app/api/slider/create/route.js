@@ -16,7 +16,7 @@ export const POST = async (req) => {
     const data = await addSlider(user.church, body);
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

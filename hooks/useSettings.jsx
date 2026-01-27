@@ -6,7 +6,7 @@ import { zat } from '../utils/api';
 import { bzat } from '../utils/axios';
 import { VERBS } from '../config';
 import { CHURCH, USER, SEED_DATA } from '../utils/apiUrl';
-import { churchValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '@/validator/rules';
+import { churchValidator, pastorValidator, propheticValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '@/validator/rules';
 import { FEATURES } from '@/utils/helpers';
 
 const useSettings = () => {
@@ -125,6 +125,144 @@ const useSettings = () => {
     handleSeeds
   };
 };
+
+const usePastor = () => {
+  const [state, setState] = useState({
+    data: {},
+    loading: false,
+    fields: pastorValidator.fields,
+    error: null,
+    success: false,
+    rules: pastorValidator.rules
+  });
+
+  const handleChange = (name, value) => {
+    setState((prevState) => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+        [name]: value
+      }
+    }));
+  };
+
+  const handleSelect = (data) => {
+    setState((prevState) => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+       ...data
+      }
+    }));
+  };
+
+  const handleError = (error) => {
+    setState((pre) => {
+      return { ...pre, error: error, loading: false };
+    });
+  };
+
+  const handleReset = () => {
+    setState((pre) => {
+      return { ...pre, editData: null, error: null };
+    });
+  };
+
+  const handleUpdate = async (body) => {
+    setState((prev) => ({ ...prev, loading: true, success: false }));
+    const { success, errorMessage } = await zat(CHURCH.uploadPastor, body, VERBS.PUT);
+
+    if (success) {
+      setState((prevState) => ({
+        ...prevState,
+        success: true,
+        loading: false
+      }));
+      return true;
+    } else {
+      handleError(errorMessage || 'Failed to update the pastor.');
+      return false;
+    }
+  };
+
+  return {
+    ...state,
+    handleReset,
+    handleSelect,
+    handleChange,
+    handleUpdate
+  };
+};
+
+const useProphetic = () => {
+  const [state, setState] = useState({
+    data: {},
+    loading: false,
+    fields: propheticValidator.fields,
+    error: null,
+    success: false,
+    rules: propheticValidator.rules
+  });
+
+  const handleChange = (name, value) => {
+    setState((prevState) => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+        [name]: value
+      }
+    }));
+  };
+
+  const handleSelect = (data) => {
+    setState((prevState) => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+       ...data
+      }
+    }));
+  };
+
+  const handleError = (error) => {
+    setState((pre) => {
+      return { ...pre, error: error, loading: false };
+    });
+  };
+
+  const handleReset = () => {
+    setState((pre) => {
+      return { ...pre, editData: null, error: null };
+    });
+  };
+
+  const handleUpdate = async (body) => {
+    setState((prev) => ({ ...prev, loading: true, success: false }));
+    const { success, errorMessage } = await zat(CHURCH.uploadProphetic, body, VERBS.PUT);
+
+    if (success) {
+      setState((prevState) => ({
+        ...prevState,
+        success: true,
+        loading: false
+      }));
+      return true;
+    } else {
+      handleError(errorMessage || 'Failed to update the prophetic.');
+      return false;
+    }
+  };
+
+  return {
+    ...state,
+    handleReset,
+    handleSelect,
+    handleChange,
+    handleUpdate
+  };
+};
+
+
 
 const useBankTransfer = () => {
   const [state, setState] = useState({
@@ -419,7 +557,6 @@ export const single = async (id) => {
   if (success) {
     return data;
   } else {
-    console.log("..................errorMessage", errorMessage)
    // throw new Error(errorMessage);
   }
 }

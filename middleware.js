@@ -39,12 +39,6 @@ export async function middleware(req) {
       }
     }
 
-    if (isApiRoute(pathname)) {
-      return NextResponse.json(
-        { error: 'Unauthorized', message: message || 'Authentication required' },
-        { status: 401 }
-      );
-    }
 
     const returnUrl = encodeURIComponent(req.nextUrl.pathname);
     return NextResponse.redirect(new URL(`/login?returnUrl=${returnUrl}`, req.url));
@@ -60,6 +54,6 @@ export const config = {
     '/protected/:path*',
 
     // Protected API routes
-    '/api/church/:path*'
+    // '/api/:path*'
   ]
 };

@@ -43,10 +43,12 @@ export const TASK_COMMENTS = {
 };
 
 export const CHURCH = {
+  uploadProphetic: `${HOST}church/prophetic/`,
   fetch: `${HOST}admin`,
   fetchOne: `${HOST}church`,
   single: `${HOST}church/single/`,
-  uploadOne: `${HOST}church/update/`
+  uploadOne: `${HOST}church/update/`,
+  uploadPastor: `${HOST}church/pastor/`,
 };
 
 export const ADDRESS = {

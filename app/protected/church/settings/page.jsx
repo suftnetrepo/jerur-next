@@ -23,7 +23,7 @@ const SettingsPage = () => {
     useSettings();
   const { handleCustomerPortalSession } = useSubscriber();
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [selectedMenu, setSelectedMenu] = useState('general');
+  const [selectedMenu, setSelectedMenu] = useState('profile');
   const [errorMessages, setErrorMessages] = useState({});
   const [file, setFile] = useState(null);
   const [key, setKey] = useState('bank_transfer');
@@ -205,17 +205,20 @@ const SettingsPage = () => {
               </Col>
             </Row>
 
-            <Form.Group className="mb-3">
-              <Form.Label className="text-dark">Description</Form.Label>
-              <Form.Control
-                maxLength={500}
-                as="textarea"
-                rows={3}
-                value={fields?.description}
-                className="border-dark"
-                onChange={(e) => handleChange('description', e.target.value)}
-              />
-            </Form.Group>
+              <div className="row col-9">
+              <Form.Group className="mb-3">
+                <Form.Label className="text-dark">Description</Form.Label>
+                <Form.Control
+                  maxLength={500}
+                  as="textarea"
+                  rows={3}
+                  value={fields?.description}
+                  className="border-dark"
+                  onChange={(e) => handleChange('description', e.target.value)}
+                />
+              </Form.Group>
+            </div>
+
 
             <div className="d-flex justify-content-start">
               <Button type="button" variant="primary" onClick={() => onSubmit()}>
@@ -408,13 +411,7 @@ const SettingsPage = () => {
       <Row>
         <Col md={2} className="bg-light border-end vh-100 d-flex flex-column align-items-center py-3">
           <div className="w-100 text-center">
-            <div
-              onClick={() => setSelectedMenu('general')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'general' ? 'active-menu' : ''
-                }`}
-            >
-              General
-            </div>
+           
             <div
               onClick={() => setSelectedMenu('profile')}
               className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'profile' ? 'active-menu' : ''
@@ -463,6 +460,13 @@ const SettingsPage = () => {
                 }`}
             >
               Change Password
+            </div>
+             <div
+              onClick={() => setSelectedMenu('general')}
+              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'general' ? 'active-menu' : ''
+                }`}
+            >
+              Others
             </div>
           </div>
         </Col>

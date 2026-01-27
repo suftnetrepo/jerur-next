@@ -143,43 +143,6 @@ const ChurchSchema = new mongoose.Schema(
         }
       }
     ],
-    notifications: [
-      {
-        title: {
-          type: String,
-          trim: true,
-          default: ''
-        },
-        icon: {
-          type: String,
-          trim: true,
-          default: ''
-        },
-        time: {
-          type: String,
-          trim: true,
-          default: ''
-        },
-        type: {
-          type: String,
-          trim: true,
-          default: ''
-        },
-        status: {
-          type: Boolean,
-          default: false
-        },
-        description: {
-          type: String,
-          trim: true,
-          default: ''
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now
-        }
-      }
-    ],
     push_notifications: [
       {
         title: {
@@ -198,10 +161,6 @@ const ChurchSchema = new mongoose.Schema(
         }
       }
     ],
-    onboardingComplete: {
-      type: Boolean,
-      default: false
-    },
     stripe_user_id: {
       type: String,
       trim: true,
@@ -348,6 +307,56 @@ const ChurchSchema = new mongoose.Schema(
       required: false,
       default: ''
     },
+    prophetic_focus: {
+      month: {
+        type: String,
+        required: false,
+        default: ''
+      },
+      verse: {
+        type: String,
+        required: false,
+        default: ''
+      },
+      description: {
+        type: String,
+        required: false,
+        default: ''
+      }
+    },
+    pastor_section :{
+      title :{
+        type: String,
+        required: false,
+        default: ''
+      },
+      first_name : {
+        type: String,
+        required: false,
+        default: ''
+      },
+      last_name :{
+        type: String,
+        required: false,
+        default: ''
+      },
+       description: {
+        type: String,
+        required: false,
+        default: ''
+      },
+      public_id :{
+        type: String,
+        required: false,
+        default: ''
+      },
+      secure_url :{
+        type: String,
+        required: false,
+        default: ''
+      }
+    }
+
   },
   { timestamps: true }
 )

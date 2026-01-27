@@ -4,7 +4,7 @@ function sliderValidator(data) {
   const validator = new Validator()
   const schema = {
     title: { type: 'string', empty: false, max: 50 },
-    message: { type: 'string', empty: false, max: 90 }
+    message: { type: 'string', empty: false, max: 200 }
   }
   return validator.validate(data, schema)
 }
