@@ -92,22 +92,11 @@ const generateRandomChurch = () => {
       phone: faker.phone.number(),
       status: faker.datatype.boolean()
     })),
-    notifications: [
-      {
-        title: 'New Service',
-        icon: 'bell',
-        time: new Date().toISOString(),
-        type: 'event',
-        status: true,
-        description: faker.lorem.sentence()
-      }
-    ],
     push_notifications: Array.from({ length: 5 }, () => ({
       title: faker.lorem.words(2),
       message: faker.lorem.sentence(),
       status: true
     })),
-    onboardingComplete: faker.datatype.boolean(),
     stripe_user_id: faker.string.uuid(),
     currency: faker.finance.currencySymbol(),
     tax_rate: faker.number.int({ min: 0, max: 9 }),
@@ -137,7 +126,22 @@ const generateRandomChurch = () => {
     enable_app_giving: true,
     facebook_url: 'https://facebook.com/' + faker.internet.userName(),
     instagram_url: 'https://instagram.com/' + faker.internet.userName(),
-    youtube_url: 'https://youtube.com/' + faker.internet.userName()
+    youtube_url: 'https://youtube.com/' + faker.internet.userName(),
+    pastor_section: {
+      title : faker.person.jobTitle(),
+      first_name: faker.person.firstName(),
+      last_name: faker.person.lastName(),
+      mobile: faker.phone.number(),
+      email: faker.internet.email(),
+      description: faker.lorem.paragraph(),
+      secure_url: faker.image.avatar(),
+      public_id: faker.string.uuid(),
+    },
+    prophetic_focus: {
+      month: faker.company.name(),
+      verse: faker.lorem.sentence(),
+      description: faker.lorem.sentence(),
+    }
   });
 };
 
@@ -232,40 +236,6 @@ const generateEventsForChurch = (churchId) => {
   }
 
   return events;
-};
-
-const generateUsersForChurch = async (churchId) => {
-  const users = [];
-
-  for (let i = 0; i < 20; i++) {
-    const password = faker.internet.password();
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const email = faker.internet.email();
-
-    console.log(`Generated user: ${email} / ${password}`); // Optional for testing
-
-    users.push(
-      new User({
-        church: churchId,
-        first_name: faker.person.firstName(),
-        last_name: faker.person.lastName(),
-        mobile: faker.phone.number(),
-        user_status: faker.datatype.boolean(),
-        otp: faker.string.numeric(6),
-        email: email.toLowerCase(),
-        role: faker.helpers.arrayElement(['user', 'admin']),
-        profilePicture: faker.image.avatar(),
-        bio: faker.lorem.sentence(),
-        password: hashedPassword,
-        secure_url: faker.image.avatar(),
-        public_id: faker.string.uuid(),
-        fcm: faker.string.uuid()
-      })
-    );
-  }
-
-  return users;
 };
 
 const generateMembersForChurch = (churchId) => {
@@ -403,20 +373,20 @@ const generateAttendanceForChurch = (churchId, serviceTimes, options = {}) => {
   const { lookbackDays = 30 } = options;
   const attendances = [];
   const today = new Date();
-  
+
   // Create a map to track used dates for each day of week
   const usedDates = new Map();
-  
+
   serviceTimes.forEach((service) => {
     if (!Array.isArray(service.days) || service.days.length === 0) return;
 
     const targetDay = service.days[0];
-    
+
     // Find an available date for this service day that hasn't been used yet
     for (let i = 0; i < lookbackDays; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
-      
+
       if (date.getDay() === targetDay && !usedDates.has(date.toDateString())) {
         const [startHourStr, startMinuteStr = '00'] = service.start_time.split(':');
         const hour = parseInt(startHourStr, 10);
@@ -453,12 +423,12 @@ const seedDatabase = async () => {
     // await User.insertMany(users);
 
     const allServiceTimes = [];
-    
+
     for (const church of savedChurches) {
       const serviceTimes = generateServiceTimesForChurch(church._id);
       allServiceTimes.push(...serviceTimes);
     }
-    
+
     if (allServiceTimes.length > 0) {
       await ServiceTime.insertMany(allServiceTimes);
     }
@@ -497,7 +467,7 @@ const seedDatabase = async () => {
       const churchServiceTimes = allServiceTimes.filter((st) => st.suid.toString() === church._id.toString());
       return generateAttendanceForChurch(church._id, churchServiceTimes);
     });
-    
+
     if (attendances.length > 0) {
       await Attendance.insertMany(attendances);
     }

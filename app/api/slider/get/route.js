@@ -16,7 +16,7 @@ export const GET = async (req) => {
     }
 
     const identifier = decrypt(clientId);
-
+    
     const data = await getAllSliders(identifier);
     return NextResponse.json({ data, success: true });
   } catch (error) {

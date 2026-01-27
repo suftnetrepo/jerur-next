@@ -5,12 +5,66 @@ import {
   updateAddressValidator,
   updateOneValidator,
   updateFeatureValidator,
-  churchUpdateValidator
+  churchUpdateValidator,
+  pastorValidator, 
+  propheticValidator
 } from '../validation/churchValidator';
 import { logger } from '../../utils/logger';
 import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
+
+async function updateProphetic(suid, body) {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const bodyErrors = propheticValidator(body);
+    if (bodyErrors.length) {
+      const error = new Error(bodyErrors.map((it) => it.message).join(','));
+      error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
+      throw error;
+    }
+    await Church.findByIdAndUpdate(suid, body, {
+      new: true
+    });
+
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error updating church prophetic verse');
+  }
+}
+
+async function updatePastor(suid, body) {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const bodyErrors = pastorValidator(body);
+    if (bodyErrors.length) {
+      const error = new Error(bodyErrors.map((it) => it.message).join(','));
+      error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
+      throw error;
+    }
+    await Church.findByIdAndUpdate(suid, body, {
+      new: true
+    });
+
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error updating church pastor');
+  }
+}
 
 async function updateChurchContact(suid, body) {
   try {
@@ -379,5 +433,7 @@ export {
   searchChurchesWithinRadius,
   getChurchByIdentifier,
   updateFeatures,
-  updateChurchContact
+  updateChurchContact,
+  updatePastor,
+  updateProphetic
 };

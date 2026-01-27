@@ -27,6 +27,28 @@ function contactValidator(data) {
   return validator.validate(data, schema);
 }
 
+function propheticValidator(data) {
+  const validator = new Validator();
+  const schema = {
+    month: { type: 'string', empty: false, max: 15 },
+    verse: { type: 'string', empty: false, max: 20 },
+    description: { type: 'string', empty: false, max: 200 },
+  };
+  return validator.validate(data, schema);
+}
+
+function pastorValidator(data) {
+  const validator = new Validator();
+  const schema = {
+    first_name: { type: 'string', empty: false, max: 50 },
+    last_name: { type: 'string', empty: false, max: 50 },
+    mobile: { type: 'string', empty: false, max: 20 },
+    email: { type: 'string', empty: false, max: 20 },
+    description: { type: 'string', empty: false, max: 200 },
+  };
+  return validator.validate(data, schema);
+}
+
 function updateOneValidator(data) {
   const validator = new Validator();
   const updateOneSchema = {
@@ -79,5 +101,7 @@ export  {
   updateOneValidator,
   updateFeatureValidator,
   churchValidator,
-  churchUpdateValidator
+  churchUpdateValidator,
+  pastorValidator,
+  propheticValidator
 };
