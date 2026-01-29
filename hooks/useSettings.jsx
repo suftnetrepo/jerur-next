@@ -262,8 +262,6 @@ const useProphetic = () => {
   };
 };
 
-
-
 const useBankTransfer = () => {
   const [state, setState] = useState({
     data: {},
@@ -561,4 +559,4 @@ export const single = async (id) => {
   }
 }
 
-export { useSettings,useConfig, useBankTransfer, useSocialMedia, useFeatures };
+export { usePastor, useProphetic, useSettings,useConfig, useBankTransfer, useSocialMedia, useFeatures };

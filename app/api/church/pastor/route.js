@@ -30,7 +30,6 @@ export const PUT = async (req) => {
         const title = formData.get('title');
         const first_name = formData.get('first_name');
         const last_name = formData.get('last_name');
-        const email = formData.get('email');
         const mobile = formData.get('mobile');
         const description = formData.get('description');
         const file = formData.get('file');
@@ -66,7 +65,6 @@ export const PUT = async (req) => {
                 description,
                 first_name,
                 last_name,
-                email,
                 mobile,
                 ...(result && {
                     public_id: result.public_id,
@@ -79,7 +77,7 @@ export const PUT = async (req) => {
         return NextResponse.json({ success: true, data: updated });
 
     } catch (error) {
-        logger.error(error);
+        console.error(error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 };

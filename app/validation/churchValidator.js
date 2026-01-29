@@ -43,8 +43,7 @@ function pastorValidator(data) {
     first_name: { type: 'string', empty: false, max: 50 },
     last_name: { type: 'string', empty: false, max: 50 },
     mobile: { type: 'string', empty: false, max: 20 },
-    email: { type: 'string', empty: false, max: 20 },
-    description: { type: 'string', empty: false, max: 200 },
+    description: { type: 'string', empty: false, max: 1000 },
   };
   return validator.validate(data, schema);
 }

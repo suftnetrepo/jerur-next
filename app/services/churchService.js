@@ -6,7 +6,7 @@ import {
   updateOneValidator,
   updateFeatureValidator,
   churchUpdateValidator,
-  pastorValidator, 
+  pastorValidator,
   propheticValidator
 } from '../validation/churchValidator';
 import { logger } from '../../utils/logger';
@@ -29,14 +29,19 @@ async function updateProphetic(suid, body) {
       error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
       throw error;
     }
-    await Church.findByIdAndUpdate(suid, body, {
+
+    const updateData = {
+      prophetic_focus: body
+    };
+
+    const updated = await Church.findByIdAndUpdate(suid, updateData, {
       new: true
     });
 
-    return true;
+    return updated;
   } catch (error) {
     logger.error(error);
-    throw new Error('Error updating church prophetic verse');
+    throw new Error(error.message || 'Error updating church prophetic verse');
   }
 }
 
@@ -49,7 +54,7 @@ async function updatePastor(suid, body) {
       throw error;
     }
 
-    const bodyErrors = pastorValidator(body);
+    const bodyErrors = pastorValidator(body.pastor_section);
     if (bodyErrors.length) {
       const error = new Error(bodyErrors.map((it) => it.message).join(','));
       error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
@@ -61,7 +66,7 @@ async function updatePastor(suid, body) {
 
     return true;
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     throw new Error('Error updating church pastor');
   }
 }
@@ -193,7 +198,7 @@ async function getChurchesByName(churchName) {
     throw new Error('Error fetching churches');
   }
 }
-async function updateBulk(suid , body) {
+async function updateBulk(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -311,13 +316,13 @@ async function getChurches({ page = 1, limit = 10, sortField, sortOrder, searchQ
 
     const searchFilter = searchQuery
       ? {
-          $or: [
-            { name: { $regex: searchQuery, $options: 'i' } },
-            { mobile: { $regex: searchQuery, $options: 'i' } },
-            { email: { $regex: searchQuery, $options: 'i' } },
-            { plan: { $regex: searchQuery, $options: 'i' } }
-          ]
-        }
+        $or: [
+          { name: { $regex: searchQuery, $options: 'i' } },
+          { mobile: { $regex: searchQuery, $options: 'i' } },
+          { email: { $regex: searchQuery, $options: 'i' } },
+          { plan: { $regex: searchQuery, $options: 'i' } }
+        ]
+      }
       : {};
 
     const query = {

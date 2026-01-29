@@ -16,6 +16,9 @@ import BankTransfer from './bank-transfer';
 import SocialMedia from './social_media';
 import Features from './features';
 import ConfigPage from './config';
+import Pastor from './others/pastor';
+import Prophetic from './others/prophetic';
+
 const AddressForm = dynamic(() => import('./address'), { ssr: false });
 
 const SettingsPage = () => {
@@ -30,9 +33,9 @@ const SettingsPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  console.log("...............................data", encrypt(data?._id))
-  console.log("...............................data", decrypt('443d4762f5dbd5802d79954944d0bbca:025dab65d4bc3a9fc4232a1c8a3a83f4cd4d1488b46d98db6c2e0d30740965f3'))
-  console.log("...............................data", data)
+  // console.log("...............................data", encrypt(data?._id))
+  // console.log("...............................data", decrypt('443d4762f5dbd5802d79954944d0bbca:025dab65d4bc3a9fc4232a1c8a3a83f4cd4d1488b46d98db6c2e0d30740965f3'))
+  // console.log("...............................data", data)
 
   useEffect(() => {
     return () => {
@@ -219,7 +222,6 @@ const SettingsPage = () => {
               </Form.Group>
             </div>
 
-
             <div className="d-flex justify-content-start">
               <Button type="button" variant="primary" onClick={() => onSubmit()}>
                 Save Changes
@@ -395,6 +397,12 @@ const SettingsPage = () => {
             </Tab>
             <Tab eventKey="feature" title="Mobile Features">
               <Features data={data} />
+            </Tab>
+            <Tab eventKey="pastor" title="Pastor">
+              <Pastor data={data?.pastor_section} />
+            </Tab>
+            <Tab eventKey="prophetic" title="Prophetic">
+              <Prophetic data={data?.prophetic_focus} />
             </Tab>
             <Tab eventKey="config" title="Configs">
               <ConfigPage data={data} />

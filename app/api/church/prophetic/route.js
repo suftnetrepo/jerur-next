@@ -13,6 +13,7 @@ export const PUT = async (req) => {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const body = await req.json();
         const updated = await updateProphetic(user?.church, body);
         return NextResponse.json({ success: true, data: updated });
 
