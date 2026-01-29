@@ -2,12 +2,9 @@ import { NextResponse } from 'next/server';
 import { AuthService } from './lib/AuthService';
 import { getToken } from 'next-auth/jwt';
 
-const isApiRoute = (pathname) => pathname.startsWith('/api');
-
 export async function middleware(req) {
   try {
-    const { pathname } = req.nextUrl;
-
+   
     const token = await getToken({
       req: req,
       secret: process.env.NEXTAUTH_SECRET?.trim(),
@@ -31,14 +28,15 @@ export async function middleware(req) {
 
     const key = req.headers.get('nj-api-key');
     if (key) {
-      try {
-      const response = NextResponse.next();
-      response.headers.set('nj-client-id', key);
-      return response } catch (error) {
-        return NextResponse.json({ error: 'Unauthorized', message: 'Invalid API Key' }, { status: 401 });
-      }
+      const requestHeaders = new Headers(req.headers);
+      requestHeaders.set('x-nj-client-id', key);
+      
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
     }
-
 
     const returnUrl = encodeURIComponent(req.nextUrl.pathname);
     return NextResponse.redirect(new URL(`/login?returnUrl=${returnUrl}`, req.url));
@@ -50,10 +48,7 @@ export async function middleware(req) {
 
 export const config = {
   matcher: [
-    // Protected routes
     '/protected/:path*',
-
-    // Protected API routes
-    // '/api/:path*'
+    '/api/:path*'  // Make sure your API routes are matched
   ]
 };

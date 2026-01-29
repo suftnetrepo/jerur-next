@@ -930,8 +930,8 @@ export const propheticValidator = {
     description: [
       { pattern: /^.+$/, message: 'description is required' },
       {
-        pattern: /^.{0,50}$/,
-        message: 'description must not be more than 50 characters'
+        pattern: /^.{0,1000}$/,
+        message: 'description must not be more than 1000 characters'
       }
     ],
   },
