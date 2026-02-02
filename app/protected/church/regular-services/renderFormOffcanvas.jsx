@@ -32,7 +32,7 @@ const RenderFormOffcanvas = ({
       return;
     }
 
-    const { description, remote, sequency_no, remote_link, start_time, status, title, end_time } = fields;
+    const { description, remote, sequency_no, remote_link, start_time, status, title, end_time, service_type } = fields;
 
     const body = {
       description,
@@ -42,7 +42,8 @@ const RenderFormOffcanvas = ({
       start_time,
       status,
       title,
-      end_time
+      end_time,
+      service_type
     };
 
     if (fields?._id) {

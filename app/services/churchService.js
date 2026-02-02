@@ -166,7 +166,7 @@ async function getChurch(id) {
       throw error;
     }
 
-    const data = await Church.findById(id).select('name mobile email description address features sliders contacts currency bank_name account_number sort_code tax_rate').lean();
+    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description address features sliders contacts currency bank_name account_number sort_code tax_rate').lean();
     return data;
   } catch (error) {
     logger.error(error);

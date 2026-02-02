@@ -1,12 +1,12 @@
-import { decrypt } from '@/utils/helpers';
-import { getChurch } from '../../../services/churchService';
-import { logger } from '@/utils/logger';
+import { getServicesTimeByType } from '../../../../services/serviceTime';
+import { logger } from '../../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { decrypt } from '@/utils/helpers';
 
 export const GET = async (req) => {
   try {
-   
-       const clientId = req.headers.get('x-nj-client-id');
+
+    const clientId = req.headers.get('x-nj-client-id');
 
     if (!clientId) {
       return NextResponse.json(
@@ -16,7 +16,8 @@ export const GET = async (req) => {
     }
 
     const identifier = decrypt(clientId);
-    const data = await getChurch(identifier);
+
+    const data = await getServicesTimeByType(identifier, true);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

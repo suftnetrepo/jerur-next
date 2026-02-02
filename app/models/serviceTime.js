@@ -40,6 +40,10 @@ const ServiceTimeSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    service_type: {
+      type: String,
+      default: ''
+    },
     sequency_no: {
       type: Number,
       default: 0

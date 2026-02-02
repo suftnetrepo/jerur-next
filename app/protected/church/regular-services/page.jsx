@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import Tooltip from '@mui/material/Tooltip';
 import RenderFormOffcanvas from './renderFormOffcanvas';
 import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
-import { getYesNoColorCode } from '@/utils/helpers';
+import { getYesNoColorCode, serviceType } from '@/utils/helpers';
 
 const Render = () => {
   const router = useRouter();
@@ -33,10 +33,20 @@ const Render = () => {
     handleReset,
     handleSelect
   } = useRegularService();
- 
+
   const columns = useMemo(
     () => [
       { Header: 'Sn', accessor: 'sequency_no', sortType: 'basic' },
+      {
+        Header: 'Service Type',
+        accessor: 'service_type',
+        headerClassName: { textAlign: 'center' },
+        Cell: ({ value }) => (
+          <div className="d-flex justify-content-start align-items-center">
+            <span>{serviceType[value]}</span>
+          </div>
+        )
+      },
       { Header: 'Title', accessor: 'title', sortType: 'basic' },
       { Header: 'Start Time', accessor: 'start_time', sortType: 'basic' },
       { Header: 'End Time', accessor: 'end_time', sortType: 'basic' },

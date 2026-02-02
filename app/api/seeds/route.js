@@ -164,6 +164,7 @@ const generateServiceTimesForChurch = (churchId) => {
         status: true,
         remote: faker.datatype.boolean(),
         remote_link: faker.internet.url(),
+        service_type : 'prayer',
         sequency_no: index + 1,
         days: [dayNumber],
         agenda: Array.from({ length: 3 }, (_, i) => ({

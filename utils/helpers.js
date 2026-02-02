@@ -244,10 +244,10 @@ const reverseGeocode = async (latitude, longitude) => {
     const json = await response.json();
 
     return formatAddressParts(json.address);
-  } catch (error) {}
+  } catch (error) { }
 };
 
-function formatCurrency(currencySymbol ='£', amount) {
+function formatCurrency(currencySymbol = '£', amount) {
   const numericAmount = parseFloat(amount);
 
   if (isNaN(numericAmount)) {
@@ -299,7 +299,7 @@ function checkAmount(amount) {
 }
 
 function encrypt(text) {
-  if(!text) return
+  if (!text) return
   try {
     const iv = crypto.randomBytes(IV_LENGTH);
     const keyBuffer = Buffer.from(process.env.ENCRYPTION_KEY || '946acb540311776067cadad0976d65c086673babcd8e8298b323ae85823f34b3', 'hex');
@@ -315,7 +315,7 @@ function encrypt(text) {
 }
 
 function decrypt(text) {
-    if(!text) return
+  if (!text) return
   try {
     const textParts = text.split(':');
     const iv = Buffer.from(textParts.shift(), 'hex');
@@ -368,24 +368,24 @@ function getStatusBadgeClass(status) {
       return 'bg-light text-dark'; // Default/fallback
   }
 }
- const FEATURES = [  
+const FEATURES = [
   {
     name: 'House fellowship nearby',
     color: '#4338ca',
     icon: 'house',
-    id: '2'   
+    id: '2'
   },
   {
     name: 'Campaigns',
     color: '#0e7490',
     icon: 'wallet-giftcard',
-    id: '3'  
+    id: '3'
   },
   {
     name: 'Giving',
     color: '#a16207',
     icon: 'money',
-    id: '4' 
+    id: '4'
   },
   {
     name: 'Hymns',
@@ -397,8 +397,8 @@ function getStatusBadgeClass(status) {
     name: 'Register Member',
     color: '#0284c7',
     icon: 'library-books',
-    id: '6'   
-  },  
+    id: '6'
+  },
   {
     name: 'Testimony',
     color: '#808000',
@@ -425,8 +425,15 @@ const featuresOptions = FEATURES.map(feature => ({
   label: feature.name
 }));
 
+const serviceType = {
+  'sunday_service': 'Sunday Service',
+  'bible_study': 'Bible Study',
+  'night_vigil': 'Night Vigil',
+  'prayer': 'Prayer'
+}
 
 export {
+  serviceType,
   FEATURES,
   featuresOptions,
   capitalizeFirstLetter,
