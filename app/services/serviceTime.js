@@ -6,7 +6,7 @@ import { mongoConnect } from '@/utils/connectDb';
 
 mongoConnect();
 
-async function addServiceTime( suid , body) {
+async function addServiceTime(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -21,6 +21,7 @@ async function addServiceTime( suid , body) {
       error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
       throw error;
     }
+
     const newServiceTime = new ServiceTime({
       suid,
       ...body
@@ -49,6 +50,7 @@ async function editServiceTime(id, body) {
       error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
       throw error;
     }
+
     await ServiceTime.findByIdAndUpdate(id, body, {
       new: true
     });
@@ -108,10 +110,29 @@ async function getAllServiceTimes(suid, status = false) {
   }
 }
 
+async function getServicesTimeByType(suid, status = false, service_type= 'prayer') {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const allServiceTimes = await ServiceTime.find({ suid, status: status, service_type : service_type });
+    return allServiceTimes.sort((a, b) => a.sequency_no - b.sequency_no);
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error getting all service times');
+  }
+}
+
 export {
+  getServicesTimeByType,
   addServiceTime,
   editServiceTime,
   deleteServiceTime,
   getServiceTimeById,
-  getAllServiceTimes
+  getAllServiceTimes,
+
 };

@@ -16,7 +16,27 @@ const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleC
   return (
     <Form>
       <div className="row">
-        <div className="col-md-4">
+        <div className="col-md-12">
+          <Form.Group controlId="formName" className="mb-3">
+            <Form.Label className="text-dark"> Title</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter title"
+              name="name"
+              value={fields?.title}
+              onChange={(e) => handleChange('title', e.target.value)}
+              className="border-dark"
+              maxLength={50}
+            />
+            {errorMessages?.title?.message && (
+              <span className="text-danger fs-13 ms-2">{errorMessages?.title?.message}</span>
+            )}
+          </Form.Group>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-md-6">
           <Form.Group controlId="formLastName" className="mb-3">
             <Form.Label className="text-dark">Sequency No</Form.Label>
             <Form.Select
@@ -37,21 +57,22 @@ const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleC
             )}
           </Form.Group>
         </div>
-        <div className="col-md-8">
-          <Form.Group controlId="formName" className="mb-3">
-            <Form.Label className="text-dark"> Title</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter title"
-              name="name"
-              value={fields?.title}
-              onChange={(e) => handleChange('title', e.target.value)}
+        <div className="col-md-6">
+          <Form.Group controlId="formServiceType" className="mb-3">
+            <Form.Label className="text-dark">Service Type</Form.Label>
+            <Form.Select
+              name="service_type"
+              value={fields.service_type}
               className="border-dark"
-              maxLength={50}
-            />
-            {errorMessages?.title?.message && (
-              <span className="text-danger fs-13 ms-2">{errorMessages?.title?.message}</span>
-            )}
+              onChange={(e) => handleChange('service_type', e.target.value)}
+            >
+              <option value="">Select a Service Type</option>
+              <option value="prayer">Prayer</option>
+              <option value="sunday_service">Sunday Service</option>
+              <option value="bible_study">Bible Study</option>
+              <option value="night_vigil">Night Vigil</option>
+            </Form.Select>
+            {errorMessages.role?.message && <span className="text-danger">{errorMessages.role?.message}</span>}
           </Form.Group>
         </div>
       </div>
@@ -182,7 +203,7 @@ const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleC
             onConfirm={async (id) => {
               handleDelete(id);
             }}
-            onCancel={() => {}}
+            onCancel={() => { }}
             itemId={fields?._id}
           >
             <Button type="button" className="ms-4" variant="danger">
