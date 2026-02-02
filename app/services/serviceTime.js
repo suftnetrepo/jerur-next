@@ -119,8 +119,8 @@ async function getServicesTimeByType(suid, status = false, service_type= 'prayer
       throw error;
     }
 
-    const allServiceTimes = await ServiceTime.find({ suid, status: status, service_type : service_type });
-    return allServiceTimes.sort((a, b) => a.sequency_no - b.sequency_no);
+    const result = await ServiceTime.find({ suid, status, service_type : service_type }).select('-suid');
+    return result.sort((a, b) => a.sequency_no - b.sequency_no);
   } catch (error) {
     logger.error(error);
     throw new Error('Error getting all service times');
