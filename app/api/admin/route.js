@@ -7,8 +7,8 @@ import {
   getChurchByIdentifier,
   getChurchesByName,
   getChurchesByCountryCode
-} from '../../services/churchService';
-import { logger } from '../../../utils/logger';
+} from '@/services/churchService';
+import { logger } from '@/utils/logger';
 import { NextResponse } from 'next/server';
 
 export const GET = async (req) => {

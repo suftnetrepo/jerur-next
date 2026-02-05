@@ -1,5 +1,5 @@
-import { remove } from '../../../services/attendanceService';
-import { logger } from '../../../../utils/logger';
+import { remove } from '@/services/attendanceService';
+import { logger } from '@/utils/logger';
 import { NextResponse } from 'next/server';
 
 export const DELETE = async (req) => {
