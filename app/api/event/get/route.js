@@ -6,7 +6,7 @@ import { decrypt } from '@/utils/helpers';
 export const GET = async (req) => {
   try {
 
-    const clientId = req.headers.get('nj-client-id');
+      const clientId = req.headers.get('x-nj-client-id');
 
     if (!clientId) {
       return NextResponse.json(
