@@ -1,5 +1,5 @@
-import { logger } from '../utils/logger';
-import { FCMNotificationService } from '../utils/push-notification';
+import { logger } from '@/utils/logger';
+import { FCMNotificationService } from '@/utils/push-notification';
 const { NextResponse } = require('next/server');
 
 export const PUT = async (req) => {

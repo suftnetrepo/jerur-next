@@ -2,8 +2,8 @@ import {
   getAttendanceTrends,
   getMemberAttendanceStats,
   getServiceAttendanceSummary
-} from '../../services/attendanceService';
-import { logger } from '../../../utils/logger';
+} from '@/services/attendanceService';
+import { logger } from '@/utils/logger';
 import { NextResponse } from 'next/server';
 import { getUserSession } from '@/utils/generateToken';
 
@@ -34,7 +34,7 @@ export const GET = async (req) => {
       return NextResponse.json({ data, success: true });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

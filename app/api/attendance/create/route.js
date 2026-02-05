@@ -1,5 +1,5 @@
-import { add } from '../../../services/attendanceService';
-import { logger } from '../../../../utils/logger';
+import { add } from '@/services/attendanceService';
+import { logger } from '@/utils/logger';
 import { NextResponse } from 'next/server';
 
 export const POST = async (req) => {
