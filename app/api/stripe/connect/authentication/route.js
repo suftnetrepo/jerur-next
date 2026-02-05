@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import {logger} from '../../../../../utils/logger'
-import { updateStripeConnect } from '@/services/subscriptionUpdateService'
 import {mongoConnect} from '../../../../../utils/connectDb'
 import Church from '../../../../models' 
 
