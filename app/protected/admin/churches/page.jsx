@@ -2,11 +2,11 @@
 
 import React, { useMemo, useState } from 'react';
 import { Table } from '@/components/elements/table/table';
-import { useAdmin } from '../../../../hooks/useAdmin';
+import { useAdmin } from '@/hooks/useAdmin';
 import { TiEye } from 'react-icons/ti';
-import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
-import useDebounce from '../../../../hooks/useDebounce';
-import { dateFormatted } from '../../../../utils/helpers';
+import ErrorDialogue from '@/src/components/elements/errorDialogue';
+import useDebounce from '@/hooks/useDebounce';
+import { dateFormatted } from '@/utils/helpers';
 import RenderChurchOffcanvas from '../renderChurchOffcanvas';
 
 const Page = () => {
