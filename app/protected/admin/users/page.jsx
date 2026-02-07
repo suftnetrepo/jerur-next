@@ -3,13 +3,13 @@
 import React, { useMemo, useState } from 'react';
 import { Table } from '@/components/elements/table/table';
 import { Button } from 'react-bootstrap';
-import { useUser } from '../../../../hooks/useUser';
+import { useUser } from '@/hooks/useUser';
 import Badge from 'react-bootstrap/Badge';
 import { MdDelete } from 'react-icons/md';
 import { TiEdit } from 'react-icons/ti';
-import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
-import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
-import useDebounce from '../../../../hooks/useDebounce';
+import DeleteConfirmation from '@/src/components/elements/ConfirmDialogue';
+import ErrorDialogue from '@/src/components/elements/errorDialogue';
+import useDebounce from '@/hooks/useDebounce';
 import RenderUserOffcanvas from '../renderUserOffcanvas';
 
 const User = () => {
