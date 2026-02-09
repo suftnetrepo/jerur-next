@@ -1,9 +1,9 @@
 import { mongoConnect } from '../../../../utils/connectDb';
-import User from '../../../models/user';
+import User from '@/models/user';
 import { errorHandler } from '../../../../utils/errors';
-import { sendEmail } from '../../../../lib/mail';
+import { sendBrevoEmail } from '../../../../lib/mail';
 import { emailTemplates } from '../../../email';
-import { compileEmailTemplate } from '../../../templates/compile-email-template';
+import { compileEmailTemplate } from '@/templates/compile-email-template';
 import { NextResponse } from 'next/server';
 
 mongoConnect();
@@ -42,14 +42,14 @@ export async function POST(req: Request) {
     );
 
     const mailOptions = {
-      from: process.env.USER_NAME || "kabelsus@gmail.com",
-      to: emailAddress,
-      subject: 'Instructions for changing your Snatchi Account password',
-      text: 'Instructions for changing your Snatchi Account password',
-      html: template
+      sender:{email:process.env.USER_NAME, name: 'Jerur'},
+      to: [{email :emailAddress}],
+      subject: 'Instructions for changing your Jerur account password',
+      textContent: template,
+      htmlContent :template
     };
    
-    await sendEmail(mailOptions);
+    await sendBrevoEmail(mailOptions);
 
     return NextResponse.json({ data: true }, { status: 200 });
   } catch (err) {      
