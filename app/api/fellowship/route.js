@@ -1,7 +1,8 @@
 import {
   getAllFellowships,
   countInFellowshipCollection,
-  searchFellowshipWithinRadius
+  searchFellowshipWithinRadius,
+  getByPagination
 } from '../../services/fellowshipService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
@@ -14,9 +15,27 @@ export const GET = async (req) => {
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    
+
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
+
+    if (action === 'paginate') {
+      const sortField = url.searchParams.get('sortField');
+      const sortOrder = url.searchParams.get('sortOrder');
+      const searchQuery = url.searchParams.get('searchQuery');
+      const page = parseInt(url.searchParams.get('page') || '1', 10);
+      const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+
+      const { data, totalCount } = await getByPagination({
+        suid: user?.church,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+        searchQuery
+      });
+      return NextResponse.json({ data, totalCount });
+    }
 
     if (action === 'getAll') {
       const data = await getAllFellowships(user?.church);

@@ -80,7 +80,7 @@ const useFellowship = (searchQuery = '') => {
       }));
       return true;
     } else {
-      handleError(errorMessage || 'Failed to update the service.');
+      handleError(errorMessage || 'Failed to update the fellowship.');
       return false;
     }
   }
@@ -115,22 +115,37 @@ const useFellowship = (searchQuery = '') => {
     }
   };
 
-  const handleFetch = useCallback(async ({ pageIndex = 1, pageSize = 10, sortBy = [], searchQuery = '' }) => {
-    setState((prev) => ({ ...prev, loading: true }));
-    const {
-      success,
-      errorMessage,
-      data = []
-    } = await zat(FELLOWSHIP.fetch, null, VERBS.GET, { status: true, searchQuery, sortBy, action: 'getAll' });
-
-    if (success) {
-      setState((prev) => ({ ...prev, totalCount: data.length, data, loading: false }));
-      return true;
-    } else {
-      handleError(errorMessage || 'Failed to update the fellowship.');
-      return false;
-    }
-  }, []);
+    const handleFetch = useCallback(async ({ pageIndex = 1, pageSize = 10, sortBy = [], searchQuery = '' }) => {
+      const sortField = sortBy.length > 0 ? sortBy[0].id : null;
+      const sortOrder = sortBy.length > 0 ? (sortBy[0].desc ? 'desc' : 'asc') : null;
+  
+      try {
+        const { data, success, errorMessage, totalCount } = await zat(FELLOWSHIP.fetch, null, VERBS.GET, {
+          action: 'paginate',
+          page: pageIndex === 0 ? 1 : pageIndex,
+          limit: pageSize,
+          ...(sortField && { sortField }),
+          ...(sortOrder && { sortOrder }),
+          searchQuery
+        });
+  
+        if (success) {
+          setState((pre) => ({
+            ...pre,
+            data: data,
+            totalCount: totalCount,
+            loading: false
+          }));
+          return true;
+        } else {
+          handleError(errorMessage || 'Failed to fetch fellowship.');
+          return false;
+        }
+      } catch (error) {
+        handleError('An unexpected error occurred while fetching fellowship.');
+        return false;
+      }
+    }, []);
 
   const handleSelectedAddress = (selectedAddress) => {
     setState((prev) => ({

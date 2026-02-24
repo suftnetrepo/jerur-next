@@ -13,8 +13,11 @@ import Tooltip from '@mui/material/Tooltip';
 import RenderFormOffcanvas from './renderFormOffcanvas';
 import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
 import { getYesNoColorCode, serviceType } from '@/utils/helpers';
+import useDebounce from '../../../../hooks/useDebounce';
 
 const Render = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const router = useRouter();
   const [show, setShow] = useState(false);
   const [showAgenda, setShowAgenda] = useState(false);
@@ -32,7 +35,7 @@ const Render = () => {
     handleSave,
     handleReset,
     handleSelect
-  } = useRegularService();
+  } = useRegularService(debouncedSearchQuery);
 
   const columns = useMemo(
     () => [
@@ -110,15 +113,19 @@ const Render = () => {
   return (
     <div className="ms-5 me-5 ">
       <div className="d-flex justify-content-start align-items-center mb-3">
-        <Button variant="outline-secondary" onClick={() => router.push(`/protected/church/regular-services`)}>
-          <MdArrowBack size={24} /> Back
-        </Button>
+
         <h3 className="card-title ms-2">Regular Services</h3>
       </div>
       <div className={` mt-2 ${!loading ? 'overlay__block' : null}`}>
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-end mb-3">
-            <div></div>
+            <div><input
+              type="text"
+              className="form-control w-25"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            /></div>
             <Button
               type="submit"
               size="sm"
@@ -134,7 +141,7 @@ const Render = () => {
         </div>
       </div>
       {!loading && <span className="overlay__block" />}
-      {error && <ErrorDialogue showError={error} onClose={() => {}} />}
+      {error && <ErrorDialogue showError={error} onClose={() => { }} />}
       <RenderFormOffcanvas
         fields={fields}
         handleChange={handleChange}
