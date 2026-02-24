@@ -59,20 +59,54 @@ const useDashboard = () => {
     }
   };
 
-   const handleChartAggregate = async () => {
-			const { data, success, errorMessage } = await zat(DASHBOARD.chart, null, VERBS.GET);
+  const handleChartAggregate = async () => {
+    const { data, success, errorMessage } = await zat(DASHBOARD.chart, null, VERBS.GET);
 
-			if (success) {
-				setState(pre => {
-					return { ...pre, data: data, loading: false };
-				});
-				return { success, user: data };
-			} else {
-				handleError(errorMessage);
-			}
-		};
+    if (success) {
+      setState(pre => {
+        return { ...pre, data: data, loading: false };
+      });
+      return { success, user: data };
+    } else {
+      handleError(errorMessage);
+    }
+  };
 
-  return { ...state, handleAggregate, handleRecent, handlePaginate, handleChartAggregate };
+  const handleDashboardAggregates = async () => {
+    setState((pre) => {
+      return { ...pre, loading: true };
+    });
+
+    const { data, success, errorMessage } = await zat(DASHBOARD.aggregates, null, VERBS.GET);
+
+    if (success) {
+      setState((pre) => {
+        return { ...pre, data: data, loading: false };
+      });
+      return { success, aggregates: data };
+    } else {
+      handleError(errorMessage);
+    }
+  };
+
+  const handleDashboardStatistics = async () => {
+    setState((pre) => {
+      return { ...pre, loading: true };
+    });
+
+    const { data, success, errorMessage } = await zat(DASHBOARD.statistics, null, VERBS.GET);
+
+    if (success) {
+      setState((pre) => {
+        return { ...pre, data: data, loading: false };
+      });
+      return { success, statistics: data };
+    } else {
+      handleError(errorMessage);
+    }
+  };
+
+  return { ...state, handleAggregate, handleRecent, handlePaginate, handleChartAggregate, handleDashboardAggregates, handleDashboardStatistics };
 };
 
 export { useDashboard };

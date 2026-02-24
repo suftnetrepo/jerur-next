@@ -1,15 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Card } from 'react-bootstrap';
-// import { getAggregate } from '../../../../utils/helpers';
+import { getDashboardAggregateValue } from '../../../../utils/helpers';
 import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
 import { TotalInvested, NumberofInvested, Portfoliovalue, Returnsrate, UserAggregates } from '../../../share/chart';
 import RecentMembers from '../recentMembers';
 import AttendanceAnalysis from '../chart/attendance_analysis';
 
 const Dashboard = () => {
-  const { recentData, memberCount, chartData, trentData } = useChurchDashboard();
+  const { recentData, chartData, trentData, data, handleDashboardAggregates } = useChurchDashboard();
+  
+  useEffect(() => {
+    handleDashboardAggregates();
+  }, []);
+
+  console.log('Aggregate Data:', trentData, chartData);
+  
   return (
     <>
       <div className="row p-1">
@@ -25,7 +32,7 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <span className="d-block">Members</span>
-                    <span className="fs-16 fw-semibold">{memberCount?.data}</span>
+                    <span className="fs-16 fw-semibold">{getDashboardAggregateValue(data, 'members')}</span>
                   </div>
                 </div>
                 <div>
@@ -50,7 +57,7 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <span className="d-block">Upcoming Events</span>
-                    {/* <span className="fs-16 fw-semibold">{getAggregate(data?.statuses, 'Completed')}</span> */}
+                    <span className="fs-16 fw-semibold">{getDashboardAggregateValue(data, 'events')}</span>
                   </div>
                 </div>
                 <div>
@@ -74,9 +81,9 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="d-block">Upcoming Events</span>
+                    <span className="d-block">Fellowships</span>
                     <span className="fs-16 fw-semibold">
-                      {/* {getAggregate(data?.statuses, 'Progress')} */}
+                      {getDashboardAggregateValue(data, 'fellowships')}
                       <i className="ti ti-arrow-narrow-up ms-1 text-success"></i>
                     </span>
                   </div>
@@ -102,9 +109,9 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="d-block">Pending</span>
+                    <span className="d-block">Services</span>
                     <span className="fs-16 fw-semibold">
-                      {/* {getAggregate(data?.statuses, 'Pending')} */}
+                      {getDashboardAggregateValue(data, 'serviceTimes')}
                       <i className="ti ti-arrow-narrow-up ms-1 text-success"></i>
                     </span>
                   </div>
@@ -122,10 +129,10 @@ const Dashboard = () => {
       <div className="row ms-1 me-1 mt-4 ">
         <div className="col-sm-6 col-md-7 card me-2 d-flex justify-content-start">
           <Card.Header className="ps-4">Service Attendance  </Card.Header>
-          <div className="card-body"> {trentData && <AttendanceAnalysis data={trentData} />}</div>
+          <div className="card-body"> {Array.isArray(trentData) && <AttendanceAnalysis data={trentData} />}</div>
         </div>
         <div className="col-sm-6 col-md-4 card d-flex h-auto justify-content-center align-items-center ">
-          {chartData?.length && <UserAggregates data={chartData} />}
+          {Array.isArray(chartData) && <UserAggregates data={chartData} />}
         </div>
       </div>
 

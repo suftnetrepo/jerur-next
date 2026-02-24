@@ -63,7 +63,9 @@ export const DASHBOARD = {
   paginate: `${HOST}admin?action=paginate`,
   aggregate: `${HOST}admin?action=aggregate`,
   recent: `${HOST}admin?action=recent`,
-  chart: `${HOST}admin?action=chart`
+  chart: `${HOST}admin?action=chart`,
+  aggregates: `${HOST}dashboard`,
+  statistics: `${HOST}dashboard?action=statistics`
 };
 
 export const CHURCH_DASHBOARD = {
@@ -72,7 +74,9 @@ export const CHURCH_DASHBOARD = {
   recent: `${HOST}member?action=recent`,
   memberCount: `${HOST}member?action=count`,
   chart: `${HOST}member?action=chart`,
-  trent: `${HOST}attendance?action=trent`
+  trent: `${HOST}attendance?action=trent`,
+  aggregates: `${HOST}dashboard`,
+  statistics: `${HOST}dashboard?action=statistics`
 };
 
 export const STRIPE = {

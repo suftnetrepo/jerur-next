@@ -11,6 +11,7 @@ interface Initialize {
   memberCount: number;
   loading: boolean;
   error: null | string;
+  data ?: any;
 }
 
 const useChurchDashboard = () => {
@@ -21,7 +22,8 @@ const useChurchDashboard = () => {
     trentData: null,
     memberCount: 0,
     loading: false,
-    error: null
+    error: null,
+
   });
 
   const handleError = (error: string) => {
@@ -38,6 +40,40 @@ const useChurchDashboard = () => {
     }
     setState((prev) => ({ ...prev, error: errorMessage }));
     return { success: false, error: errorMessage };
+  };
+
+  const handleDashboardAggregates = async () => {
+    setState((pre) => {
+      return { ...pre, loading: true };
+    });
+
+    const { data, success, errorMessage } = await zat(CHURCH_DASHBOARD.aggregates, null, VERBS.GET);
+
+    if (success) {
+      setState((pre) => {
+        return { ...pre, data: data, loading: false };
+      });
+      return { success, data: data };
+    } else {
+      handleError(errorMessage);
+    }
+  };
+
+  const handleDashboardStatistics = async () => {
+    setState((pre) => {
+      return { ...pre, loading: true };
+    });
+
+    const { data, success, errorMessage } = await zat(CHURCH_DASHBOARD.statistics, null, VERBS.GET);
+
+    if (success) {
+      setState((pre) => {
+        return { ...pre, data: data, loading: false };
+      });
+      return { success, data: data };
+    } else {
+      handleError(errorMessage);
+    }
   };
 
   const handleRecent = async () => fetchDataHandler(CHURCH_DASHBOARD.recent, 'recentData');
@@ -68,14 +104,14 @@ const useChurchDashboard = () => {
       }
     } catch (error) {
       handleError(error instanceof Error ? error.message : 'An unknown error occurred');
-    } 
+    }
   };
 
   useEffect(() => {
     fetchAll();
   }, []);
 
-  return { ...state };
+  return { ...state, handleDashboardAggregates, handleDashboardStatistics, handleRecent, handleAggregate, handleChartAggregate, handleMemberCount, handleAttendanceTrent };
 };
 
 export { useChurchDashboard };
