@@ -348,6 +348,7 @@ const ProjectAnalysis = ({ data }) => {
 };
 
 const UserAggregates = ({ data }) => {
+
   const dataSeries = data?.map((item) => parseInt(item.count));
   const dataLabels = data?.map((item) => item.role);
 

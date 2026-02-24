@@ -29,6 +29,19 @@ const getAdminAggregate = (data, status) => {
   }
 };
 
+/**
+ * Get dashboard aggregate value by property name
+ * @param {Object} data - The aggregated data object with properties like events, members, fellowships, serviceTimes, total
+ * @param {String} propName - The property name to retrieve (e.g., 'events', 'members', 'fellowships', 'serviceTimes', 'total')
+ * @returns {Number} The value of the property, or 0 if not found
+ */
+const getDashboardAggregateValue = (data, propName) => {
+  if (!data || typeof data !== 'object') {
+    return 0;
+  }
+  return data[propName] || 0;
+};
+
 const dateFormatted = (str) => {
   const date0 = new Date(str);
   date0.setHours(date0.getHours() + 5);
@@ -453,6 +466,7 @@ export {
   addressStyles,
   customStyles,
   getAdminAggregate,
+  getDashboardAggregateValue,
   completeAddress,
   formatAddressParts,
   searchAddress,
