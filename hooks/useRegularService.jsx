@@ -116,15 +116,34 @@ const useRegularService = (searchQuery = '') => {
   };
 
   const handleFetch = useCallback(async ({ pageIndex = 1, pageSize = 10, sortBy = [], searchQuery = '' }) => {
-    setState((prev) => ({ ...prev, loading: true }));
-    const { success, errorMessage, data = [] } = await zat(REGULAR_SERVICE.fetch, null, VERBS.GET, { status: true });
+    const sortField = sortBy.length > 0 ? sortBy[0].id : null;
+    const sortOrder = sortBy.length > 0 ? (sortBy[0].desc ? 'desc' : 'asc') : null;
 
-    if (success) {
-      const sorted = data.sort((a, b) => a.sequency_no - b.sequency_no);
-      setState((prev) => ({ ...prev, totalCount: data.length, data: sorted, loading: false }));
-      return true;
-    } else {
-      handleError(errorMessage || 'Failed to update the service.');
+    try {
+      const { data, success, errorMessage, totalCount } = await zat(REGULAR_SERVICE.fetch, null, VERBS.GET, {
+        action: 'paginate',
+        page: pageIndex === 0 ? 1 : pageIndex,
+        limit: pageSize,
+        ...(sortField && { sortField }),
+        ...(sortOrder && { sortOrder }),
+        searchQuery
+      });
+
+      if (success) {
+              const sorted = data.sort((a, b) => a.sequency_no - b.sequency_no);
+        setState((pre) => ({
+          ...pre,
+          data: sorted,
+          totalCount: totalCount,
+          loading: false
+        }));
+        return true;
+      } else {
+        handleError(errorMessage || 'Failed to fetch regular service.');
+        return false;
+      }
+    } catch (error) {
+      handleError('An unexpected error occurred while fetching regular service.');
       return false;
     }
   }, []);

@@ -19,14 +19,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Sidebar>
         <ChurchSidebarNav />
       </Sidebar>
-
       <div className="wrapper d-flex flex-column min-vh-100">
         <Header />
-
         <div className="body flex-grow-1 px-sm-2 mb-4">
           <div className="ms-0 me-0">{children}</div>
         </div>
-
         <Footer />
       </div>
 

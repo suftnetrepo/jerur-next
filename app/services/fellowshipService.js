@@ -155,7 +155,48 @@ async function searchFellowshipWithinRadius(suid, latitude, longitude, radius) {
   }
 }
 
+async function getByPagination({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
+  const skip = (page - 1) * limit;
+
+  try {
+    const sortOptions = {};
+    if (sortField) {
+      sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
+    }
+
+    const searchFilter = searchQuery
+      ? {
+          $or: [
+            { name: { $regex: searchQuery, $options: 'i' } },
+            { town: { $regex: searchQuery, $options: 'i' } },
+            { postcode: { $regex: searchQuery, $options: 'i' } },
+        
+          ]
+        }
+      : {};
+
+    const query = {
+      suid,
+      ...searchFilter
+    };
+
+    const [fellowships, totalCount] = await Promise.all([
+      Fellowship.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
+      Fellowship.countDocuments({suid})
+    ]);
+
+    return {
+      data: fellowships,
+      totalCount
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error('An unexpected error occurred. Please try again.');
+  }
+}
+
 export {
+  getByPagination,
   deleteFellowship,
   updateFellowship,
   addFellowship,

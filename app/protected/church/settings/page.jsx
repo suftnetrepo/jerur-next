@@ -401,7 +401,7 @@ const SettingsPage = () => {
             <Tab eventKey="pastor" title="Pastor">
               <Pastor data={data?.pastor_section} />
             </Tab>
-            <Tab eventKey="prophetic" title="Prophetic">
+            <Tab eventKey="prophetic" title="Prophetic Theme">
               <Prophetic data={data?.prophetic_focus} />
             </Tab>
             <Tab eventKey="config" title="Configs">

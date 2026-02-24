@@ -127,7 +127,47 @@ async function getServicesTimeByType(suid, status = false, service_type= 'prayer
   }
 }
 
+async function getByPagination({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
+  const skip = (page - 1) * limit;
+
+  try {
+    const sortOptions = {};
+    if (sortField) {
+      sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
+    }
+
+    const searchFilter = searchQuery
+      ? {
+          $or: [
+            { title: { $regex: searchQuery, $options: 'i' } },
+            { service_type: { $regex: searchQuery, $options: 'i' } },
+        
+          ]
+        }
+      : {};
+
+    const query = {
+      suid,
+      ...searchFilter
+    };
+
+    const [serviceTimes, totalCount] = await Promise.all([
+      ServiceTime.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
+      ServiceTime.countDocuments({ suid })
+    ]);
+
+    return {
+      data: serviceTimes,
+      totalCount
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error('An unexpected error occurred. Please try again.');
+  }
+}
+
 export {
+  getByPagination,
   getServicesTimeByType,
   addServiceTime,
   editServiceTime,
