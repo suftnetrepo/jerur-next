@@ -3,6 +3,11 @@ import { AuthService } from './lib/AuthService';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(req) {
+  // Skip middleware for NextAuth routes
+  if (req.nextUrl.pathname.startsWith('/api/auth')) {
+    return NextResponse.next();
+  }
+
   try {
    
     const token = await getToken({
@@ -49,6 +54,6 @@ export async function middleware(req) {
 export const config = {
   matcher: [
     '/protected/:path*',
-    '/api/:path*'  // Make sure your API routes are matched
+    '/api/:path*'
   ]
 };
