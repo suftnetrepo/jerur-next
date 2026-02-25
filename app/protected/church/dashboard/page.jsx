@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 import { getDashboardAggregateValue } from '../../../../utils/helpers';
 import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
@@ -10,16 +10,16 @@ import AttendanceAnalysis from '../chart/attendance_analysis';
 
 const Dashboard = () => {
   const { recentData, chartData, trentData, data, handleDashboardAggregates } = useChurchDashboard();
-  
+
   useEffect(() => {
     handleDashboardAggregates();
   }, []);
 
   console.log('Aggregate Data:', trentData, chartData);
-  
+
   return (
     <>
-      <div className="row p-1">
+      <div className="row">
         <div className="col-sm-6 col-lg-3">
           <Card className=" py-3 px-3">
             <Card.Body>
@@ -126,20 +126,43 @@ const Dashboard = () => {
           </Card>
         </div>
       </div>
-      <div className="row ms-1 me-1 mt-4 ">
-        <div className="col-sm-6 col-md-7 card me-2 d-flex justify-content-start">
-          <Card.Header className="ps-4">Service Attendance  </Card.Header>
-          <div className="card-body"> {Array.isArray(trentData) && <AttendanceAnalysis data={trentData} />}</div>
+
+      {/* Charts Section */}
+      <div className="row mt-4">
+        <div className="col-lg-7 mb-4">
+          <Card>
+            <Card.Header className="ps-4">
+              Service Attendance
+            </Card.Header>
+            <Card.Body>
+              {Array.isArray(trentData) && (
+                <AttendanceAnalysis data={trentData} />
+              )}
+            </Card.Body>
+          </Card>
         </div>
-        <div className="col-sm-6 col-md-4 card d-flex h-auto justify-content-center align-items-center ">
-          {Array.isArray(chartData) && <UserAggregates data={chartData} />}
+
+        <div className="col-lg-5 mb-4">
+          <Card className="h-100">
+            <Card.Body className="d-flex justify-content-center align-items-center">
+              {Array.isArray(chartData) && (
+                <UserAggregates data={chartData} />
+              )}
+            </Card.Body>
+          </Card>
         </div>
       </div>
 
-      <div className="row ms-1 me-1 card mt-4">
-        <Card.Header className="ps-4">Recent Members</Card.Header>
-        <div className="card-body">
-          <RecentMembers data={recentData} />
+      <div className="row">
+        <div className="col-12">
+          <Card>
+            <Card.Header className="ps-4">
+              Recent Members
+            </Card.Header>
+            <Card.Body>
+              <RecentMembers data={recentData} />
+            </Card.Body>
+          </Card>
         </div>
       </div>
     </>

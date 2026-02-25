@@ -13,20 +13,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        await mongoConnect(); 
-      
+        await mongoConnect();
+        
         try {
           const user = await User.findOne({
             email: new RegExp(`^${credentials.email}$`, 'i')
           });
-      
+          
           if (!user) {
-            return null; 
+            return null;
           }
       
           const isMatch = await bcrypt.compare(credentials.password, user.password);
           if (!isMatch) {
-            return null; 
+            return null;
           }
       
           return {
@@ -39,7 +39,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           };
         } catch (error) {
           console.error('Authentication error:', error.message);
-          return null; 
+          console.error('Auth error stack:', error.stack);
+          return null;
         }
       }
     })
