@@ -64,10 +64,10 @@ export const PUT = async (req) => {
   try {
 
     const user = await getUserSession(req);
-    
-        if (!user) {
-          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
