@@ -1,13 +1,21 @@
 import { updateCampaign } from '../../../services/campaignService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getUserSession } from '@/utils/generateToken';
 
 export const PUT = async (req) => {
   try {
+
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
     const url = new URL(req.url);
     const body = await req.json();
     const id = url.searchParams.get('id');
-    const data  = await updateCampaign(id, body);
+    const data = await updateCampaign(id, body);
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

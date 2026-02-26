@@ -27,6 +27,8 @@ yarn-error.log*
 
 # local env files
 .env
+.env.local
+.env.production
 .env*.local
 
 # vercel
@@ -54,3 +56,5 @@ logs/trace.log.1
 logs/trace.log.2
 .env
 logs/error.log.4
+.env
+.env.production

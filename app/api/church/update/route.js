@@ -57,7 +57,7 @@ export const PUT = async (req) => {
             return new Promise((resolve, reject) => {
               cloudinary.uploader
                 .upload(fileUri, {
-                  folder: 'snatchi_project_uploads',
+                  folder: `${process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER}/${user?.church}`,
                   resource_type: 'auto',
                   invalidate: true
                 })
