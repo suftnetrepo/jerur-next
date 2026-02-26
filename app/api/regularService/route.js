@@ -43,6 +43,12 @@ export const GET = async (req) => {
 
 export const DELETE = async (req) => {
   try {
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
 
@@ -56,6 +62,13 @@ export const DELETE = async (req) => {
 
 export const PUT = async (req) => {
   try {
+
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
     const body = await req.json();
@@ -63,7 +76,7 @@ export const PUT = async (req) => {
     const updated = await editServiceTime(id, body);
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

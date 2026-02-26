@@ -62,6 +62,13 @@ export const GET = async (req) => {
 
 export const DELETE = async (req) => {
   try {
+
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
 
@@ -75,10 +82,17 @@ export const DELETE = async (req) => {
 
 export const PUT = async (req) => {
   try {
+
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
 
-    const eventData = await parseEventFormData(req); 
+    const eventData = await parseEventFormData(req, user);
     const updated = await editEvent(id, eventData);
 
     return NextResponse.json({ success: true, data: updated });
@@ -96,7 +110,7 @@ export const POST = async (req) => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const eventData = await parseEventFormData(req);
+    const eventData = await parseEventFormData(req, user);
     const data = await creatEvent(user.church, eventData);
     return NextResponse.json({ success: true, data });
   } catch (error) {

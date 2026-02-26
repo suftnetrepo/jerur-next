@@ -6,13 +6,13 @@ import { getUserSession } from '@/utils/generateToken';
 export const DELETE = async (req) => {
   try {
 
-    const url = new URL(req.url);
     const user = await getUserSession(req);
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const url = new URL(req.url);
     const id = url.searchParams.get('id');
     const { data } = await deleteCampaign(id);
     return NextResponse.json({ data, success: true });

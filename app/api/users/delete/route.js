@@ -1,12 +1,17 @@
 import { logger } from '@/utils/logger';
-import { mongoConnect } from '../../../../utils/connectDb';
 import { removeUser } from '../../../services/userServices';
 import { NextResponse } from 'next/server';
-
-mongoConnect();
+import { getUserSession } from '@/utils/generateToken';
 
 export const DELETE = async (req) => {
   try {
+
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
 

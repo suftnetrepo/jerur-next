@@ -10,12 +10,17 @@ import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = new URL(req.url);
-    const id = url.searchParams.get('id')
+    const id = url.searchParams.get('id');
 
-    const data  = await getServiceTimeAgendasById(id);
+    const data = await getServiceTimeAgendasById(id);
     return NextResponse.json({ data, success: true });
-
   } catch (error) {
     logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -24,6 +29,12 @@ export const GET = async (req) => {
 
 export const DELETE = async (req) => {
   try {
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = new URL(req.url);
 
     const id = url.searchParams.get('id');
@@ -39,6 +50,12 @@ export const DELETE = async (req) => {
 
 export const PUT = async (req) => {
   try {
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
     const body = await req.json();
@@ -58,7 +75,7 @@ export const POST = async (req) => {
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    
+
     const body = await req.json();
 
     const result = await addServiceTimeAgenda(body);
