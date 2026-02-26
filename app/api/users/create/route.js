@@ -6,12 +6,12 @@ import { getUserSession } from '@/utils/generateToken';
 export const POST = async (req) => {
   try {
 
-      const user = await getUserSession(req);
-    
-        if (!user) {
-          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-        
+    const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
 
     const result = await createUser(body);
