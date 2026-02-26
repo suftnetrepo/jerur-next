@@ -127,7 +127,6 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/bootstrap": "^5.2.0",
     "@types/bunyan": "^1.8.11",
-    "@types/faker": "^6.6.8",
     "@types/isotope-layout": "^3.0.9",
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.2",

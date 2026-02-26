@@ -10,6 +10,13 @@ import { getUserSession } from '@/utils/generateToken';
 
 export const GET = async (req) => {
   try {
+
+     const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
     const url = new URL(req.url);
     const id = url.searchParams.get('id')
 
@@ -24,6 +31,13 @@ export const GET = async (req) => {
 
 export const DELETE = async (req) => {
   try {
+
+     const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = new URL(req.url);
 
     const id = url.searchParams.get('id');
@@ -39,6 +53,13 @@ export const DELETE = async (req) => {
 
 export const PUT = async (req) => {
   try {
+
+     const user = await getUserSession(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
     const body = await req.json();
