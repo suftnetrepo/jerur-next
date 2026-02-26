@@ -63,7 +63,7 @@ export const GET = async (req) => {
 export const DELETE = async (req) => {
   try {
 
-     const user = await getUserSession(req);
+    const user = await getUserSession(req);
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -92,7 +92,7 @@ export const PUT = async (req) => {
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
 
-    const eventData = await parseEventFormData(req, user); 
+    const eventData = await parseEventFormData(req, user);
     const updated = await editEvent(id, eventData);
 
     return NextResponse.json({ success: true, data: updated });

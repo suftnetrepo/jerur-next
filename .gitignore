@@ -56,3 +56,5 @@ logs/trace.log.1
 logs/trace.log.2
 .env
 logs/error.log.4
+.env
+.env.production
