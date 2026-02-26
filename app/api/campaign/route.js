@@ -11,7 +11,7 @@ import { getUserSession } from '@/utils/generateToken';
 export const GET = async (req) => {
   try {
 
-     const user = await getUserSession(req);
+    const user = await getUserSession(req);
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -40,13 +40,13 @@ export const GET = async (req) => {
     }
 
     if (action === 'top10') {
-      const data  = await getTop10Campaigns(user?.church);
+      const data = await getTop10Campaigns(user?.church);
       return NextResponse.json({ data, success: true });
     }
 
     if (action === 'getOne') {
       const id = url.searchParams.get('id');
-      const data  = await getCampaignById(id);
+      const data = await getCampaignById(id);
       return NextResponse.json({ data, success: true });
     }
 
