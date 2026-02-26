@@ -11,7 +11,7 @@ export const config = {
     api_secret: process.env.NEXT_PUBLIC_CLOUD_SECRETE
   });
 
-export async function parseEventFormData(req) {
+export async function parseEventFormData(req, user) {
   const formData = await req.formData();
 
   const title = formData.get('title');
@@ -45,7 +45,7 @@ export async function parseEventFormData(req) {
       return new Promise((resolve, reject) => {
         cloudinary.uploader
           .upload(fileUri, {
-            folder: 'jerur_next_uploads',
+            folder: `${process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER}/${user?.church}`,
             resource_type: 'auto',
             invalidate: true
           })

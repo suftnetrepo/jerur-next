@@ -15,7 +15,7 @@ export const POST = async (req) => {
     const data = await addDonation(user.church, body);
     return NextResponse.json({ data, success: true });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };
