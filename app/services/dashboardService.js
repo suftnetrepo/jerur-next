@@ -1,7 +1,8 @@
+import mongoose from "mongoose";
 import Event from '../models/event';
 import Member from '../models/member';
 import Fellowship from '../models/fellowship';
-import ServiceTime from '../models/serviceTime';
+import Attendance from '../models/attendance';
 import { mongoConnect } from '@/utils/connectDb';
 import { logger } from '../../utils/logger';
 
@@ -16,13 +17,43 @@ export async function getDashboardAggregates(churchId = null) {
   try {
     const filter = churchId ? { suid: churchId } : {};
     const memberFilter = churchId ? { church: churchId } : {};
+    const attendanceFilter = churchId
+      ? { church: new mongoose.Types.ObjectId(churchId) }
+      : {};
 
-    const [eventsCount, membersCount, fellowshipsCount, serviceTimesCount] = await Promise.all([
+
+    const [
+      eventsCount,
+      membersCount,
+      fellowshipsCount,
+      peakAttendanceResult
+    ] = await Promise.all([
       Event.countDocuments(filter),
       Member.countDocuments(memberFilter),
       Fellowship.countDocuments(filter),
-      ServiceTime.countDocuments(filter)
+
+      Attendance.aggregate([
+        { $match: attendanceFilter },
+        {
+          $group: {
+            _id: null,
+            peak: { $max: "$count" }
+          }
+        }
+      ])
     ]);
+
+    console.log('Dashboard Aggregates:', {
+      eventsCount,
+      membersCount,
+      fellowshipsCount,
+      peakAttendanceResult
+    });
+
+    const peakAttendance =
+      peakAttendanceResult.length > 0
+        ? peakAttendanceResult[0].peak
+        : 0;
 
     return {
       success: true,
@@ -30,8 +61,12 @@ export async function getDashboardAggregates(churchId = null) {
         events: eventsCount,
         members: membersCount,
         fellowships: fellowshipsCount,
-        serviceTimes: serviceTimesCount,
-        total: eventsCount + membersCount + fellowshipsCount + serviceTimesCount
+        peakAttendance,
+        total:
+          eventsCount +
+          membersCount +
+          fellowshipsCount +
+          peakAttendance
       }
     };
   } catch (error) {
@@ -43,13 +78,12 @@ export async function getDashboardAggregates(churchId = null) {
         events: 0,
         members: 0,
         fellowships: 0,
-        serviceTimes: 0,
+        peakAttendance: 0,
         total: 0
       }
     };
   }
 }
-
 /**
  * Get detailed aggregated data with additional statistics
  * @param {string} churchId - Optional church/organization ID to filter by
@@ -64,7 +98,7 @@ export async function getDashboardStatistics(churchId = null) {
     const eventsCount = await Event.countDocuments(filter);
     const membersCount = await Member.countDocuments(memberFilter);
     const fellowshipsCount = await Fellowship.countDocuments(filter);
-    const serviceTimesCount = await ServiceTime.countDocuments(filter);
+    const attendanceCount = await Attendance.countDocuments(filter);
 
     // Get member status breakdown
     const membersByStatus = await Member.aggregate([
@@ -95,8 +129,8 @@ export async function getDashboardStatistics(churchId = null) {
           events: eventsCount,
           members: membersCount,
           fellowships: fellowshipsCount,
-          serviceTimes: serviceTimesCount,
-          total: eventsCount + membersCount + fellowshipsCount + serviceTimesCount
+          peakAttendance: peakAttendance,
+          total: eventsCount + membersCount + fellowshipsCount + peakAttendance
         },
         memberBreakdown: {
           byStatus: membersByStatus.reduce((acc, item) => {

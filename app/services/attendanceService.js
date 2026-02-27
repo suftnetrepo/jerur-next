@@ -67,31 +67,119 @@ async function remove(id) {
   }
 }
 
+const services = [
+  {
+    _id: "696be06803ad97f1331f2a0a", // Sunday
+    days: [0],
+    start_time: "09:00"
+  },
+  {
+    _id: "696be06803ad97f1331f2a0e", // Wednesday
+    days: [3],
+    start_time: "11:00"
+  },
+  {
+    _id: "696be06803ad97f1331f2a12", // Friday
+    days: [5],
+    start_time: "13:00"
+  }
+];
+
+export const seedNext14DaysAttendance = async (churchId) => {
+  try {
+    const today = new Date();
+    const records = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const currentDate = new Date();
+      currentDate.setDate(today.getDate() - i);
+
+      const dayOfWeek = currentDate.getDay();
+
+      const service = services.find(s => s.days.includes(dayOfWeek));
+
+      if (!service) continue;
+
+      const [hour, minute] = service.start_time.split(":");
+      currentDate.setHours(Number(hour), Number(minute), 0, 0);
+
+      // Optional: weighted realism
+      let attendance;
+
+      if (service.days.includes(0)) {
+        // Sunday (highest)
+        attendance = Math.floor(Math.random() * (350 - 200) + 200);
+      } else if (service.days.includes(3)) {
+        // Wednesday (medium)
+        attendance = Math.floor(Math.random() * (200 - 120) + 120);
+      } else if (service.days.includes(5)) {
+        // Friday (lower)
+        attendance = Math.floor(Math.random() * (160 - 80) + 80);
+      } else {
+        attendance = Math.floor(Math.random() * (200 - 80) + 80);
+      }
+
+      records.push({
+        church: new mongoose.Types.ObjectId(churchId),
+        service: new mongoose.Types.ObjectId(service._id),
+        count: attendance,
+        checkInTime: currentDate,
+      });
+    }
+
+    if (records.length === 0) {
+      console.log("No matching service days found.");
+      return [];
+    }
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    await Attendance.deleteMany({
+      church: churchId,
+      checkInTime: {
+        $gte: sevenDaysAgo,
+        $lte: today
+      }
+    });
+
+    const inserted = await Attendance.insertMany(records);
+
+    console.log(`Inserted ${inserted.length} attendance records for last 7 days.`);
+    return inserted;
+
+  } catch (error) {
+    console.error("Error seeding attendance:", error);
+    throw error;
+  }
+};
+
 const getAttendanceTrends = async (churchId) => {
   try {
     const now = new Date();
-      const startDate = new Date(now);
-      const dayOfWeek = now.getDay(); 
-      startDate.setDate(now.getDate() - dayOfWeek); 
-      startDate.setHours(0, 0, 0, 0); 
-    
-      const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 6); 
-      endDate.setHours(23, 59, 59, 999); 
-    
-      const results = await Attendance.find({
-        church: churchId,
-        checkInTime: {
-          $gte: startDate,
-          $lte: endDate
-        }
-      })
+    const startDate = new Date(now);
+    const dayOfWeek = now.getDay();
+    startDate.setDate(now.getDate() - dayOfWeek);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    endDate.setHours(23, 59, 59, 999);
+
+    const results = await Attendance.find({
+      church: churchId,
+      checkInTime: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    })
       .sort({ checkInTime: 1 })
       .populate({
         path: 'service',
-        select: 'title' 
+        select: 'title'
       });
-    
+
     return results;
   } catch (error) {
     console.error('Error filtering attendance records:', error);
