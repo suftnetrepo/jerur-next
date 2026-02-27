@@ -2,10 +2,10 @@ import {
   getAttendanceTrends,
   getMemberAttendanceStats,
   getServiceAttendanceSummary
-} from '@/services/attendanceService';
-import { logger } from '@/utils/logger';
+} from '../../services/attendanceService';
+import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { getUserSession } from '@/utils/generateToken';
+import { getUserSession } from '../../../utils/generateToken';
 
 export const GET = async (req) => {
   try {
@@ -17,7 +17,7 @@ export const GET = async (req) => {
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
 
-    if (action === 'trent') {
+    if (action === 'trend') {
       const data = await getAttendanceTrends(user.church);
       return NextResponse.json({ data, success: true });
     }

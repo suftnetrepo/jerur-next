@@ -1,7 +1,7 @@
-import { remove } from '@/services/attendanceService';
-import { logger } from '@/utils/logger';
+import { remove } from '../../../services/attendanceService';
+import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { getUserSession } from '@/utils/generateToken';
+import { getUserSession } from '../../../../utils/generateToken';
 
 export const DELETE = async (req) => {
   try {
