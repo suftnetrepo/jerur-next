@@ -1,7 +1,7 @@
 import { updateCampaign } from '../../../services/campaignService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { getUserSession } from '@/utils/generateToken';
+import { getUserSession } from '../../../../utils/generateToken';
 
 export const PUT = async (req) => {
   try {
