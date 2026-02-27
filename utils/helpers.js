@@ -445,7 +445,31 @@ const serviceType = {
   'prayer': 'Prayer'
 }
 
+const STATUS_COLORS = {
+  active: "#28a745",
+  inactive: "#dc3545",
+  "under discipline": "#f0ad4e",
+  provisional: "#6f42c1",
+};
+
+const getStatusStyle = (status) => {
+  const color =
+    STATUS_COLORS[status?.toLowerCase()] || "#6c757d";
+
+  return {
+    backgroundColor: color,
+    color: "#ffffff",
+    padding: "4px 10px",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: 500,
+    textTransform: "capitalize",
+  };
+};
+
 export {
+  STATUS_COLORS,
+  getStatusStyle,
   serviceType,
   FEATURES,
   featuresOptions,
