@@ -84,7 +84,7 @@ const useChurchDashboard = () => {
 
   const handleMemberCount = async () => fetchDataHandler(CHURCH_DASHBOARD.memberCount, 'memberCount');
 
-  const handleAttendanceTrent = async () => fetchDataHandler(CHURCH_DASHBOARD.trent, 'trentData');
+  const handleAttendanceTrent = async () => fetchDataHandler(CHURCH_DASHBOARD.trend, 'trentData');
 
   const fetchAll = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
