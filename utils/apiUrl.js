@@ -74,7 +74,7 @@ export const CHURCH_DASHBOARD = {
   recent: `${HOST}member?action=recent`,
   memberCount: `${HOST}member?action=count`,
   chart: `${HOST}member?action=chart`,
-  trent: `${HOST}attendance?action=trent`,
+  trend: `${HOST}attendance?action=trend`,
   aggregates: `${HOST}dashboard`,
   statistics: `${HOST}dashboard?action=statistics`
 };
