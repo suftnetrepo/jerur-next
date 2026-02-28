@@ -1,6 +1,6 @@
-import { getUserSession } from '@/utils/generateToken';
+import { getUserSession } from '../../../../utils/generateToken';
 import { deleteChurch } from '../../../services/churchService';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
 
 export const DELETE = async (req) => {
