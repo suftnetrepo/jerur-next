@@ -1,14 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    esmExternals: false,
-    middleware: {
-      // Use the Node.js runtime for middleware
-      runtime: 'nodejs'
-    },
-    serverComponentsExternalPackages: ['mongoose', 'mongodb', 'mjml'],
-    serverExternalPackages: ['mjml']
-  },
+  serverExternalPackages: ['mongoose', 'mongodb', 'mjml'],
 
   eslint: {
     ignoreDuringBuilds: true
@@ -18,7 +10,7 @@ const nextConfig = {
   },
   reactStrictMode: false,
   images: {
-    domains: ['snatchi.org'],
+    domains: ['jerur-next-production.onrender.com', 'jerur-next.onrender.com'],
     formats: ['image/avif', 'image/webp']
   },
 
