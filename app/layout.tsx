@@ -2,8 +2,6 @@
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import ThemeProvider from '@/theme/ThemeProvider';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 // Bootstrap and custom scss
 import '@/assets/scss/style.scss';
@@ -21,7 +19,6 @@ import 'plyr-react/plyr.css';
 import 'glightbox/dist/css/glightbox.css';
 // custom scrollcue css
 import '@/plugins/scrollcue/scrollCue.css';
-import { AppProvider } from '../Store/AppContext';
 import { SessionProvider } from 'next-auth/react';
 
 function RootLayout({ children }: { children: React.ReactNode }) {
@@ -49,9 +46,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
       <body>
         <SessionProvider>
           <ThemeProvider>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <AppProvider>{children}</AppProvider>
-            </LocalizationProvider>
+           {children}
           </ThemeProvider>
         </SessionProvider>
       </body>
