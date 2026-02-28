@@ -6,10 +6,11 @@ import { getDashboardAggregateValue } from '../../../../utils/helpers';
 import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
 import { TotalInvested, NumberofInvested, Portfoliovalue, Returnsrate, UserAggregates } from '../../../share/chart';
 import RecentMembers from '../recentMembers';
-import AttendanceAnalysis from '../chart/attendance_analysis';
+// import AttendanceAnalysis from '../chart/attendance_analysis';
+import AttendanceChart from '@/share/aChart';
 
 const Dashboard = () => {
-  const { recentData, chartData, trentData, data, handleDashboardAggregates } = useChurchDashboard();
+  const { recentData, chartData, trentData, data, loading, handleDashboardAggregates } = useChurchDashboard();
 
   useEffect(() => {
     handleDashboardAggregates();
@@ -31,7 +32,7 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="d-block">Members</span>
+                    <span className="d-block">Total Members</span>
                     <span className="fs-16 fw-semibold">{getDashboardAggregateValue(data, 'members')}</span>
                   </div>
                 </div>
@@ -81,7 +82,7 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="d-block">Fellowships</span>
+                    <span className="d-block">Fellowship Groups</span>
                     <span className="fs-16 fw-semibold">
                       {getDashboardAggregateValue(data, 'fellowships')}
                       <i className="ti ti-arrow-narrow-up ms-1 text-success"></i>
@@ -109,9 +110,9 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="d-block">Services</span>
+                    <span className="d-block">Peak Attendance</span>
                     <span className="fs-16 fw-semibold">
-                      {getDashboardAggregateValue(data, 'serviceTimes')}
+                      {getDashboardAggregateValue(data, 'peakAttendance')}
                       <i className="ti ti-arrow-narrow-up ms-1 text-success"></i>
                     </span>
                   </div>
@@ -130,16 +131,10 @@ const Dashboard = () => {
       {/* Charts Section */}
       <div className="row mt-4">
         <div className="col-lg-7 mb-4">
-          <Card>
-            <Card.Header className="ps-4">
-              Service Attendance
-            </Card.Header>
-            <Card.Body>
-              {Array.isArray(trentData) && (
-                <AttendanceAnalysis data={trentData} />
-              )}
-            </Card.Body>
+          <Card className="h-100 py-5 px-5">
+             <AttendanceChart data={trentData} loading={loading} />
           </Card>
+        
         </div>
 
         <div className="col-lg-5 mb-4">

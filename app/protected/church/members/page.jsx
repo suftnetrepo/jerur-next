@@ -11,7 +11,7 @@ import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
 import RenderUserOffcanvas from './renderOffcanvas';
 import Tooltip from '@mui/material/Tooltip';
-import { capitalizeFirstLetter, getStatusBadgeClass } from '@/utils/helpers';
+import { capitalizeFirstLetter, getStatusStyle } from '@/utils/helpers';
 
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,7 +64,7 @@ const Page = () => {
         headerClassName: { textAlign: 'center' },
         Cell: ({ value }) => (
           <div className="d-flex justify-content-start align-items-center">
-            <span className={`badge ${getStatusBadgeClass(value)}`}>{capitalizeFirstLetter(value)}</span>
+            <span style={getStatusStyle(value)}>{capitalizeFirstLetter(value)}</span>
           </div>
         )
       },
