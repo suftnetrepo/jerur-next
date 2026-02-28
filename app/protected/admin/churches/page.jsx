@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useMemo, useState } from 'react';
 import { Table } from '@/components/elements/table/table';
 import { useAdmin } from '@/hooks/useAdmin';
