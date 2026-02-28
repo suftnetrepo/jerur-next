@@ -18,6 +18,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
+      "@/utils/*": ["./utils/*"],
       "@/*": ["./app/*", "./src/*", "./*", "./utils/*"]
     },
     "plugins": [
@@ -33,7 +34,6 @@
     "**/*.js",
     "**/*.jsx",
     ".next/types/**/*.ts",
-    "middleware.js"
-, "app/api/users/update"  ],
+    "middleware.js" ],
   "exclude": ["node_modules"]
 }
