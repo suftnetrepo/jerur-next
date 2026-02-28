@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -18,7 +20,7 @@ const nextConfig = {
   },
   reactStrictMode: false,
   images: {
-    domains: ['snatchi.org'],
+    domains: ['jerur-next-production.onrender.com', 'jerur-next.onrender.com'],
     formats: ['image/avif', 'image/webp']
   },
 
@@ -47,6 +49,12 @@ const nextConfig = {
 
     // Ignore fastest-validator critical dependency warnings
     config.module.exprContextCritical = false;
+
+    // Explicit alias so @/utils/* always resolves to the root utils/ directory
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@/utils': path.resolve(__dirname, 'utils')
+    };
 
     return config;
   }
