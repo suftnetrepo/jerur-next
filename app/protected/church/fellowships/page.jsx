@@ -82,7 +82,7 @@ const Render = () => {
   return (
     <div className="ms-5 me-5 ">
       <div className="d-flex justify-content-start align-items-center mb-3">
-        <h3 className="card-title ms-2">Fellowships</h3>
+        <h3 className="card-title ms-2">Fellowship Groups</h3>
       </div>
       <div className={` mt-2 ${!loading ? 'overlay__block' : null}`}>
         <div className="card-body">

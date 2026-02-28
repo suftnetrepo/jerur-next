@@ -1,23 +1,12 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
-import { dateFormatted } from '../../../utils/helpers';
+import { dateFormatted, getStatusStyle } from '../../../utils/helpers';
 
 const RecentMembers = ({ data }) => {
 
-  const getStatusColorCode = (status) => {
-    const colors = {
-      inactive: 'bg-danger',
-      'under discipline': 'bg-warning',
-      inactive: 'bg-info',
-      active: 'bg-primary',
-      provisional: 'bg-secondary'
-    };
-    return colors[status] || 'bg-secondary';
-  };
-
   return (
     <div className="table-responsive">
-      <Table className="table  table-striped">
+      <Table className="table table-striped">
         <thead>
           <tr>
             <th>Date</th>
@@ -37,7 +26,9 @@ const RecentMembers = ({ data }) => {
               <td>{item.email}</td>
               <td>{item.mobile}</td>
               <td>
-                <span className={`badge ${getStatusColorCode(item.status)}`}>{item.status}</span>
+                <span style={getStatusStyle(item.status)}>
+                  {item.status}
+                </span>
               </td>
             </tr>
           ))}

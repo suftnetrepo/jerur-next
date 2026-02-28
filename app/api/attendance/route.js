@@ -1,7 +1,8 @@
 import {
   getAttendanceTrends,
   getMemberAttendanceStats,
-  getServiceAttendanceSummary
+  getServiceAttendanceSummary,
+  seedNext14DaysAttendance
 } from '../../services/attendanceService';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
@@ -18,6 +19,7 @@ export const GET = async (req) => {
     const action = url.searchParams.get('action');
 
     if (action === 'trend') {
+      // await seedNext14DaysAttendance(user.church);
       const data = await getAttendanceTrends(user.church);
       return NextResponse.json({ data, success: true });
     }
@@ -33,6 +35,7 @@ export const GET = async (req) => {
       const data = await getServiceAttendanceSummary(id);
       return NextResponse.json({ data, success: true });
     }
+
   } catch (error) {
     logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
