@@ -1,5 +1,5 @@
 import { mongoConnect } from '../../../../utils/connectDb';
-import User from '@/models/user';
+import User from '../../../../models/user';
 import { errorHandler } from '../../../../utils/errors';
 import { sendBrevoEmail } from '../../../../lib/mail';
 import { emailTemplates } from '../../../email';

@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 import {
   updateBulk,
   updateChurchStatus,
@@ -8,7 +8,7 @@ import {
 } from '../../../services/churchService';
 import { v2 as cloudinary } from 'cloudinary';
 import { NextResponse } from 'next/server';
-import { getUserSession } from '@/utils/generateToken';
+import { getUserSession } from '../../../../utils/generateToken';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUD_NAME,

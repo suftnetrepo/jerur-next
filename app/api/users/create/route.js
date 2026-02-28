@@ -1,7 +1,7 @@
 import { createUser } from '../../../services/userServices';
 import { NextResponse } from 'next/server';
-import { logger } from '@/utils/logger';
-import { getUserSession } from '@/utils/generateToken';
+import { logger } from '../../../../utils/logger';
+import { getUserSession } from '../../../../utils/generateToken';
 
 export const POST = async (req) => {
   try {

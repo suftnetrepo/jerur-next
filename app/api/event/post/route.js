@@ -2,7 +2,7 @@
 import { addEventRegister } from '../../../services/eventRegisterServices';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { decrypt } from '@/utils/helpers';
+import { decrypt } from '../../../../utils/helpers';
 
 export const POST = async (req) => {
   try {
