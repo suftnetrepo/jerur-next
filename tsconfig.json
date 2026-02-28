@@ -18,7 +18,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/utils/*": ["./utils/*"],
+      "@/utils/*": ["./utils/*", "./src/utils/*"],
       "@/*": ["./app/*", "./src/*", "./*", "./utils/*"]
     },
     "plugins": [
