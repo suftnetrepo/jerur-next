@@ -3,7 +3,6 @@ import {
   getRecentChurches,
   getChurches,
   getWeeklyChurchSignOnData,
-  getChurchById,
   getChurchByIdentifier,
   getChurchesByName,
   getChurchesByCountryCode
@@ -54,7 +53,7 @@ export const GET = async (req) => {
 
     if (action === 'byId') {
       const id = url.searchParams.get('id');
-      const data = await getChurchById(id);
+      const data = await getChurchByIdentifier(id);
       return NextResponse.json({ data, success: true });
     }
 
