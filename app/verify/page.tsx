@@ -2,7 +2,7 @@
 
 import { NextPage } from 'next';
 import { Suspense } from 'react';
-import VerifyCodeForm from '@/components/elements/forms/VerifyCodeForm';
+import VerifyCodeForm from '../../src/components/elements/forms/VerifyCodeForm';
 
 const VerifyCode: NextPage = () => {
   return (

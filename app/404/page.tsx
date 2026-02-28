@@ -3,10 +3,10 @@
 import { NextPage } from 'next';
 import { Fragment } from 'react';
 // -------- custom component -------- //
-import { Navbar } from '@/components/blocks/navbar';
-import { Footer } from '@/components/blocks/footer';
-import FigureImage from '@/components/reuseable/FigureImage';
-import NextLink from '@/components/reuseable/links/NextLink';
+import { Navbar } from '../../src/components/blocks/navbar';
+import { Footer } from '../../src/components/blocks/footer';
+import FigureImage from '../../src/components/reuseable/FigureImage';
+import NextLink from '../../src/components/reuseable/links/NextLink';
 
 const NotFound: NextPage = () => {
   return (

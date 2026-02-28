@@ -2,7 +2,7 @@ import Fellowship from '../models/fellowship';
 import { identifierValidator } from '../validation/identifierValidator';
 import { fellowshipValidator } from '../validation/fellowshipValidator';
 import { logger } from '../../utils/logger';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

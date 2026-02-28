@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Badge } from 'react-bootstrap';
 import { TiEdit, TiDelete } from 'react-icons/ti';
 import Tooltip from '@mui/material/Tooltip';
-import DeleteConfirmation from '@/components/elements/ConfirmDialogue';
+import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
 
 const AgendaTable = ({ agenda, handleSelect, serviceId, handleDelete }) => {
   return (

@@ -3,20 +3,20 @@
 import { NextPage } from 'next';
 import { Fragment } from 'react';
 // -------- custom component -------- //
-import Team from '@/components/blocks/team/Team';
-import Target from '@/icons/lineal/Target';
-import AwardTwo from '@/icons/lineal/AwardTwo';
+import Team from '../../src/components/blocks/team/Team';
+import Target from '../../src/icons/lineal/Target';
+import AwardTwo from '../../src/icons/lineal/AwardTwo';
 
-import { Footer } from '@/components/blocks/footer';
-import FigureImage from '@/components/reuseable/FigureImage';
-import NextLink from '@/components/reuseable/links/NextLink';
-import NavBarLink from '@/components/reuseable/links/NavbarLink';
-import AboutUs from '@/components/blocks/about';
-import PageProgress from '@/components/common/PageProgress';
-import Topbar from '@/components/elements/Topbar';
-import Navbar from '@/components/blocks/navbar/Navbar';
+import { Footer } from '../../src/components/blocks/footer';
+import FigureImage from '../../src/components/reuseable/FigureImage';
+import NextLink from '../../src/components/reuseable/links/NextLink';
+import NavBarLink from '../../src/components/reuseable/links/NavbarLink';
+import AboutUs from '../../src/components/blocks/about';
+import PageProgress from '../../src/components/common/PageProgress';
+import Topbar from '../../src/components/elements/Topbar';
+import Navbar from '../../src/components/blocks/navbar/Navbar';
 import Link from 'next/link';
-import AccordionList from '@/components/common/AccordionList';
+import AccordionList from '../../src/components/common/AccordionList';
 
 const About: NextPage = () => {
   return (

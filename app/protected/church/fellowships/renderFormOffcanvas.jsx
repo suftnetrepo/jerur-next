@@ -6,7 +6,7 @@ import { validate } from '../../../../validator/validator';
 import { ConfirmationDialogue, OkDialogue } from '../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import dynamic from 'next/dynamic';
-import { fellowshipValidator } from '@/validator/rules';
+import { fellowshipValidator } from '../../../../validator/rules';
 const Form = dynamic(() => import('./form'), { ssr: false });
 
 const RenderFormOffcanvas = ({

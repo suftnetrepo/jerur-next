@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Offcanvas, Button, Form } from 'react-bootstrap';
-import { ConfirmationDialogue, OkDialogue } from '@/src/components/elements/ConfirmDialogue';
-import { sliderValidator } from '@/validator/rules';
-import { validate } from '@/validator/validator';
-import { ImageUploader } from '@/components/elements/image';
+import { ConfirmationDialogue, OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
+import { sliderValidator } from '../../../../../validator/rules';
+import { validate } from '../../../../../validator/validator';
+import { ImageUploader } from '../../../../../src/components/elements/image';
 
 const RenderSliderOffcanvas = ({
   show,

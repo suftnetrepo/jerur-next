@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Offcanvas, Button, Form } from 'react-bootstrap';
-import { ConfirmationDialogue, OkDialogue } from '@/src/components/elements/ConfirmDialogue';
-import { pushNotificationValidator } from '@/validator/rules';
-import { validate } from '@/validator/validator';
+import { ConfirmationDialogue, OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
+import { pushNotificationValidator } from '../../../../../validator/rules';
+import { validate } from '../../../../../validator/validator';
 
 const RenderNotificationOffcanvas = ({
   show,

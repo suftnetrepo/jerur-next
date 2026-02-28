@@ -2,10 +2,10 @@
 
 import { NextPage } from 'next';
 import { Fragment } from 'react';
-import { Footer } from '@/components/blocks/footer';
-import NextLink from '@/components/reuseable/links/NextLink';
-import ResetPasswordForm from '@/components/elements/forms/ResetPasswordForm';
-import NavBarLink from '@/components/reuseable/links/NavbarLink';
+import { Footer } from '../../src/components/blocks/footer';
+import NextLink from '../../src/components/reuseable/links/NextLink';
+import ResetPasswordForm from '../../src/components/elements/forms/ResetPasswordForm';
+import NavBarLink from '../../src/components/reuseable/links/NavbarLink';
 
 const ResetPassword: NextPage = () => {
   return (

@@ -2,7 +2,7 @@ import Campaign from '../models/campaign';
 import { identifierValidator } from '../validation/identifierValidator';
 import { campaignContributionValidator } from '../validation/campaignContributionValidator';
 import { logger } from '../../utils/logger';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

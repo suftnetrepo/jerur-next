@@ -2,19 +2,19 @@
 
 import { Fragment } from 'react';
 import type { NextPage } from 'next';
-import PageProgress from '@/components/common/PageProgress';
-import { Footer } from '@/components/blocks/footer';
-import  Hero2  from '@/components/blocks/hero/Hero';
-import useLightBox from '@/hooks/useLightBox';
-import { Navbar } from '@/components/blocks/navbar';
-import FAQ from '@/components/blocks/faq';
+import PageProgress from '../src/components/common/PageProgress';
+import { Footer } from '../src/components/blocks/footer';
+import  Hero2  from '../src/components/blocks/hero/Hero';
+import useLightBox from '../src/hooks/useLightBox';
+import { Navbar } from '../src/components/blocks/navbar';
+import FAQ from '../src/components/blocks/faq';
 import Link from 'next/link';
-import Topbar from '@/components/elements/Topbar';
-import Features from '@/components/blocks/service';
-import Steps from '@/components/blocks/steps';
-import Pricing from '@/components/blocks/pricing';
-import Contact from '@/components/elements/contact';
-import Testimonial from '@/components/blocks/testimonial';
+import Topbar from '../src/components/elements/Topbar';
+import Features from '../src/components/blocks/service';
+import Steps from '../src/components/blocks/steps';
+import Pricing from '../src/components/blocks/pricing';
+import Contact from '../src/components/elements/contact';
+import Testimonial from '../src/components/blocks/testimonial';
 
 
 const Home: NextPage = () => {

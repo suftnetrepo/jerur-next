@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Offcanvas, Button, Form } from 'react-bootstrap';
 import { validate } from '../../../../validator/validator';
 import { ConfirmationDialogue, OkDialogue } from '../../../../src/components/elements/ConfirmDialogue';
-import { registerValidator } from '@/validator/rules';
+import { registerValidator } from '../../../../validator/rules';
 import { IoCloseCircle } from 'react-icons/io5';
 import RegisterTable from './registerTable';
-import { useEventRegister } from '@/hooks/useEventRegister';
+import { useEventRegister } from '../../../../hooks/useEventRegister';
 
 const RenderRegisterOffcanvas = ({ show, setShow, selectedEventId }) => {
   const [errorMessages, setErrorMessages] = useState({});

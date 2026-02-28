@@ -1,7 +1,7 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import ThemeProvider from '@/theme/ThemeProvider';
+import ThemeProvider from '../src/theme/ThemeProvider';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import 'react-big-calendar/lib/css/react-big-calendar.css';

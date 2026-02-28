@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Table } from '@/components/elements/table/table';
+import { Table } from '../../../../../src/components/elements/table/table';
 import { Button, Badge } from 'react-bootstrap';
-import { usePushNotification } from '@/hooks/usePushNotification';
+import { usePushNotification } from '../../../../../hooks/usePushNotification';
 import { TiEdit } from 'react-icons/ti';
 import { MdDelete } from 'react-icons/md';
-import ErrorDialogue from '@/src/components/elements/errorDialogue';
-import DeleteConfirmation from '@/src/components/elements/ConfirmDialogue';
+import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
+import DeleteConfirmation from '../../../../../src/components/elements/ConfirmDialogue';
 import Tooltip from '@mui/material/Tooltip';
 import RenderNotificationOffcanvas from './render';
 

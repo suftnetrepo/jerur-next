@@ -3,12 +3,12 @@
 import next, { NextPage } from 'next';
 import { Fragment } from 'react';
 
-import { Footer } from '@/components/blocks/footer';
-import PageProgress from '@/components/common/PageProgress';
-import ContactForm from '@/components/common/ContactForm';
-import ContactTiles from '@/components/elements/tiles/Contact-Tiles';
-import Topbar from '@/components/elements/Topbar';
-import Navbar from '@/components/blocks/navbar/Navbar';
+import { Footer } from '../../src/components/blocks/footer';
+import PageProgress from '../../src/components/common/PageProgress';
+import ContactForm from '../../src/components/common/ContactForm';
+import ContactTiles from '../../src/components/elements/tiles/Contact-Tiles';
+import Topbar from '../../src/components/elements/Topbar';
+import Navbar from '../../src/components/blocks/navbar/Navbar';
 import Link from 'next/link';
 
 const ContactTwo: NextPage = () => {
