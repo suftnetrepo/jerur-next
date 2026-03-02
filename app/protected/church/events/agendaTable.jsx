@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Table, Badge } from 'react-bootstrap';
 import { TiEdit, TiDelete } from 'react-icons/ti';

@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import { TiDelete } from 'react-icons/ti';

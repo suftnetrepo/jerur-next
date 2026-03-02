@@ -2,8 +2,7 @@ import bunyan from 'bunyan';
 import path from 'path';
 import fs from 'fs';
 
-// Check if running in a serverless environment
-const isServerless = process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+const isServerless = process.env.NODE_ENV === "production";
 
 // Ensure logs directory exists (Only in non-serverless environments)
 const logDir = path.resolve(process.cwd(), 'logs');

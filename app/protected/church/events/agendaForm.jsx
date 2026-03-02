@@ -5,7 +5,6 @@ import { Form, Button } from 'react-bootstrap';
 import { normalizeTime } from '@/utils/helpers';
 
 const AgendaForm = ({ errorMessages, handleSubmit, handleChange, fields }) => {
-  console.log('..............fields', fields);
 
   const handlePaste = (e) => {
     const pastedText = e.clipboardData.getData('text');

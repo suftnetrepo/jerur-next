@@ -6,7 +6,6 @@ import { getDashboardAggregateValue } from '../../../../utils/helpers';
 import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
 import { TotalInvested, NumberofInvested, Portfoliovalue, Returnsrate, UserAggregates } from '../../../share/chart';
 import RecentMembers from '../recentMembers';
-// import AttendanceAnalysis from '../chart/attendance_analysis';
 import AttendanceChart from '@/share/aChart';
 
 const Dashboard = () => {
