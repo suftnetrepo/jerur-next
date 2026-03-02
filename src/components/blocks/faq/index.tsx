@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import Accordion from '@/components/reuseable/accordion';
+import Accordion from '../../reuseable/accordion';
 
 const FAQ: FC = () => {
    const accordions = [

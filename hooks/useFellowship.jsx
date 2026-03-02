@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { FELLOWSHIP } from '../utils/apiUrl';
-import { fellowshipValidator } from '@/validator/rules';
+import { fellowshipValidator } from '../validator/rules';
 
 const useFellowship = (searchQuery = '') => {
   const [state, setState] = useState({

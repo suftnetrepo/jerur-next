@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { SLIDER } from '../utils/apiUrl';
-import { sliderValidator } from '@/validator/rules';
+import { sliderValidator } from '../validator/rules';
 
 const useSlider = (searchQuery= '') => {
   const [state, setState] = useState({

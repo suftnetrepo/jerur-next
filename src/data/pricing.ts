@@ -1,7 +1,7 @@
 // -------- icons -------- //
-import Home from '@/icons/lineal/Home';
-import BriefcaseTwo from '@/icons/lineal/BriefcaseTwo';
-import ShoppingBasket from '@/icons/lineal/ShoppingBasket';
+import Home from '../icons/lineal/Home';
+import BriefcaseTwo from '../icons/lineal/BriefcaseTwo';
+import ShoppingBasket from '../icons/lineal/ShoppingBasket';
 
 export const pricingList = [
   {

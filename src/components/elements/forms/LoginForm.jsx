@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import NextLink from '@/components/reuseable/links/NextLink';
+import NextLink from '../../reuseable/links/NextLink';
 import Button from 'react-bootstrap/Button';
 import { useRouter } from 'next/navigation';
 import { signIn, getCsrfToken } from 'next-auth/react';

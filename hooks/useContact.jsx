@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { CONTACT } from '../utils/apiUrl';
-import { contactValidator } from '@/validator/rules';
+import { contactValidator } from '../validator/rules';
 
 const useContact = (searchQuery= '') => {
   const [state, setState] = useState({

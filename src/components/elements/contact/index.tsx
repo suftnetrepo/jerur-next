@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import Email from '@/icons/lineal/Email';
+import Email from '../../../icons/lineal/Email';
 
 const Contact: FC = () => {
   return (

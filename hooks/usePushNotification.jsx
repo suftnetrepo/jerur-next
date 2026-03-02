@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { PUSH_NOTIFICATION } from '../utils/apiUrl';
-import { pushNotificationValidator } from '@/validator/rules';
+import { pushNotificationValidator } from '../validator/rules';
 
 const usePushNotification = (searchQuery= '') => {
   const [state, setState] = useState({

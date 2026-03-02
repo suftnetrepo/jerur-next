@@ -1,6 +1,6 @@
 import { FC } from 'react';
 // -------- data -------- //
-import data from '@/data/demo-27';
+import data from '../../../data/demo-27';
 
 interface PricingProps {
   show?: boolean;

@@ -1,4 +1,4 @@
-import { Navbar } from '@/components/blocks/navbar';
+import { Navbar } from '../../blocks/navbar';
 import { FC, ReactElement } from 'react';
 
 // ==============================================================

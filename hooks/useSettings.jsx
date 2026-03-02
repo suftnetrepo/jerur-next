@@ -6,8 +6,8 @@ import { zat } from '../utils/api';
 import { bzat } from '../utils/axios';
 import { VERBS } from '../config';
 import { CHURCH, USER, SEED_DATA } from '../utils/apiUrl';
-import { churchValidator, pastorValidator, propheticValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '@/validator/rules';
-import { FEATURES } from '@/utils/helpers';
+import { churchValidator, pastorValidator, propheticValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '../validator/rules';
+import { FEATURES } from '../utils/helpers';
 
 const useSettings = () => {
   const [state, setState] = useState({

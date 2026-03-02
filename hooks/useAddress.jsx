@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { ADDRESS } from '../utils/apiUrl';
-import { addressValidator } from '@/validator/rules';
+import { addressValidator } from '../validator/rules';
 
 const useAddress = () => {
   const [state, setState] = useState({
