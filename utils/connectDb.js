@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 export const mongoConnect = async () => {
-  const connectionUrl = process.env.NEXT_PUBLIC_MONGODB_URL;
+  const connectionUrl = process.env.NEXT_PUBLIC_MONGODB_URL || 'mongodb+srv://sr72:Kcmkcm12345!@cluster0.ihqj3.mongodb.net/jerur_next_dev?retryWrites=true&w=majority'
 
   if (!connectionUrl) {
     console.error('Error: NEXT_PUBLIC_MONGODB_URL is not defined in environment variables.');
