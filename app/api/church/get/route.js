@@ -1,6 +1,6 @@
-import { decrypt } from '@/utils/helpers';
+import { decrypt } from '../../../../utils/helpers';
 import { getChurch } from '../../../services/churchService';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
 
 export const GET = async (req) => {
