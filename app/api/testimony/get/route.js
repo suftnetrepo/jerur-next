@@ -1,7 +1,7 @@
 import { getTestimonies } from '../../../services/testimoniesService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { decrypt } from '@/utils/helpers';
+import { decrypt } from '../../../../utils/helpers';
 
 export const GET = async (req) => {
   try {

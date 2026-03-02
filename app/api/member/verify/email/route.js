@@ -1,5 +1,5 @@
 import { verificationPin } from '../../../../services/memberService';
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../../utils/logger';
 import { NextResponse } from 'next/server';
 
 export const POST = async (req) => {

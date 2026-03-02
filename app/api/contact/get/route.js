@@ -1,6 +1,6 @@
 import { getAllContacts } from '../../../services/contactService';
 import { logger } from '../../../../utils/logger';
-import { decrypt } from '@/utils/helpers';
+import { decrypt } from '../../../../utils/helpers';
 import { NextResponse } from 'next/server';
 
 export const GET = async (req) => {

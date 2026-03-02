@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { logger } from '@/utils/logger';
-import { addDonation } from '@/services/donationService'
-import { checkAmount } from '@/utils/helpers'
+import { logger } from '../../../../../utils/logger';
+import { addDonation } from '../../../../services/donationService'
+import { checkAmount } from '../../../../../utils/helpers'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
