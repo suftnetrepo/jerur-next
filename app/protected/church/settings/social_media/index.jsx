@@ -1,8 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { OkDialogue } from '@/src/components/elements/ConfirmDialogue';
-import { useSocialMedia } from '@/hooks/useSettings';
+import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
+import { useSocialMedia } from '../../../../../hooks/useSettings';
 
 const SocialMedia = ({data}) => {
   const { error, success, fields, handleChange, handleSave, handleReset, handleSelect } = useSocialMedia();

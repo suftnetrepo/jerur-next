@@ -3,7 +3,7 @@ import Event from '../models/event';
 import Member from '../models/member';
 import Fellowship from '../models/fellowship';
 import Attendance from '../models/attendance';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 import { logger } from '../../utils/logger';
 
 mongoConnect();

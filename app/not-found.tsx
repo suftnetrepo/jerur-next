@@ -1,10 +1,10 @@
 export const dynamic = 'force-dynamic';
 
 import { Fragment } from 'react';
-import { Navbar } from '@/components/blocks/navbar';
-import { Footer } from '@/components/blocks/footer';
-import FigureImage from '@/components/reuseable/FigureImage';
-import NextLink from '@/components/reuseable/links/NextLink';
+import { Navbar } from '../src/components/blocks/navbar';
+import { Footer } from '../src/components/blocks/footer';
+import FigureImage from '../src/components/reuseable/FigureImage';
+import NextLink from '../src/components/reuseable/links/NextLink';
 
 export default function NotFound() {
   return (

@@ -1,7 +1,7 @@
 import Church from '../models/church';
 import { churchValidator } from '../validation/churchValidator';
 import { logger } from '../../utils/logger';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

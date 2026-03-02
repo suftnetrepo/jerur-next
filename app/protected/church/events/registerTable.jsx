@@ -3,7 +3,7 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 import { TiDelete } from 'react-icons/ti';
 import Tooltip from '@mui/material/Tooltip';
-import DeleteConfirmation from '@/components/elements/ConfirmDialogue';
+import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
 
 const RegisterTable = ({ data, eventId, handleDelete }) => {
   return (

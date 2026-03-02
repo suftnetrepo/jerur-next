@@ -4,7 +4,7 @@ import { logger } from '../../utils/logger';
 import Church from '../models/church';
 // import { sendNotification } from '../../utils/push-notification';
 import { MESSAGE_TYPE_ENUMS } from '../../utils/enums';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

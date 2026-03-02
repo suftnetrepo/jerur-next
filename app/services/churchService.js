@@ -10,7 +10,7 @@ import {
   propheticValidator
 } from '../validation/churchValidator';
 import { logger } from '../../utils/logger';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
 import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
-import FindAddress from '@/share/findAddress';
+import FindAddress from '../../../share/findAddress';
 
 const FellowshipForm = ({ errorMessages, handleDelete, handleSubmit, handleChange, fields, handleSelectedAddress }) => {
   return (
