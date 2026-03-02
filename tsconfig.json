@@ -18,7 +18,10 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*", "./src/*", ".*"]
+      "@/*": ["./app/*", "./src/*", "./*"],
+      "@utils/*": ["./utils/*"],
+      "@lib/*": ["./lib/*"],
+      "@models/*": ["./models/*"]
     },
     "plugins": [
       {
@@ -26,14 +29,6 @@
       }
     ]
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
-    ".next/types/**/*.ts",
-    "middleware.js"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", ".next/types/**/*.ts", "middleware.js"],
   "exclude": ["node_modules"]
 }
