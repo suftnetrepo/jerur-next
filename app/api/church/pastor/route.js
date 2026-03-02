@@ -1,10 +1,10 @@
-import { logger } from '@/utils/logger';
+import { logger } from '../../../../utils/logger';
 import {
     updatePastor
 } from '../../../services/churchService';
 import { v2 as cloudinary } from 'cloudinary';
 import { NextResponse } from 'next/server';
-import { getUserSession } from '@/utils/generateToken';
+import { getUserSession } from '../../../../utils/generateToken';
 
 cloudinary.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUD_NAME,
@@ -77,7 +77,7 @@ export const PUT = async (req) => {
         return NextResponse.json({ success: true, data: updated });
 
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 };
