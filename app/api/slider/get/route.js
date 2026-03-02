@@ -1,7 +1,7 @@
 import { getAllSliders } from '../../../services/sliderService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { decrypt } from '@/utils/helpers';
+import { decrypt } from '../../../../utils/helpers';
 
 export const GET = async (req) => {
   try {

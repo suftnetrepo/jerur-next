@@ -8,7 +8,7 @@ import {
 } from '../../services/eventServices';
 import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { getUserSession } from '@/utils/generateToken';
+import { getUserSession } from '../../../utils/generateToken';
 import { parseEventFormData } from '../shared/parseEventFormData';
 
 export const GET = async (req) => {

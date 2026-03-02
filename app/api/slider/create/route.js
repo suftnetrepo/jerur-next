@@ -1,8 +1,8 @@
 import { addSlider } from '../../../services/sliderService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
-import { getUserSession } from '@/utils/generateToken';
-import { parseSliderFormData } from '@/api/shared/parseSliderFormData';
+import { getUserSession } from '../../../../utils/generateToken';
+import { parseSliderFormData } from '../../shared/parseSliderFormData';
 
 export const POST = async (req) => {
   try {
