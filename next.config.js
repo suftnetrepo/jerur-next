@@ -57,7 +57,7 @@ try {
   const { withSentryConfig } = require('@sentry/nextjs');
   module.exports = withSentryConfig(nextConfig, {
     org: 'suftnetcom',
-    project: 'jerur-next',
+    project: 'snatchi',
     silent: !process.env.CI,
     widenClientFileUpload: true,
     disableLogger: true,
