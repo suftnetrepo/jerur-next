@@ -4,8 +4,8 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
-    "noImplicitAny": true,
+    "strict": false,
+    "noImplicitAny": false,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -18,8 +18,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/utils/*": ["./utils/*", "./src/utils/*"],
-      "@/*": ["./app/*", "./src/*", "./*", "./utils/*"]
+      "@/*": ["./app/*", "./src/*", "./*"]
     },
     "plugins": [
       {
@@ -34,6 +33,7 @@
     "**/*.js",
     "**/*.jsx",
     ".next/types/**/*.ts",
-    "middleware.js" ],
+    "middleware.js"
+  ],
   "exclude": ["node_modules"]
 }

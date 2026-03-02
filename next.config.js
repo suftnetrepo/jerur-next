@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['mongoose', 'mongodb', 'mjml'],
+    experimental: {
+    esmExternals: false,
+    middleware: {
+      // Use the Node.js runtime for middleware
+      runtime: 'nodejs'
+    },
+    serverComponentsExternalPackages: ['mongoose', 'mongodb', 'mjml'],
+    serverExternalPackages: ['mjml']
+  },
 
   eslint: {
     ignoreDuringBuilds: true
@@ -49,7 +57,7 @@ try {
   const { withSentryConfig } = require('@sentry/nextjs');
   module.exports = withSentryConfig(nextConfig, {
     org: 'suftnetcom',
-    project: 'snatchi',
+    project: 'jerur-next',
     silent: !process.env.CI,
     widenClientFileUpload: true,
     disableLogger: true,
