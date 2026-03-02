@@ -18,10 +18,11 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*", "./src/*", "./*"],
-      "@utils/*": ["./utils/*"],
-      "@lib/*": ["./lib/*"],
-      "@models/*": ["./models/*"]
+   "@src/*": ["src/*"],
+  "@root/*": ["*"],
+  "@utils/*": ["utils/*"],
+  "@store/*": ["Store/*"],
+  "@validator/*": ["validator/*"]
     },
     "plugins": [
       {

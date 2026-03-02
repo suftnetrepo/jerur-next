@@ -2,7 +2,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]
+     "@src/*": ["src/*"],
+  "@root/*": ["*"],
+  "@utils/*": ["utils/*"],
+  "@store/*": ["Store/*"],
+  "@validator/*": ["validator/*"]
     }
   }
 }
