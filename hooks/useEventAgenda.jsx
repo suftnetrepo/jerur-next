@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { EVENT_AGENDA } from '../utils/apiUrl';
-import { regularAgendaValidator } from '@/validator/rules';
+import { regularAgendaValidator } from '../validator/rules';
 
 const useEventAgenda = () => {
   const [state, setState] = useState({

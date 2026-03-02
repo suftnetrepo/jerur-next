@@ -1,9 +1,9 @@
 'use client'; 
 
 import { FC, Fragment, ReactElement, useRef } from 'react';
-import useSticky from '@/hooks/useSticky';
-import NextLink from '@/components/reuseable/links/NextLink';
-import SocialLinks from '@/components/reuseable/SocialLinks';
+import useSticky from '../../../hooks/useSticky';
+import NextLink from '../../reuseable/links/NextLink';
+import SocialLinks from '../../reuseable/SocialLinks';
 import Social from './partials/Social';
 
 type NavbarProps = {

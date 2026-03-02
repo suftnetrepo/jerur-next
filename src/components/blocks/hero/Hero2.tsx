@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { slideInDownAnimate, zoomInAnimate } from '@/utils/animation';
-import NextLink from '@/components/reuseable/links/NextLink';
-import AppBtn from '@/components/common/AppBtn';
+import { slideInDownAnimate, zoomInAnimate } from '../../../utils/animation';
+import NextLink from '../../reuseable/links/NextLink';
+import AppBtn from '../../common/AppBtn';
 
 
 const Hero2: FC = () => {

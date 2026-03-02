@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { REGULAR_SERVICE_AGENDA } from '../utils/apiUrl';
-import { regularAgendaValidator } from '@/validator/rules';
+import { regularAgendaValidator } from '../validator/rules';
 
 const useRegularServiceAgenda = () => {
   const [state, setState] = useState({

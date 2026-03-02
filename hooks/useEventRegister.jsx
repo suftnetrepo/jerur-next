@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { EVENT_REGISTER } from '../utils/apiUrl';
-import { registerValidator } from '@/validator/rules';
+import { registerValidator } from '../validator/rules';
 
 const useEventRegister = () => {
   const [state, setState] = useState({

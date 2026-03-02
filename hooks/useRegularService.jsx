@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { REGULAR_SERVICE } from '../utils/apiUrl';
-import { regularServiceValidator } from '@/validator/rules';
+import { regularServiceValidator } from '../validator/rules';
 
 const useRegularService = (searchQuery = '') => {
   const [state, setState] = useState({

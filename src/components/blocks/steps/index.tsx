@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import data from '@/data/demo-27';
+import data from '../../../data/demo-27';
 
 const Steps: FC = () => {
   return (

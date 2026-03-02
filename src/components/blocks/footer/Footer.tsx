@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import SocialLinks from '@/components/reuseable/SocialLinks';
+import SocialLinks from '../../reuseable/SocialLinks';
 
 const Footer8: FC = () => {
   return (

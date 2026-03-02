@@ -1,6 +1,6 @@
 import { FC, Fragment } from 'react';
-import { slideInDownAnimate } from '@/utils/animation';
-import NextLink from '@/components/reuseable/links/NextLink';
+import { slideInDownAnimate } from '../../utils/animation';
+import NextLink from '../reuseable/links/NextLink';
 
 const AppBtn: FC = () => {
   return (

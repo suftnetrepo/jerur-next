@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { TESTIMONY } from '../utils/apiUrl';
-import { testimoniesValidator } from '@/validator/rules';
+import { testimoniesValidator } from '../validator/rules';
 
 const useTestimonies = (searchQuery) => {
   const [state, setState] = useState({

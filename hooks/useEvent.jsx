@@ -3,7 +3,7 @@ import moment from 'moment';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { EVENT } from '../utils/apiUrl';
-import { eventValidator } from '@/validator/rules';
+import { eventValidator } from '../validator/rules';
 
 const useEvent = (searchQuery) => {
   const [state, setState] = useState({

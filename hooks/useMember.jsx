@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { MEMBER } from '../utils/apiUrl';
-import { memberValidator } from '@/validator/rules';
+import { memberValidator } from '../validator/rules';
 
 const useMember = (searchQuery) => {
   const [state, setState] = useState({

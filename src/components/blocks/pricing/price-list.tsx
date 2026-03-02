@@ -2,7 +2,7 @@
 
 import { FC } from 'react';
 // -------- data-------- //
-import { pricingList } from '@/data/pricing';
+import { pricingList } from '../../../data/pricing';
 import PricingCard from './pricing-card';
 
 // =============================================================================

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import Accordion from '@/components/reuseable/accordion';
+import Accordion from '../reuseable/accordion';
 // -------- data -------- //
 const accordions = [
   {
