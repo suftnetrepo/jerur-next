@@ -6,8 +6,8 @@ const nextConfig = {
       // Use the Node.js runtime for middleware
       runtime: 'nodejs'
     },
-    serverComponentsExternalPackages: ['mongoose', 'mongodb', 'mjml'],
-    serverExternalPackages: ['mjml']
+    serverComponentsExternalPackages: ['mongoose', 'mongodb', 'mjml', 'bunyan'],
+    serverExternalPackages: ['mjml', 'bunyan']
   },
 
   eslint: {
@@ -42,11 +42,28 @@ const nextConfig = {
 
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      config.resolve.fallback.fs = false;
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        'source-map-support': false,
+        'dtrace-provider': false,
+      };
+    }
+
+    // Exclude optional native bunyan dependencies that aren't available on all platforms
+    config.externals = config.externals || [];
+    if (isServer) {
+      config.externals.push('source-map-support', 'dtrace-provider');
     }
 
     // Ignore fastest-validator critical dependency warnings
     config.module.exprContextCritical = false;
+
+    // Suppress SCSS deprecation warnings
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      /Deprecation/,
+    ];
 
     return config;
   }

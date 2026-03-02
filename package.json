@@ -9,7 +9,7 @@
     "build-local": "NODE_ENV=production next build",
     "start": "next start",
     "sass": "sass --no-source-map src/assets/scss:public/css",
-    "build:render": "yarn --frozen-lockfile install && NODE_OPTIONS='--trace-warnings' yarn build"
+    "build:render": "yarn --frozen-lockfile --production=false install && NODE_OPTIONS='--trace-warnings' yarn build"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.8.0",
