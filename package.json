@@ -6,7 +6,7 @@
     "dev": "next dev",
     "lint": "next lint",
     "build": "next build",
-    "build-local": "NODE_ENV=local next build",
+    "build-local": "NODE_ENV=production next build",
     "start": "next start",
     "sass": "sass --no-source-map src/assets/scss:public/css",
     "build:render": "yarn --frozen-lockfile install && NODE_OPTIONS='--trace-warnings' yarn build"

@@ -4,10 +4,8 @@ import { Navbar } from '@/components/blocks/navbar';
 import Pricing from '@/components/blocks/pricing';
 import PageProgress from '@/components/common/PageProgress';
 import Link from 'next/link';
-import Topbar from '@/components/elements/Topbar';
 import { Footer } from '@/components/blocks/footer';
 import FAQ from '@/components/blocks/faq';
-
 
 const PricePlans: NextPage = () => {
   return (

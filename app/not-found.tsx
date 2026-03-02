@@ -1,17 +1,14 @@
 export const dynamic = 'force-dynamic';
 
-import { NextPage } from 'next';
 import { Fragment } from 'react';
-// -------- custom component -------- //
 import { Navbar } from '@/components/blocks/navbar';
 import { Footer } from '@/components/blocks/footer';
 import FigureImage from '@/components/reuseable/FigureImage';
 import NextLink from '@/components/reuseable/links/NextLink';
 
-const NotFound: NextPage = () => {
+export default function NotFound() {
   return (
     <Fragment>
-      {/* ========== header section ========== */}
       <header className="wrapper bg-light">
         <Navbar button={<NextLink title="Contact" href="#" className="btn btn-sm btn-primary rounded-pill" />} />
       </header>
@@ -30,7 +27,6 @@ const NotFound: NextPage = () => {
                   The page you are looking for is not available or has been moved. Try a different page or go to
                   homepage with the button below.
                 </p>
-
                 <NextLink title="Go to Homepage" href="/" className="btn btn-primary rounded-pill" />
               </div>
             </div>
@@ -38,10 +34,7 @@ const NotFound: NextPage = () => {
         </section>
       </main>
 
-      {/* ========== footer section ========== */}
       <Footer />
     </Fragment>
   );
-};
-
-export default NotFound;
+}

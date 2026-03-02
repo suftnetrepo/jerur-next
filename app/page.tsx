@@ -9,15 +9,13 @@ import useLightBox from '@/hooks/useLightBox';
 import { Navbar } from '@/components/blocks/navbar';
 import FAQ from '@/components/blocks/faq';
 import Link from 'next/link';
-import Topbar from '@/components/elements/Topbar';
 import Features from '@/components/blocks/service';
 import Steps from '@/components/blocks/steps';
 import Pricing from '@/components/blocks/pricing';
 import Contact from '@/components/elements/contact';
 import Testimonial from '@/components/blocks/testimonial';
 
-
-const Home: NextPage = () => {
+const Page: NextPage = () => {
   useLightBox();
 
   return (
@@ -61,4 +59,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default Page;

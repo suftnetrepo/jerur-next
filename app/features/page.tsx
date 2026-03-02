@@ -3,7 +3,6 @@ import { Fragment } from 'react';
 import { Navbar } from '@/components/blocks/navbar';
 import PageProgress from '@/components/common/PageProgress';
 import Link from 'next/link';
-import Topbar from '@/components/elements/Topbar';
 import { Footer } from '@/components/blocks/footer';
 import Features from '@/components/blocks/service';
 import Testimonial from '@/components/blocks/testimonial';
