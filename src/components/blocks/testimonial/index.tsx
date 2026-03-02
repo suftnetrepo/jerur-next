@@ -1,6 +1,6 @@
 import { Fragment } from "react";
-import { Tiles3 } from "@/components/elements/tiles/title3";
-import Carousel from "@/components/reuseable/Carousel";
+import { Tiles3 } from "../../elements/tiles/title3";
+import Carousel from "../../reuseable/Carousel";
 import TestimonialCard2 from "./testimonial-card";
 import { testimonialList2 } from "../../../data/testimonial-list";
 
