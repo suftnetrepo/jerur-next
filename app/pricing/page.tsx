@@ -1,11 +1,11 @@
 import { NextPage } from 'next';
 import { Fragment } from 'react';
-import { Navbar } from '@/components/blocks/navbar';
-import Pricing from '@/components/blocks/pricing';
-import PageProgress from '@/components/common/PageProgress';
+import { Navbar } from '../../src/components/blocks/navbar';
+import Pricing from '../../src/components/blocks/pricing';
+import PageProgress from '../../src/components/common/PageProgress';
 import Link from 'next/link';
-import { Footer } from '@/components/blocks/footer';
-import FAQ from '@/components/blocks/faq';
+import { Footer } from '../../src/components/blocks/footer';
+import FAQ from '../../src/components/blocks/faq';
 
 const PricePlans: NextPage = () => {
   return (

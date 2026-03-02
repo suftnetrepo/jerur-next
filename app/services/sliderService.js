@@ -2,7 +2,7 @@ import { sliderValidator } from '../validation/sliderValidator';
 import { identifierValidator, identifierValidators } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
 import Church from '../models/church';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

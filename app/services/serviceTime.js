@@ -2,7 +2,7 @@ import ServiceTime from '../models/serviceTime';
 import { identifierValidator } from '../validation/identifierValidator';
 import { serviceTimeValidator } from '../validation/serviceTimeValidator';
 import { logger } from '../../utils/logger';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

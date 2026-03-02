@@ -2,7 +2,7 @@ import Event from '../models/event';
 import { identifierValidator } from '../validation/identifierValidator';
 import { eventValidator } from '../validation/eventValidator';
 import { logger } from '../../utils/logger';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

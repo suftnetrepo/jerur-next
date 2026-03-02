@@ -9,7 +9,7 @@ import { checkoutValidator } from '../../../validator/checkoutValidator';
 import { validate } from '../../../validator/validator';
 import { useSubscriber } from '../../../hooks/useSubscriber';
 import { useRouter, useParams } from 'next/navigation';
-import ErrorDialogue from '@/components/elements/errorDialogue';
+import ErrorDialogue from '../../../src/components/elements/errorDialogue';
 
 const CheckOut = () => {
   const router = useRouter();

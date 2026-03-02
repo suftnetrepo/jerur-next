@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import ThemeProvider from '@/theme/ThemeProvider';
+import ThemeProvider from '../src/theme/ThemeProvider';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 // Bootstrap and custom scss
 import '@/assets/scss/style.scss';

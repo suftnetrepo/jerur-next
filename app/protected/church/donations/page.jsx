@@ -11,7 +11,7 @@ import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
 import RenderUserOffcanvas from './renderOffcanvas';
 import Tooltip from '@mui/material/Tooltip';
-import { formatCurrency, getYesNoColorCode, dateFormatted } from '@/utils/helpers';
+import { formatCurrency, getYesNoColorCode, dateFormatted } from '../../../../utils/helpers';
 
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { normalizeTime } from '@/utils/helpers';
+import { normalizeTime } from '../../../../utils/helpers';
 
 const AgendaForm = ({ errorMessages, handleSubmit, handleChange, fields }) => {
   console.log('..............fields', fields);

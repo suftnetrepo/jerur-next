@@ -2,7 +2,7 @@
 
 import { NextPage } from 'next';
 import { Fragment } from 'react';
-import ForgotPasswordForm from '@/components/elements/forms/ForgotPasswordForm';
+import ForgotPasswordForm from '../../src/components/elements/forms/ForgotPasswordForm';
 
 const ForgotPassword: NextPage = () => {
   return (

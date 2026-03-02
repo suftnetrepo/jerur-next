@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, Suspense } from 'react';
-import { Table } from '@/components/elements/table/table';
+import { Table } from '../../../../src/components/elements/table/table';
 import { Button } from 'react-bootstrap';
 import { useRegularService } from '../../../../hooks/useRegularService';
 import { MdArrowBack } from 'react-icons/md';
@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import Tooltip from '@mui/material/Tooltip';
 import RenderFormOffcanvas from './renderFormOffcanvas';
 import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
-import { getYesNoColorCode, serviceType } from '@/utils/helpers';
+import { getYesNoColorCode, serviceType } from '../../../../utils/helpers';
 import useDebounce from '../../../../hooks/useDebounce';
 
 const Render = () => {

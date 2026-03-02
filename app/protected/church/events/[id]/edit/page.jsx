@@ -8,7 +8,7 @@ import ErrorDialogue from '../../../../../../src/components/elements/errorDialog
 import { OkDialogue } from '../../../../../../src/components/elements/ConfirmDialogue';
 import Button from 'react-bootstrap/Button';
 import { MdArrowBack } from 'react-icons/md';
-import { eventValidator } from '@/validator/rules';
+import { eventValidator } from '../../../../../../validator/rules';
 import dynamic from 'next/dynamic';
 
 const Form = dynamic(() => import('../../form'), { ssr: false });

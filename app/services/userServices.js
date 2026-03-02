@@ -2,9 +2,9 @@ import User from './../models/user';
 import mongoose from 'mongoose'
 import Church from './../models/church';
 import { logger } from '../../utils/logger';
-import { userValidator, userEditValidator } from '@/validator';
-import { isValidObjectId, generatePassword, comparePassword } from '@/utils/helpers';
-import { mongoConnect } from '@/utils/connectDb';
+import { userValidator, userEditValidator } from '../../validator';
+import { isValidObjectId, generatePassword, comparePassword } from '../../utils/helpers';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

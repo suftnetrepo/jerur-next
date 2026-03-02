@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { OkDialogue } from '@/src/components/elements/ConfirmDialogue';
-import ErrorDialogue from '@/src/components/elements/errorDialogue';
-import { validate } from '@/validator/validator';
-import { useBankTransfer } from '@/hooks/useSettings';
+import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
+import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
+import { validate } from '../../../../../validator/validator';
+import { useBankTransfer } from '../../../../../hooks/useSettings';
 
 const BankTransfer = ({data}) => {
   const { error, success, fields, rules, handleChange, handleSave, handleReset, handleSelect } = useBankTransfer();

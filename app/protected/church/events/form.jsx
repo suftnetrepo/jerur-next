@@ -5,7 +5,7 @@ import { Form, Button } from 'react-bootstrap';
 import Editor from '../../../../src/components/reuseable/editor';
 import 'react-datetime/css/react-datetime.css';
 import FindAddress from '../../../share/findAddress';
-import { ImageUploader } from '@/components/elements/image';
+import { ImageUploader } from '../../../../src/components/elements/image';
 
 const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSelectedAddress }) => {
 

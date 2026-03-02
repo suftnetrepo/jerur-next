@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, Suspense } from 'react';
-import { Table } from '@/components/elements/table/table';
+import { Table } from '../../../../src/components/elements/table/table';
 import { Button } from 'react-bootstrap';
 import { useFellowship } from '../../../../hooks/useFellowship';
 import { MdArrowBack } from 'react-icons/md';
@@ -10,7 +10,7 @@ import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import { useRouter } from 'next/navigation';
 import Tooltip from '@mui/material/Tooltip';
 import RenderFormOffcanvas from './renderFormOffcanvas';
-import { getYesNoColorCode } from '@/utils/helpers';
+import { getYesNoColorCode } from '../../../../utils/helpers';
 import useDebounce from '../../../../hooks/useDebounce';
 
 const Render = () => {

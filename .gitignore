@@ -58,3 +58,4 @@ logs/trace.log.2
 logs/error.log.4
 .env
 .env.production
+.env.stage

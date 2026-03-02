@@ -7,7 +7,7 @@ import { logger } from '../../utils/logger';
 import { sendEmail } from '../../lib/mail';
 import { emailTemplates } from '../email';
 import { compileEmailTemplate } from '../templates/compile-email-template';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

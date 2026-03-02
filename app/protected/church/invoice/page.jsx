@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Fragment, useMemo, useState } from 'react';
-import { Table } from '@/components/elements/table/table';
+import { Table } from '../../../../src/components/elements/table/table';
 import { useInvoice } from '../../../../hooks/useInvoice';
 import { FaEye } from 'react-icons/fa';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';

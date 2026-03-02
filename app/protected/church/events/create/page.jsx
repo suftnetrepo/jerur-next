@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { validate } from '../../../../../validator/validator';
-import { eventValidator } from '@/validator/rules';
+import { eventValidator } from '../../../../../validator/rules';
 import { useEventEdit } from '../../../../../hooks/useEvent';
 import { ConfirmationDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import { useRouter } from 'next/navigation';

@@ -1,7 +1,7 @@
 
 
 import { Fragment } from 'react';
-import LoginForm from '@/components/elements/forms/LoginForm';
+import LoginForm from '../../src/components/elements/forms/LoginForm';
 
 const Login = () => {
   return (

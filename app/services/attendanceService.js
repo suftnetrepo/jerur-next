@@ -4,7 +4,7 @@ import { identifierValidator } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
 import ServiceTime from '../models/serviceTime';
 import Attendance from '../models/attendance';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

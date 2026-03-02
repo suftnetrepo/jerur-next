@@ -3,7 +3,7 @@ import Donation from '../models/donation';
 import { donationValidator } from '../validation/donationValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

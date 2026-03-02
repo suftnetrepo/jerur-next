@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import FindAddress from '@/share/findAddress';
+import FindAddress from '../../../../share/findAddress';
 import { validate } from '../../../../../validator/validator';
 import { useAddress } from '../../../../../hooks/useAddress';
 

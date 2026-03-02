@@ -1,11 +1,11 @@
 import { NextPage } from 'next';
 import { Fragment } from 'react';
-import { Navbar } from '@/components/blocks/navbar';
-import PageProgress from '@/components/common/PageProgress';
+import { Navbar } from '../../src/components/blocks/navbar';
+import PageProgress from '../../src/components/common/PageProgress';
 import Link from 'next/link';
-import { Footer } from '@/components/blocks/footer';
-import Features from '@/components/blocks/service';
-import Testimonial from '@/components/blocks/testimonial';
+import { Footer } from '../../src/components/blocks/footer';
+import Features from '../../src/components/blocks/service';
+import Testimonial from '../../src/components/blocks/testimonial';
 
 const Feature: NextPage = () => {
   return (

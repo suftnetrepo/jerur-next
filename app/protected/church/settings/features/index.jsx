@@ -2,11 +2,11 @@
 
 import React, { useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { OkDialogue } from '@/src/components/elements/ConfirmDialogue';
-import ErrorDialogue from '@/src/components/elements/errorDialogue';
-import { useFeatures } from '@/hooks/useSettings';
-import { featuresOptions } from '@/utils/helpers';
-import MultiSelectDropdown from '@/components/reuseable/MultiSelectDropdown';
+import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
+import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
+import { useFeatures } from '../../../../../hooks/useSettings';
+import { featuresOptions } from '../../../../../utils/helpers';
+import MultiSelectDropdown from '../../../../../src/components/reuseable/MultiSelectDropdown';
 
 const Features = ({ data }) => {
   const { error, success, fields, handleSave, handleChange, handleSelect, handleReset } = useFeatures();

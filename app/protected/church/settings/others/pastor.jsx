@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
-import { OkDialogue } from '@/src/components/elements/ConfirmDialogue';
-import ErrorDialogue from '@/src/components/elements/errorDialogue';
-import { validate } from '@/validator/validator';
-import { usePastor } from '@/hooks/useSettings';
+import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
+import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
+import { validate } from '../../../../../validator/validator';
+import { usePastor } from '../../../../../hooks/useSettings';
 
 const Pastor = ({ data }) => {
     const { error, success, fields, rules, handleChange, handleUpdate, handleReset, handleSelect } = usePastor();

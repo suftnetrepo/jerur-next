@@ -3,7 +3,7 @@ import { testimoniesValidator } from '../validation/userValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import Testimonies from '../models/testimonies';
 import { logger } from '../../utils/logger';
-import { mongoConnect } from '@/utils/connectDb';
+import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 

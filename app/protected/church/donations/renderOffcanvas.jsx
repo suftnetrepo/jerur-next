@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Offcanvas, Button, Form } from 'react-bootstrap';
 import { validate } from '../../../../validator/validator';
 import { ConfirmationDialogue, OkDialogue } from '../../../../src/components/elements/ConfirmDialogue';
-import { donationValidator } from '@/validator/rules';
+import { donationValidator } from '../../../../validator/rules';
 
 const RenderUserOffcanvas = ({
   show,
