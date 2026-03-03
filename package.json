@@ -31,8 +31,6 @@
     "@reduxjs/toolkit": "^1.9.5",
     "@sendgrid/mail": "^7.6.0",
     "@sentry/nextjs": "^9.5.0",
-    "@sentry/node": "^6.19.7",
-    "@sentry/tracing": "^6.19.7",
     "@stripe/react-stripe-js": "^1.5.0",
     "@stripe/stripe-js": "^1.18.0",
     "@types/react-fontawesome": "^1.6.8",
@@ -61,7 +59,6 @@
     "google-auth-library": "^9.15.1",
     "handlebars": "^4.7.7",
     "i18next": "^23.12.2",
-    "install": "^0.13.0",
     "isotope-layout": "^3.0.6",
     "itooltip": "^1.1.1",
     "jose": "^5.9.6",
@@ -72,7 +69,6 @@
     "micro": "^10.0.1",
     "micro-cors": "^0.1.1",
     "mjml": "^4.15.3",
-    "mockgoose": "^8.0.4",
     "moment": "^2.29.4",
     "mongodb-memory-server": "^8.12.2",
     "mongoosastic": "^5.0.0",
@@ -130,7 +126,7 @@
     "@types/isotope-layout": "^3.0.9",
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.2",
-    "@types/node": "18.0.6",
+    "@types/node": "^20.0.0",
     "@types/progressbar.js": "^1.1.2",
     "@types/react": "^18.3.8",
     "@types/react-countup": "^4.3.1",
@@ -140,12 +136,9 @@
     "@types/react-syntax-highlighter": "^15.5.5",
     "@types/recharts": "^1.8.29",
     "cross-env": "^7.0.3",
-    "eslint": "8.20.0",
-    "eslint-config-next": "12.2.3",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^15.0.3",
     "sass": "^1.54.0",
-    "typescript": "4.7.4"
-  },
-  "resolutions": {
-    "@types/react": "^17.0.38"
+    "typescript": "^5.0.0"
   }
 }

@@ -142,7 +142,7 @@ async function addMember(suid, body) {
       throw new Error('create new member failed');
     }
 
-    const token = generateToken(newUser, process.env.DURATION);
+    const token = generateToken(newUser, '30m');
     return token;
   } catch (error) {
     logger.error(error);
