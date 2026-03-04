@@ -315,9 +315,9 @@ async function removeMember( suid , id) {
   }
 }
 
-const getRecentMembers = async (id, limit = 10) => {
+const getRecentMembers = async (suid, limit = 10) => {
   try {
-    const recentMembers = await Member.find({ }).sort({ createdAt: -1 }).limit(limit);
+    const recentMembers = await Member.find({ church: suid }).sort({ createdAt: -1 }).limit(limit);
     return recentMembers;
   } catch (error) {
     logger.error(error);

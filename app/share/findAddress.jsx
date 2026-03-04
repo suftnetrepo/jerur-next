@@ -5,14 +5,14 @@ import { FaSearch } from 'react-icons/fa';
 import { Form, Button } from 'react-bootstrap';
 import { searchAddress, formatAddressParts } from '../../utils/helpers';
 
-const FindAddress = ({ handleSelectedAddress }) => {
+const FindAddress = ({ handleSelectedAddress, addressStatus = false }) => {
   const [fields, setFields] = useState({
-    status: false,
+    status: addressStatus,
     query: '',
     place_id: 0
   });
   const [searchResults, setSearchResults] = useState([]);
-  const [findAddressStatus, setFindAddressStatus] = useState(false);
+  const [findAddressStatus, setFindAddressStatus] = useState(addressStatus);
 
   const handleFind = async (e) => {
     e.preventDefault();

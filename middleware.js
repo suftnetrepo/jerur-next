@@ -4,7 +4,7 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(req) {
   // Skip middleware for NextAuth routes
-  if (req.nextUrl.pathname.startsWith('/api/auth')) {
+  if (req.nextUrl.pathname.startsWith('/api/auth') || req.nextUrl.pathname.startsWith('/api/stripe') || req.nextUrl.pathname.startsWith('/api/subscriber') || req.nextUrl.pathname.startsWith('/api/webhooks')) {
     return NextResponse.next();
   }
 

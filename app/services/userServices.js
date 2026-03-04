@@ -8,7 +8,7 @@ import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 
-async function getUsers({ page = 1, limit = 10, sortField = 'createdAt', sortOrder = 'desc', searchQuery }) {
+async function getUsers({ suid, page = 1, limit = 10, sortField = 'createdAt', sortOrder = 'desc', searchQuery }) {
   const skip = (page - 1) * limit;
 
   try {
@@ -17,6 +17,8 @@ async function getUsers({ page = 1, limit = 10, sortField = 'createdAt', sortOrd
     sortOptions[sortField || 'createdAt'] = sortOrder === 'desc' ? -1 : 1;
 
     const pipeline = [
+      // Filter by suid (church) first
+      { $match: { church: new mongoose.Types.ObjectId(suid) } },
       // Join with church collection
       { $lookup: {
           from: 'churches',
@@ -67,6 +69,7 @@ async function getUsers({ page = 1, limit = 10, sortField = 'createdAt', sortOrd
 
     // Count documents using similar query
     const countPipeline = [
+      { $match: { church: new mongoose.Types.ObjectId(suid) } },
       { $lookup: {
           from: 'churches',
           localField: 'church',

@@ -91,6 +91,14 @@ export default function AttendanceChart({ data = [], loading = false }) {
     },
   };
 
+  if (!data || data.length === 0) {
+        return (
+           <div className="d-flex justify-content-center align-items-center h-100">
+                <span> No attendance data available</span>
+            </div>
+        );
+    }
+
   return (
     <Card className="shadow-sm border-0 h-100">
       <Card.Header className="bg-white border-0">
