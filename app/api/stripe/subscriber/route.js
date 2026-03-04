@@ -12,15 +12,20 @@ export async function POST(req) {
 
         // Parse the request body
         const body = await req.json();
-        const { customerId, priceId, contact, email } = body;
+        const { priceId, contact, email } = body;
+
+         // Create a new Stripe customer
+        const customer = await stripe.customers.create({
+            email,
+        });
 
         // Create a subscription
         const subscription = await stripe.subscriptions.create({
-            customer: customerId,
+            customer: customer.id,
             items: [{ price: priceId }],
             payment_behavior: 'default_incomplete',
             metadata: {
-                stripeCustomerId: customerId,
+                stripeCustomerId: customer.id,
                 contact: contact,
                 email: email,
             },
@@ -32,6 +37,7 @@ export async function POST(req) {
             {
                 data: {
                     subscriptionId: subscription.id,
+                    customerId: customer.id,
                     clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
                 },
             },

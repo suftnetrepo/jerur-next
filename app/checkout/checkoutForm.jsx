@@ -1,34 +1,42 @@
 import React, { useEffect } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-export default function CheckoutForm({ subscription, handleError, handleSuccess, fields }) {
+export default function CheckoutForm({ reset, alreadySubscribed, subscription, handleError, handleSuccess, fields }) {
   const stripe = useStripe();
   const elements = useElements();
 
-  useEffect(() => {
-    async function handleCheckout() {
-      if (!stripe || !elements || !subscription.clientSecret) {
-        return;
-      }
-
-      const { error, paymentIntent } = await stripe.confirmCardPayment(subscription.clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement)
-        }
-      });
-
-      if (error) {
-        handleError(error?.message);
-        return;
-      }
-
-      if (paymentIntent && paymentIntent.status === 'succeeded') {
-          handleSuccess(fields);
-      }
+  async function handleCheckout() {
+    if (!stripe || !elements || !subscription.clientSecret) {
+      return;
     }
 
-    handleCheckout();
-  }, [subscription]);
+    const { error, paymentIntent } = await stripe.confirmCardPayment(subscription.clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement)
+      }
+    });
+
+    if (error) {
+      handleError(error?.message);
+      return;
+    }
+
+    if (paymentIntent && paymentIntent.status === 'succeeded') {
+      handleSuccess(fields);
+    }
+  }
+
+   useEffect(() => {
+ 
+    if (alreadySubscribed) {
+      reset();
+    }
+    
+    if (subscription?.clientSecret) {
+      handleCheckout();
+    }
+  }, [subscription, alreadySubscribed]); 
+
 
   const CARD_ELEMENT_OPTIONS = {
     style: {

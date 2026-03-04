@@ -439,6 +439,14 @@ const UserAggregates = ({ data = [] }) => {
         };
     }, [data]);
 
+    if (!data || data.length === 0) {
+        return (
+            <div style={{ width: 284, height: 300 }} className="d-flex justify-content-center align-items-center">
+                <span>No User aggregate data available</span>
+            </div>
+        );
+    }
+
     return (
         <div style={{ width: 284, height: 300 }}>
             <Doughnut data={chartData} options={{

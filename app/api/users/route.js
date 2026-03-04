@@ -22,6 +22,7 @@ export const GET = async (req) => {
       const limit = parseInt(url.searchParams.get('limit') || '10', 10);
 
       const { data, totalCount } = await getUsers({
+        suid: user?.church,
         page,
         limit,
         sortField,

@@ -1,6 +1,6 @@
 'use client';
 
-import React, {  useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 import Button from 'react-bootstrap/Button';
 import { signIn, getCsrfToken } from 'next-auth/react';
@@ -11,15 +11,16 @@ import { useSubscriber } from '../../../hooks/useSubscriber';
 import { useRouter, useParams } from 'next/navigation';
 import ErrorDialogue from '../../../src/components/elements/errorDialogue';
 
+const PASSWORD = '12345!';
 const CheckOut = () => {
   const router = useRouter();
   const params = useParams();
   const [csrfToken, setCsrfToken] = useState('');
+  const [alreadySubscribed, setAlreadySubscribed] = useState(false);
   const [validationError, setValidationError] = useState({});
   const [fields, setFields] = useState(checkoutValidator.fields);
   const { priceId } = params;
   const {
-    handleNewCustomer,
     handleNewSubscriber,
     handleErrorReset,
     loading,
@@ -37,18 +38,20 @@ const CheckOut = () => {
   }, []);
 
   useEffect(() => {
-    const handleResult = async () => {
+    const handleAuthentication = async () => {
+      if (!data) return;
+
       await signIn('credentials', {
         redirect: false,
         email: fields.email,
         csrfToken,
-        password: '12345!'
+        password: PASSWORD
       });
 
       router.push('/protected/church/dashboard');
     };
 
-    data && handleResult();
+    handleAuthentication();
   }, [success, data]);
 
   const handleChange = (e) => {
@@ -67,26 +70,25 @@ const CheckOut = () => {
       setValidationError(validationResult.errors);
       return;
     }
-
-    const customerResult = await handleNewCustomer({ email: fields.email });
-    if (customerResult) {
-      const subscriptionResult = await handleNewSubscriber({
-        customerId: customerResult.id,
-        priceId,
-        contact: `${fields.first_name} ${fields.last_name}`,
-        email: fields.email
-      });
-
-      if (subscriptionResult) {
-        setFields((prevFields) => ({
-          ...prevFields,
-          priceId: priceId,
-          plan: pricing?.planName,
-          stripeCustomerId: customerResult.id,
-          subscriptionId: subscriptionResult.subscriptionId
-        }));
-      }
+  
+    if(fields.subscriptionId) {
+      setAlreadySubscribed(true);
+      return;
     }
+
+    const subscriptionResult = await handleNewSubscriber({
+      priceId,
+      contact: `${fields.first_name} ${fields.last_name}`,
+      email: fields.email
+    });
+
+    setFields((prev) => ({
+      ...prev,
+      priceId: priceId,
+      plan: pricing?.planName,
+      stripeCustomerId: subscriptionResult?.customerId,
+      subscriptionId: subscriptionResult.subscriptionId
+    }));
   };
 
   const handleClose = () => {
@@ -134,11 +136,11 @@ const CheckOut = () => {
                           onChange={handleChange}
                         />
                         <label htmlFor="name" className="text-dark">
-                          Company *
+                          Church name *
                         </label>
                       </div>
                       {validationError.name?.message && (
-                        <span className="text-danger ps-2 fs-12">Company is required.</span>
+                        <span className="text-danger ps-2 fs-12">Church name is required.</span>
                       )}
                     </div>
                     <div className="col-md-6">
@@ -225,10 +227,12 @@ const CheckOut = () => {
                     </div>
                   </div>
                   <CheckoutPage
+                    alreadySubscribed={alreadySubscribed && subscription}
                     handleError={handleError}
                     subscription={subscription}
                     handleSuccess={handleSuccess}
                     fields={fields}
+                    reset={() => setAlreadySubscribed(false)}
                   />
                   <div className="form-check mb-3 mt-3">
                     <input

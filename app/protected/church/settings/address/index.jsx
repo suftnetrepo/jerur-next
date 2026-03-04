@@ -46,7 +46,7 @@ const AddressForm = ({ address }) => {
         <Form>
              <div className="row col-md-6">
                 <div className="col-md-12 mt-2">
-                    <FindAddress handleSelectedAddress={handleSelectedAddress} />
+                    <FindAddress addressStatus={fields?.completeAddress ? false : true} handleSelectedAddress={handleSelectedAddress} />
                 </div>
                 {fields?.completeAddress && <span className='text-dark fs-15 p-4'>{fields.completeAddress}</span>}
             </div>
@@ -145,7 +145,7 @@ const AddressForm = ({ address }) => {
             )}
 
             {
-                address && (
+                (fields?.completeAddress || address) && (
                     <div className="d-flex justify-content-start">
                         <Button type="button" variant="primary" onClick={() => handleSubmit()}>
                             Save Changes

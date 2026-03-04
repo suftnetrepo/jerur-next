@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Card } from 'react-bootstrap';
+import { Card, Spinner } from 'react-bootstrap';
 import { getDashboardAggregateValue } from '../../../../utils/helpers';
 import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
 import { TotalInvested, NumberofInvested, Portfoliovalue, Returnsrate, UserAggregates } from '../../../share/chart';
@@ -14,8 +14,6 @@ const Dashboard = () => {
   useEffect(() => {
     handleDashboardAggregates();
   }, []);
-
-  console.log('Aggregate Data:', trentData, chartData);
 
   return (
     <>
@@ -131,17 +129,22 @@ const Dashboard = () => {
       <div className="row mt-4">
         <div className="col-lg-7 mb-4">
           <Card className="h-100 py-5 px-5">
-             <AttendanceChart data={trentData} loading={loading} />
+            <AttendanceChart data={trentData} loading={loading} />
           </Card>
-        
+
         </div>
 
         <div className="col-lg-5 mb-4">
           <Card className="h-100">
             <Card.Body className="d-flex justify-content-center align-items-center">
-              {Array.isArray(chartData) && (
-                <UserAggregates data={chartData} />
-              )}
+              {loading ? (
+                <div className="d-flex justify-content-center align-items-center h-100">
+                  <Spinner animation="border" />
+                </div>) : (<>
+                  {Array.isArray(chartData) && (
+                    <UserAggregates data={chartData} />
+                  )}
+                </>)}
             </Card.Body>
           </Card>
         </div>
