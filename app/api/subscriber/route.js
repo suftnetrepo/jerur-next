@@ -8,6 +8,7 @@ mongoConnect();
 export async function POST(req) {
   try {
     const body = await req.json();
+    console.log('Received body:', body); // Debug log to check the received data
     const church = await createChurch({ ...body, status: 'inactive' });
     
     const userPayload = {
@@ -23,9 +24,10 @@ export async function POST(req) {
     
     return response;
   } catch (err) {
+    console.error(err);
     return NextResponse.json(
       {
-        error: null
+        error: err.message
       },
       { status: 400 }
     );
