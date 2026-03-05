@@ -25,6 +25,7 @@
     "@getbrevo/brevo": "^3.0.1",
     "@mui/material": "^6.0.1",
     "@mui/x-date-pickers": "^7.23.2",
+    "@playwright/test": "^1.58.2",
     "@popperjs/core": "^2.11.5",
     "@react-email/components": "^0.0.32",
     "@react-email/render": "^1.0.4",
