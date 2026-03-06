@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Container, Row, Col, Card, Button, Badge, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faHome,
@@ -15,7 +15,7 @@ import { useSubscriber } from '../../../hooks/useSubscriber';
 
 const PASSWORD = '12345!';
 
-export default function CheckoutSuccess() {
+function CheckoutSuccess() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { handleVerifySubscriptionStatus } = useSubscriber();
@@ -176,4 +176,12 @@ export default function CheckoutSuccess() {
             </Container>
         </div>
     );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutSuccess />
+    </Suspense>
+  );
 }
