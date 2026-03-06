@@ -419,8 +419,25 @@ async function updateChurchStatus(stripeCustomerId, body) {
     throw new Error('Error updating church status');
   }
 }
+async function getVerifySubscriptionStatus(id) {
+  try {
+
+    const result = await Church.findOne({
+      stripeCustomerId: id
+    }).select('status').lean();
+
+    return {
+      active: result && result.status === 'active'
+    };
+
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Error fetching church');
+  }
+}
 
 export {
+  getVerifySubscriptionStatus,
   getAggregateChurchStatus,
   getRecentChurches,
   getChurches,
