@@ -42,7 +42,7 @@ const CheckOut = () => {
 
 
   const handleCheckout = async (clientSecret, userPayload) => {
-    if (!stripe || !elements || !clientSecret) return;
+    if (!stripe || !elements || !clientSecret) return false;
 
     const { error, paymentIntent } = await stripe.confirmCardPayment(
       clientSecret,
@@ -59,9 +59,8 @@ const CheckOut = () => {
       cardElement?.clear();
       return false;
     }
-    
+
     if (paymentIntent?.status === 'requires_payment_method') {
-      // Allow retry
       return false;
     }
 
@@ -77,20 +76,7 @@ const CheckOut = () => {
         userCreatedRef.current = true;
       }
 
-      const loginResult = await signIn('credentials', {
-        redirect: false,
-        email: userPayload.email,
-        csrfToken,
-        password: PASSWORD
-      });
-
-      if (loginResult?.error) {
-        handleError('Login failed after payment');
-        return false;
-      }
-
-      await new Promise(r => setTimeout(r, 300));
-      router.replace('/protected/church/dashboard');
+      router.replace(`/checkout/success?stripeCustomerId=${userPayload?.stripeCustomerId}&email=${fields.email}&plan=${pricing?.planName}&amount=${pricing?.currency}${pricing?.raw_price}`);
       return true;
     }
 
@@ -119,22 +105,24 @@ const CheckOut = () => {
       return;
     }
 
-    const subscriptionResult = await handleNewSubscriber({
+    handleNewSubscriber({
       priceId,
       contact: `${fields.first_name} ${fields.last_name}`,
       email: fields.email
+    }).then((subscriptionResult) => {
+      if (subscriptionResult) {
+        const fullFields = {
+          ...fields,
+          priceId,
+          stripeCustomerId: subscriptionResult.customerId,
+          subscriptionId: subscriptionResult.subscriptionId
+        };
+
+        setClientSecret(subscriptionResult.clientSecret);
+        setEnrichedFields(fullFields);
+        handleCheckout(subscriptionResult.clientSecret, fullFields).catch(() => { });
+      }
     });
-
-    const fullFields = {
-      ...fields,
-      priceId,
-      stripeCustomerId: subscriptionResult.customerId,
-      subscriptionId: subscriptionResult.subscriptionId
-    };
-
-    setClientSecret(subscriptionResult.clientSecret);
-    setEnrichedFields(fullFields);
-    await handleCheckout(subscriptionResult.clientSecret, fullFields);
   };
 
   const handleClose = () => {

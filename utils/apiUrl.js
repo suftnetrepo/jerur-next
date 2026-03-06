@@ -80,6 +80,7 @@ export const CHURCH_DASHBOARD = {
 };
 
 export const STRIPE = {
+  verifySubscriptionStatus: `${HOST}stripe/subscriber/status`,
   createCustomer: `${HOST}stripe/customer`,
   createSubscriber: `${HOST}stripe/subscriber`,
   createCustomerPortalSession: `${HOST}stripe/customerPortal`
