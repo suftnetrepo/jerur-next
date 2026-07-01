@@ -14,7 +14,7 @@ const Features: FC<PricingProps> = ({show = true}) => {
           <div className="row text-center">
             <div className="col-md-10 col-lg-9 col-xxl-8 mx-auto">
               <h2 className="fs-15 text-uppercase text-muted mb-3">What We Do?</h2>
-              <h3 className="display-3 ls-sm mb-9 px-xl-11">
+              <h3 className="display-6 ls-sm mb-9 px-xl-11">
               Built for your church, made with care because every detail matters.
               </h3>
             </div>

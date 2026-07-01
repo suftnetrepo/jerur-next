@@ -20,7 +20,7 @@ const Page: NextPage = () => {
           navOtherClass="navbar-other ms-lg-4"
           navClassName="navbar navbar-expand-lg classic transparent navbar-light"
           button={
-            <Link href="/login" className="btn btn-sm text-white bg__purple rounded-pill">
+            <Link href="/login" className="btn btn-sm text-white btn-primary rounded-pill">
               Sign In
             </Link>
           }

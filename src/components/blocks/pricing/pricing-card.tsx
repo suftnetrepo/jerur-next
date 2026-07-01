@@ -48,7 +48,7 @@ const PricingCard: FC<PricingCardProps> = (props) => {
           <NextLink
             href={`/checkout/${priceId}`}
             title="Choose Plan"
-            className={`text-white btn text-white bg__purple ${roundedButton ? 'rounded' : 'rounded-pill'}`}
+            className={`text-white btn text-white btn-primary rounded-pill`}
           />
         </div>
       </div>

@@ -11,7 +11,7 @@ const LoadingButton = ({ loading, onClick, title = 'Sign In', disabled = false }
         <button
             type="button"
                 disabled={disabled}
-                className="btn text-white bg__purple rounded-pill btn-login w-100 mb-2"
+                className="btn text-white btn-primary rounded-pill btn-login w-100 mb-2"
             onClick={onClick}
         >
                 {title}

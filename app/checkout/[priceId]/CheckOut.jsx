@@ -25,33 +25,21 @@ const CheckOut = () => {
   const userCreatedRef = useRef(false);
   const [clientSecret, setClientSecret] = useState(null);
   const { priceId } = params;
-  const {
-    handleNewSubscriber,
-    handleErrorReset,
-    handleSuccess,
-    loading,
-    subscription,
-    handleError,
-    error,
-    pricing,
-  } = useSubscriber(priceId);
+  const { handleNewSubscriber, handleErrorReset, handleSuccess, loading, subscription, handleError, error, pricing } =
+    useSubscriber(priceId);
 
   useEffect(() => {
     getCsrfToken().then(setCsrfToken);
   }, []);
 
-
   const handleCheckout = async (clientSecret, userPayload) => {
     if (!stripe || !elements || !clientSecret) return false;
 
-    const { error, paymentIntent } = await stripe.confirmCardPayment(
-      clientSecret,
-      {
-        payment_method: {
-          card: elements.getElement(CardElement),
-        },
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement)
       }
-    );
+    });
 
     if (error) {
       handleError(error.message);
@@ -76,7 +64,9 @@ const CheckOut = () => {
         userCreatedRef.current = true;
       }
 
-      router.replace(`/checkout/success?stripeCustomerId=${userPayload?.stripeCustomerId}&email=${fields.email}&plan=${pricing?.planName}&amount=${pricing?.currency}${pricing?.raw_price}`);
+      router.replace(
+        `/checkout/success?stripeCustomerId=${userPayload?.stripeCustomerId}&email=${fields.email}&plan=${pricing?.planName}&amount=${pricing?.currency}${pricing?.raw_price}`
+      );
       return true;
     }
 
@@ -120,13 +110,13 @@ const CheckOut = () => {
 
         setClientSecret(subscriptionResult.clientSecret);
         setEnrichedFields(fullFields);
-        handleCheckout(subscriptionResult.clientSecret, fullFields).catch(() => { });
+        handleCheckout(subscriptionResult.clientSecret, fullFields).catch(() => {});
       }
     });
   };
 
   const handleClose = () => {
-    router.push('/');
+    router.push('/pricing');
   };
 
   return (
@@ -265,8 +255,7 @@ const CheckOut = () => {
                       )}
                     </div>
                   </div>
-                  <CheckoutForm
-                  />
+                  <CheckoutForm />
                   <div className="form-check mb-3 mt-3">
                     <input
                       type="checkbox"
@@ -292,7 +281,8 @@ const CheckOut = () => {
                   <div className="col-12 mt-3">
                     {loading ? (
                       <Button
-                        variant="primary"
+                        className="text-white btn-primary rounded-pill"
+                        size="sm"
                         onClick={() => handleSubmit()}
                         value={`Pay Now ${pricing?.currency}${pricing?.raw_price}`}
                       >
@@ -301,24 +291,22 @@ const CheckOut = () => {
                       </Button>
                     ) : (
                       <div className="col-12 mt-3 ms-1">
-                        <Button
-                          className="text-white rounded-pill"
-                          variant="primary"
+                        <button
+                          className="btn text-white btn-primary rounded-pill  mb-2"
                           size="sm"
                           disabled={!fields.terms}
                           data-testid="pay-button"
                           onClick={() => handleSubmit()}
                         >
                           {`Pay Now ${pricing?.currency}${pricing?.raw_price}`}
-                        </Button>
-                        <Button
-                          variant="secondary"
+                        </button>
+                        <button
+                          className="btn text-white btn-secondary rounded-pill btn-login  mb-2 ms-2"
                           size="sm"
-                          className="ms-2 text-white rounded-pill"
                           onClick={() => handleClose()}
                         >
                           Close
-                        </Button>
+                        </button>
                       </div>
                     )}
                   </div>

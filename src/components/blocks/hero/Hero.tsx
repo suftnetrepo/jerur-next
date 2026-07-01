@@ -32,19 +32,75 @@ const Hero: FC = () => {
               Connect members, manage events, and keep your church thriving—anytime, anywhere, on any device.
             </p>
 
-            <div className="d-flex justify-content-start align-items-center">
-              <span style={slideInDownAnimate('1200ms')}>
-                <NextLink title="Get Started" href="/pricing" className="btn btn-lg btn-primary rounded me-2" />
-              </span>
+            <div className="d-flex flex-wrap gap-3 mb-5" style={slideInDownAnimate('1000ms')}>
+              <NextLink title="Get Started" href="/pricing" className="btn btn-primary btn-lg px-5 rounded-pill" />
+
+              <NextLink title="Watch Demo" href="#" className="btn btn-outline-dark btn-lg px-5 rounded-pill" />
+            </div>
+            <div className="d-flex align-items-left" style={slideInDownAnimate('1200ms')}>
+             
+
+              <div className="ms-0">
+                <div className="fw-bold">
+                  Trusted by <span className="text-primary">500+</span> Churches
+                </div>
+
+                <small className="text-muted">Growing ministry communities worldwide</small>
+              </div>
             </div>
           </div>
 
-          <div className="col-lg-7">
+          <div className="col-lg-7 position-relative mt-5 mt-lg-0">
+            {/* Church image */}
+
             <div
-              className="col-12 col-lg-12 d-flex justify-content-end align-items-center"
-              style={zoomInAnimate('3ms')}
+              className="position-absolute"
+              style={{
+                top: -40,
+                right: -20,
+                width: '70%',
+                zIndex: 1
+              }}
             >
-              <img className=" img-fluid " src="/img/photos/sa16.jpg" srcSet="/img/hero/right_image.png" alt="demo" />
+              <img
+                src="/img/hero/hero.avif"
+                className="img-fluid rounded-5 shadow"
+                alt=""
+              />
+            </div>
+
+            {/* Laptop */}
+
+            <div
+              className="position-relative"
+              style={{
+                zIndex: 2,
+                ...zoomInAnimate('300ms')
+              }}
+            >
+              <img
+                src="/img/hero/hero_2.png"
+                className="img-fluid rounded-5 shadow-lg"
+                alt=""
+              />
+            </div>
+
+            {/* Phone */}
+
+            <div
+              className="position-absolute"
+              style={{
+                right: 40,
+                bottom: -30,
+                width: 180,
+                zIndex: 3
+              }}
+            >
+              <img
+                src="/img/hero/hero_3.png"
+                className="img-fluid rounded-5 shadow-lg"
+                alt=""
+              />
             </div>
           </div>
         </div>

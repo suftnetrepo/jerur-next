@@ -16,7 +16,7 @@ const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
     if (typeof window === undefined) return;
 
     // Change the color and font based on route
-    changeTheme(pathname);
+    changeTheme('/demo-8');
 
     // Hide loader
     // If you don't want loader remove <div className="page-loader" /> element form _app.tsx
