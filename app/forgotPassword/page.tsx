@@ -27,7 +27,7 @@ const ForgotPassword: NextPage = () => {
                   <div className="row gx-0 text-center">
                     <div
                       className="col-lg-6 image-wrapper bg-image bg-cover rounded-top rounded-lg-start d-none d-md-block"
-                      style={{ backgroundImage: 'url(/img/photos/tm3.jpg)' }}
+                      style={{ backgroundImage: 'url(/img/photos/tm3.png)' }}
                     />
 
                     <div className="col-lg-6">
