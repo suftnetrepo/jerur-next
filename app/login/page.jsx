@@ -26,11 +26,11 @@ const Login = () => {
                 <div className="card shadow-lg">
                   <div className="row gx-0 text-center">
                     <div
-                      className="col-lg-6 image-wrapper bg-image bg-cover rounded-top rounded-lg-start d-none d-md-block"
-                      style={{ backgroundImage: 'url(/img/photos/tm3.jpg)' }}
+                      className="col-lg-7 image-wrapper bg-image bg-cover rounded-top rounded-lg-start d-none d-md-block"
+                      style={{ backgroundImage: 'url(/img/photos/tm3.png)' }}
                     />
 
-                    <div className="col-lg-6">
+                    <div className="col-lg-5">
                       <div className="p-10 p-md-11 p-lg-13">
                         <LoginForm />
                       </div>
