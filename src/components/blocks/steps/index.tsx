@@ -11,7 +11,7 @@ const Steps: FC = () => {
       <div className="row gx-lg-8 gx-xl-12 gy-10 align-items-center">
         <div className="col-md-6 col-lg-6 mt-lg-n2 text-center text-lg-start order-2 order-lg-0">
           <figure className="rounded">
-            <img className=" img-fluid " src="/img/photos/sa24.png" srcSet="/img/photos/sa24.png" alt="demo" />
+            <img className=" img-fluid " src="/img/svg/onboarding-illustration.svg" srcSet="/img/svg/onboarding-illustration.svg" alt="onboarding illustration" />
           </figure>
         </div>
 

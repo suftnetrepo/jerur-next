@@ -31,7 +31,7 @@ const Navbar: FC<NavbarProps> = (props) => {
       <div className="navbar-brand w-100">
         <NextLink
           href="/"
-          title={<img alt="logo" src={`/img/logo_1.png`} srcSet={`/img/logo_1.png`} className="img-fluids" />}
+          title={<img alt="logo" src={`/img/logo.png`} srcSet={`/img/logo.png`} className="img-fluids" />}
         />
       </div>
 

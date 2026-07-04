@@ -9,9 +9,7 @@ const AboutUs: NextPage = () => {
           <div className="container py-14 py-md-16">
             <div className="row gx-md-8 gx-xl-12 gy-6 align-items-center">
               <div className="col-md-8 col-lg-5 order-lg-2 mx-auto">
-                <div className="img-mask mask-2">
-                  <Image width={1000} height={850} src="/img/photos/sa23.png" alt="" />
-                </div>
+                <img  src="/img/photos/sa23.png"  srcSet="/img/photos/sa23@2x.png 2x" alt="" />
               </div>
 
               <div className="col-lg-7">
