@@ -1,14 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental: {
-    esmExternals: false,
-    middleware: {
-      // Use the Node.js runtime for middleware
-      runtime: 'nodejs'
-    },
-    serverComponentsExternalPackages: ['mongoose', 'mongodb', 'mjml', 'bunyan'],
-    serverExternalPackages: ['mjml', 'bunyan']
-  },
+  // ✅ Moved out of experimental (Next.js 15)
+  serverExternalPackages: ['mongoose', 'mongodb', 'mjml', 'bunyan'],
 
   eslint: {
     ignoreDuringBuilds: true
@@ -50,16 +43,13 @@ const nextConfig = {
       };
     }
 
-    // Exclude optional native bunyan dependencies that aren't available on all platforms
     config.externals = config.externals || [];
     if (isServer) {
       config.externals.push('source-map-support', 'dtrace-provider');
     }
 
-    // Ignore fastest-validator critical dependency warnings
     config.module.exprContextCritical = false;
 
-    // Suppress SCSS deprecation warnings
     config.ignoreWarnings = [
       ...(config.ignoreWarnings || []),
       /Deprecation/,
