@@ -36,9 +36,13 @@ test.describe('SaaS Subscription Journey', () => {
         await stripeFrame.locator('input[name="exp-date"]').fill('12 / 34');
         await stripeFrame.locator('input[name="cvc"]').fill('123');
 
-        // 5️⃣ Wait for redirect to dashboard
+        // 5️⃣ The app redirects to a success page first, then to dashboard
+        await page.waitForURL('**/checkout/success**', {
+            timeout: 30000
+        });
+
         await page.waitForURL('**/protected/church/dashboard', {
-            timeout: 20000
+            timeout: 30000
         });
 
         await expect(page).toHaveURL(/dashboard/);
@@ -84,6 +88,7 @@ test.describe('SaaS Subscription Journey', () => {
     });
 
     test('User can retry payment with same clientSecret after failure', async ({ page }) => {
+        test.setTimeout(90000);
 
         await page.goto('http://localhost:3000/checkout/price_1HDVRhJ9QQF7JMlNSdnkB7l4');
 
@@ -115,25 +120,21 @@ test.describe('SaaS Subscription Journey', () => {
         // Wait for modal gone
         await page.waitForSelector('text=Your card has insufficient funds', { state: 'detached' });
 
-        // Re-enter card details FIRST
+        // Re-enter card details using the same stable fill flow as the other tests
         const retryFrame = page.frameLocator(
             'iframe[title="Secure card payment input frame"]'
         );
 
-        // Clear & retype card
-        await retryFrame.locator('input[name="cardnumber"]').click();
-        await retryFrame.locator('input[name="cardnumber"]').pressSequentially('4242424242424242', { delay: 40 });
-
-        await retryFrame.locator('input[name="exp-date"]').click();
-        await retryFrame.locator('input[name="exp-date"]').pressSequentially('1234', { delay: 40 });
-
-        await retryFrame.locator('input[name="cvc"]').click();
-        await retryFrame.locator('input[name="cvc"]').pressSequentially('123', { delay: 40 });
+        await retryFrame.locator('input[name="cardnumber"]').fill('4242424242424242');
+        await retryFrame.locator('input[name="exp-date"]').fill('12 / 34');
+        await retryFrame.locator('input[name="cvc"]').fill('123');
 
         // 🔥 Now click Pay
         await page.getByTestId('pay-button').click();
 
-        // Wait for redirect
+        // The retry flow also passes through the success page before dashboard
+        await page.waitForURL('**/checkout/success**', { timeout: 30000 });
+
         await page.waitForURL('**/protected/church/dashboard', { timeout: 30000 });
 
         await expect(page).toHaveURL(/dashboard/);

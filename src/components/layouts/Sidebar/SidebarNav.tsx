@@ -8,7 +8,8 @@ import {
   faDonate,
   faLocation,
   faUsers,
-  faFileImage
+  faFileImage,
+  faClipboardList
 } from '@fortawesome/free-solid-svg-icons';
 import {} from 'react-icons/ti';
 import React from 'react';
@@ -41,6 +42,12 @@ const ChurchSidebarNav = () => {
       </SidebarNavItem>
       <SidebarNavItem icon={faUsers} href="/protected/church/members">
         Members
+      </SidebarNavItem>
+      <SidebarNavItem icon={faClipboardList} href="/protected/church/attendance">
+        Attendance
+      </SidebarNavItem>
+      <SidebarNavItem icon={faClipboardList} href="/protected/church/pastoral-care">
+        Pastoral Care
       </SidebarNavItem>
       <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-services">
        Services

@@ -27,30 +27,78 @@ const dayToNumber = {
   Saturday: 6
 };
 
-export async function GET() {
+export async function GET(req) {
   try {
-    await clearSeeds();
-    await seedDatabase();
-    return NextResponse.json({ message: 'Database cleared and seeded successfully' }, { status: 200 });
+    const url = new URL(req.url);
+    const churchEmail = url.searchParams.get('churchEmail')?.trim();
+    const churchName = url.searchParams.get('churchName')?.trim();
+
+    const targetChurches = await resolveTargetChurches({ churchEmail, churchName });
+
+    await clearSeeds(targetChurches);
+    const summary = await seedDatabase(targetChurches);
+
+    return NextResponse.json(
+      {
+        message: 'Database cleared and seeded successfully',
+        success: true,
+        churches: targetChurches.map((church) => ({
+          id: church._id,
+          name: church.name,
+          email: church.email
+        })),
+        summary
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error in clearing or seeding database:', error);
-    return NextResponse.json({ message: 'Failed to clear or seed database', error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Failed to clear or seed database', success: false, error: error.message },
+      { status: 500 }
+    );
   }
 }
 
-const clearSeeds = async () => {
+const resolveTargetChurches = async ({ churchEmail, churchName }) => {
+  const filters = [];
+
+  if (churchEmail) {
+    filters.push({ email: new RegExp(`^${churchEmail}$`, 'i') });
+  }
+
+  if (churchName) {
+    filters.push({ name: new RegExp(`^${churchName}$`, 'i') });
+  }
+
+  if (filters.length === 0) {
+    throw new Error('Provide churchEmail or churchName to seed a church');
+  }
+
+  const churches = await Church.find({
+    $or: filters
+  }).select('_id name email');
+
+  if (!churches.length) {
+    throw new Error('No church found for the provided churchEmail or churchName');
+  }
+
+  return churches;
+};
+
+const clearSeeds = async (churches) => {
   try {
-    // await Church.deleteMany({});
-    // await User.deleteMany({});
-    await Campaign.deleteMany({});
-    await Attendance.deleteMany({});
-    await Donation.deleteMany({});
-    await Event.deleteMany({});
-    await Fellowship.deleteMany({});
-    await Member.deleteMany({});
-    await ServiceTime.deleteMany({});
-    await Testimonies.deleteMany({});
-    console.log('Existing seeds cleared');
+    const churchIds = churches.map((church) => church._id);
+
+    await Campaign.deleteMany({ suid: { $in: churchIds } });
+    await Attendance.deleteMany({ church: { $in: churchIds } });
+    await Donation.deleteMany({ suid: { $in: churchIds } });
+    await Event.deleteMany({ suid: { $in: churchIds } });
+    await Fellowship.deleteMany({ suid: { $in: churchIds } });
+    await Member.deleteMany({ church: { $in: churchIds } });
+    await ServiceTime.deleteMany({ suid: { $in: churchIds } });
+    await Testimonies.deleteMany({ church: { $in: churchIds } });
+    console.log('Existing targeted seeds cleared');
   } catch (error) {
     console.error('Error clearing seeds:', error);
     throw error;
@@ -415,11 +463,8 @@ const generateAttendanceForChurch = (churchId, serviceTimes, options = {}) => {
   return attendances;
 };
 
-const seedDatabase = async () => {
+const seedDatabase = async (savedChurches) => {
   try {
-    // const churches = Array.from({ length: 5 }, () => generateRandomChurch());
-    const savedChurches = [{ _id: '696b72e203ad97f1331f2976' }];
-
     // const users = (await Promise.all(savedChurches.map((church) => generateUsersForChurch(church._id)))).flat();
     // await User.insertMany(users);
 
@@ -474,6 +519,17 @@ const seedDatabase = async () => {
     }
 
     console.log('Database seeded successfully');
+
+    return {
+      serviceTimes: allServiceTimes.length,
+      events: events.length,
+      members: members.length,
+      fellowships: fellowships.length,
+      testimonies: testimonies.length,
+      campaigns: campaigns.length,
+      donations: donations.length,
+      attendances: attendances.length
+    };
   } catch (error) {
     console.error('Error seeding database:', error);
     throw error;

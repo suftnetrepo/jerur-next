@@ -33,11 +33,11 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 		},
 	)} id="sidebar">
 		<div className="sidebar-brand d-none d-md-flex align-items-center justify-content-center p-8">
-			<div className="sidebar-brand-full bg-white rounded-circle p-2 m-3">
-				<img src="/img/logo_1.png" alt="" height={100} width={100} className="img-fluid" />
+			<div className="sidebar-brand-full bg-white rounded p-2 m-3">
+				<img src="/img/logo.png" alt="" height={100} width={100} className="img-fluid" />
 			</div>
 			<div className="sidebar-brand-narrow d-none">
-				<img src="/img/logo_1.png" alt="" height={20} className="img-fluids" />
+				<img src="/img/logo.png" alt="" height={20} className="img-fluids" />
 			</div>
 		</div>
 

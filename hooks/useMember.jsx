@@ -74,6 +74,30 @@ const useMember = (searchQuery) => {
     }
   };
 
+  const handleFetchOne = useCallback(async (id) => {
+    if (!id) {
+      return false;
+    }
+
+    try {
+      const { data, success, errorMessage } = await zat(MEMBER.fetch, null, VERBS.GET, {
+        action: 'get',
+        id
+      });
+
+      if (success && data) {
+        handleSelect(data);
+        return true;
+      }
+
+      handleError(errorMessage || 'Failed to fetch member.');
+      return false;
+    } catch (error) {
+      handleError('An unexpected error occurred while fetching member.');
+      return false;
+    }
+  }, []);
+
   async function handleSave(body) {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     const { success, errorMessage, data } = await zat(MEMBER.createOne, body, VERBS.POST);
@@ -150,6 +174,7 @@ const useMember = (searchQuery) => {
     ...state,
     handleFetch,
     handleDelete,
+    handleFetchOne,
     handleSelect,
     handleEdit,
     handleSave,

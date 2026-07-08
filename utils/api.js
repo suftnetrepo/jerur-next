@@ -21,7 +21,8 @@ export const zat = async (url, body, method, queryParams = null) => {
     // Handle query parameters
     if (queryParams && (method === "GET" || method === "DELETE" || method === "PUT")) {
       const params = new URLSearchParams(queryParams);
-      url += `?${params.toString()}`;
+      const separator = url.includes('?') ? '&' : '?';
+      url += `${separator}${params.toString()}`;
     }
 
     // Set body

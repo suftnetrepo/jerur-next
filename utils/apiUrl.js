@@ -127,6 +127,7 @@ export const REGULAR_SERVICE = {
   updateOne: `${HOST}regularService`,
   fetchOne: `${HOST}regularService/`,
   fetch: `${HOST}regularService/`,
+  paginate: `${HOST}regularService?action=paginate`,
   removeOne: `${HOST}regularService/`
 };
 
@@ -214,4 +215,19 @@ export const PUSH_NOTIFICATION = {
 
 export const SEED_DATA = {
   fetch: `${HOST}seeds/`
+};
+
+export const ATTENDANCE = {
+  dashboard: `${HOST}attendance?action=dashboard`,
+  fetchByService: `${HOST}attendance?action=byService`,
+  getById: `${HOST}attendance?action=byId`,
+  getStatistics: `${HOST}attendance?action=statistics`,
+  create: `${HOST}attendance/create`
+};
+
+export const CARE_FOLLOW_UP = {
+  createOne: `${HOST}careFollowUp`,
+  fetch: `${HOST}careFollowUp`,
+  dashboard: `${HOST}careFollowUp?action=dashboard`,
+  updateOne: `${HOST}careFollowUp`
 };

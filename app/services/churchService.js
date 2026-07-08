@@ -410,7 +410,8 @@ async function updateChurchStatus(stripeCustomerId, body) {
     const updated = await Church.findOneAndUpdate({ stripeCustomerId: stripeCustomerId }, body, { new: true });
 
     if (!updated) {
-      throw new Error('Church not found or update failed');
+      logger.warn({ stripeCustomerId, body }, 'Church not found for status update');
+      return null;
     }
 
     return updated;

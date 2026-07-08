@@ -33,25 +33,34 @@ function CheckoutSuccess() {
     }, []);
 
     useEffect(() => {
-        if (!stripeCustomerId) return;
+        if (!stripeCustomerId || !email || !csrfToken) return;
 
         let retryCount = 0;
+        let isNavigating = false;
 
         const checkStatus = async () => {
             try {
                 const data = await handleVerifySubscriptionStatus(stripeCustomerId);
 
-                if (data.active) {
+                if (data.active && !isNavigating) {
+                    isNavigating = true;
                     setStatus('active');
 
-                    await signIn('credentials', {
+                    const loginResult = await signIn('credentials', {
                         redirect: false,
                         email,
                         password: PASSWORD,
                         csrfToken
                     });
 
-                    router.push('/protected/church/dashboard');
+                    if (loginResult?.error) {
+                        isNavigating = false;
+                        setStatus('failed');
+                        return;
+                    }
+
+                    window.location.assign('/protected/church/dashboard');
+                    return;
                 }
 
                 retryCount++;
@@ -67,7 +76,7 @@ function CheckoutSuccess() {
         const interval = setInterval(checkStatus, 2000);
         return () => clearInterval(interval);
 
-    }, [stripeCustomerId]);
+    }, [csrfToken, email, handleVerifySubscriptionStatus, stripeCustomerId]);
 
     return (
         <div

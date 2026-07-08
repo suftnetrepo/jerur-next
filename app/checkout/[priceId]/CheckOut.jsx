@@ -32,6 +32,22 @@ const CheckOut = () => {
     getCsrfToken().then(setCsrfToken);
   }, []);
 
+  const ensureSubscriberRecord = async (userPayload) => {
+    if (userCreatedRef.current) {
+      return true;
+    }
+
+    const userData = await handleSuccess(userPayload);
+
+    if (!userData) {
+      handleError('User creation failed.');
+      return false;
+    }
+
+    userCreatedRef.current = true;
+    return true;
+  };
+
   const handleCheckout = async (clientSecret, userPayload) => {
     if (!stripe || !elements || !clientSecret) return false;
 
@@ -53,17 +69,6 @@ const CheckOut = () => {
     }
 
     if (paymentIntent?.status === 'succeeded') {
-      if (!userCreatedRef.current) {
-        const userData = await handleSuccess(userPayload);
-
-        if (!userData) {
-          handleError('User creation failed.');
-          return false;
-        }
-
-        userCreatedRef.current = true;
-      }
-
       router.replace(
         `/checkout/success?stripeCustomerId=${userPayload?.stripeCustomerId}&email=${fields.email}&plan=${pricing?.planName}&amount=${pricing?.currency}${pricing?.raw_price}`
       );
@@ -99,7 +104,7 @@ const CheckOut = () => {
       priceId,
       contact: `${fields.first_name} ${fields.last_name}`,
       email: fields.email
-    }).then((subscriptionResult) => {
+    }).then(async (subscriptionResult) => {
       if (subscriptionResult) {
         const fullFields = {
           ...fields,
@@ -107,6 +112,12 @@ const CheckOut = () => {
           stripeCustomerId: subscriptionResult.customerId,
           subscriptionId: subscriptionResult.subscriptionId
         };
+
+        const subscriberCreated = await ensureSubscriberRecord(fullFields);
+
+        if (!subscriberCreated) {
+          return;
+        }
 
         setClientSecret(subscriptionResult.clientSecret);
         setEnrichedFields(fullFields);
@@ -283,6 +294,7 @@ const CheckOut = () => {
                       <Button
                         className="text-white btn-primary rounded-pill"
                         size="sm"
+                        type="button"
                         onClick={() => handleSubmit()}
                         value={`Pay Now ${pricing?.currency}${pricing?.raw_price}`}
                       >
@@ -292,6 +304,7 @@ const CheckOut = () => {
                     ) : (
                       <div className="col-12 mt-3 ms-1">
                         <button
+                          type="button"
                           className="btn text-white btn-primary rounded-pill  mb-2"
                           size="sm"
                           disabled={!fields.terms}
@@ -301,6 +314,7 @@ const CheckOut = () => {
                           {`Pay Now ${pricing?.currency}${pricing?.raw_price}`}
                         </button>
                         <button
+                          type="button"
                           className="btn text-white btn-secondary rounded-pill btn-login  mb-2 ms-2"
                           size="sm"
                           onClick={() => handleClose()}

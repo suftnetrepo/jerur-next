@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Table } from '../../../../src/components/elements/table/table';
 import { Button } from 'react-bootstrap';
 import { useMember } from '../../../../hooks/useMember';
@@ -16,6 +17,9 @@ import { capitalizeFirstLetter, getStatusStyle } from '../../../../utils/helpers
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [show, setShow] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const {
     data,
@@ -27,20 +31,39 @@ const Page = () => {
     handleFetch,
     handleDelete,
     handleEdit,
+    handleFetchOne,
     handleSave,
     handleReset,
     handleChange,
     handleSelect
   } = useMember(debouncedSearchQuery);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     handleReset();
     setShow(false);
-  };
-  const handleShow = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('memberId');
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  }, [handleReset, pathname, router, searchParams]);
+  const handleShow = useCallback(() => {
     handleReset();
     setShow(true);
-  };
+  }, [handleReset]);
+
+  useEffect(() => {
+    const memberId = searchParams.get('memberId');
+
+    if (!memberId) {
+      return;
+    }
+
+    handleFetchOne(memberId).then((result) => {
+      if (result) {
+        setShow(true);
+      }
+    });
+  }, [searchParams, handleFetchOne]);
 
   const columns = useMemo(
     () => [
@@ -103,7 +126,7 @@ const Page = () => {
         )
       }
     ],
-    []
+    [handleDelete, handleSelect, handleShow]
   );
 
   return (
