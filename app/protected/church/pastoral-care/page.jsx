@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { Badge, Button, Card, Form } from 'react-bootstrap';
+import { Badge, Button, Card, Form, Toast, ToastContainer } from 'react-bootstrap';
 import Tooltip from '@mui/material/Tooltip';
 import { TiEye } from 'react-icons/ti';
+import { BsHeartPulse, BsPersonCheck, BsTelephoneOutbound, BsCheck2Circle } from 'react-icons/bs';
 import { Table } from '../../../../src/components/elements/table/table';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
 import useDebounce from '../../../../hooks/useDebounce';
@@ -47,15 +48,16 @@ const priorityVariant = {
 };
 
 const dashboardCards = [
-  { key: 'openCases', label: 'Open Cases', filterType: 'status', filterValue: 'OPEN', tone: 'warning' },
-  { key: 'assignedToMe', label: 'Assigned To Me', filterType: 'assignedTo', filterValue: 'ME', tone: 'info' },
-  { key: 'contacted', label: 'Contacted', filterType: 'status', filterValue: 'CONTACTED', tone: 'primary' },
-  { key: 'closed', label: 'Closed', filterType: 'status', filterValue: 'CLOSED', tone: 'success' }
+  { key: 'openCases', label: 'Open Cases', filterType: 'status', filterValue: 'OPEN', tone: 'warning', icon: BsHeartPulse },
+  { key: 'assignedToMe', label: 'Assigned To Me', filterType: 'assignedTo', filterValue: 'ME', tone: 'info', icon: BsPersonCheck },
+  { key: 'contacted', label: 'Contacted', filterType: 'status', filterValue: 'CONTACTED', tone: 'primary', icon: BsTelephoneOutbound },
+  { key: 'closed', label: 'Closed', filterType: 'status', filterValue: 'CLOSED', tone: 'success', icon: BsCheck2Circle }
 ];
 
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDrawer, setShowDrawer] = useState(false);
+  const [toastState, setToastState] = useState({ show: false, message: '' });
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const {
     data,
@@ -102,21 +104,26 @@ const Page = () => {
     handleSelectAssignedTo(card.filterValue);
   }, [handleSelectAssignedTo, handleSelectStatus]);
 
-  const handleStatusUpdate = useCallback(async (status, note) => {
+  const handleSaveCase = useCallback(async (updates) => {
     if (!selectedCase?._id) {
-      return;
+      return false;
     }
 
-    await handleUpdateCase(selectedCase._id, { status, note });
-  }, [handleUpdateCase, selectedCase]);
+    const assignedToData = updates.assignedTo
+      ? owners.find((owner) => owner._id === updates.assignedTo) || null
+      : null;
 
-  const handleNotesUpdate = useCallback(async (note) => {
-    if (!selectedCase?._id) {
-      return;
+    const success = await handleUpdateCase(selectedCase._id, {
+      ...updates,
+      assignedToData
+    });
+
+    if (success) {
+      setToastState({ show: true, message: 'Pastoral care case updated successfully.' });
     }
 
-    await handleUpdateCase(selectedCase._id, { note });
-  }, [handleUpdateCase, selectedCase]);
+    return success;
+  }, [handleUpdateCase, owners, selectedCase]);
 
   const columns = useMemo(() => [
     {
@@ -181,11 +188,15 @@ const Page = () => {
                 <div className="col-sm-6 col-lg-3" key={card.key}>
                   <Card className="py-3 px-3 h-100 pointer" onClick={() => handleCardFilter(card)}>
                     <Card.Body>
+                      {(() => {
+                        const Icon = card.icon;
+
+                        return (
                       <div className="d-flex gap-3 flex-wrap align-items-top justify-content-between">
                         <div className="flex-fill d-flex align-items-top mb-4 mb-sm-0">
                           <div className="me-3">
                             <span className={`avatar avatar-rounded bg-${card.tone}`}>
-                              <i className="bi bi-boxes text-white fs-16"></i>
+                              <Icon className="text-white fs-16" />
                             </span>
                           </div>
                           <div>
@@ -194,6 +205,8 @@ const Page = () => {
                           </div>
                         </div>
                       </div>
+                        );
+                      })()}
                     </Card.Body>
                   </Card>
                 </div>
@@ -246,14 +259,19 @@ const Page = () => {
 
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
+      <ToastContainer position="bottom-end" className="p-3">
+        <Toast bg="success" show={toastState.show} onClose={() => setToastState({ show: false, message: '' })} autohide delay={2500}>
+          <Toast.Body className="text-white">{toastState.message}</Toast.Body>
+        </Toast>
+      </ToastContainer>
       <RenderCaseOffcanvas
         show={showDrawer}
         handleClose={handleCloseDrawer}
         caseData={selectedCase}
+        owners={owners}
         loading={detailsLoading}
         saving={saving}
-        handleStatusUpdate={handleStatusUpdate}
-        handleNotesUpdate={handleNotesUpdate}
+        handleSaveCase={handleSaveCase}
       />
     </>
   );

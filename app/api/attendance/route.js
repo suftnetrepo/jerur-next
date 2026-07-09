@@ -55,13 +55,17 @@ export const GET = async (req) => {
       const status = url.searchParams.get('status');
       const queue = url.searchParams.get('queue');
       const searchQuery = url.searchParams.get('searchQuery') || '';
+      const startDate = url.searchParams.get('startDate');
+      const endDate = url.searchParams.get('endDate');
 
       const result = await getAttendanceByService(serviceId, {
         page: parseInt(page),
         limit: parseInt(limit),
         status,
         queue,
-        searchQuery
+        searchQuery,
+        startDate,
+        endDate
       });
       return NextResponse.json({
         data: result.data,
@@ -73,7 +77,9 @@ export const GET = async (req) => {
 
     if (action === 'dashboard') {
       const serviceId = url.searchParams.get('serviceId');
-      const data = await getAttendanceDashboard(user.church, { serviceId });
+      const startDate = url.searchParams.get('startDate');
+      const endDate = url.searchParams.get('endDate');
+      const data = await getAttendanceDashboard(user.church, { serviceId, startDate, endDate });
       return NextResponse.json({ data, success: true });
     }
 

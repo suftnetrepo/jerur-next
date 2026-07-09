@@ -3,6 +3,40 @@ import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { CARE_FOLLOW_UP, USER } from '../utils/apiUrl';
 
+const getMemberName = (member) => `${member?.first_name || ''} ${member?.last_name || ''}`.trim().toLowerCase();
+
+const matchesSelectedFilters = ({ row, selectedStatus, selectedAssignedTo, selectedPriority, searchQuery, currentUserId }) => {
+  if (selectedStatus !== 'ALL' && row.status !== selectedStatus) {
+    return false;
+  }
+
+  if (selectedPriority !== 'ALL' && row.priority !== selectedPriority) {
+    return false;
+  }
+
+  if (selectedAssignedTo !== 'ALL') {
+    const assignedId = row.assignedTo?._id || row.assignedTo;
+    const expectedAssignedId = selectedAssignedTo === 'ME' ? currentUserId : selectedAssignedTo;
+
+    if (!expectedAssignedId || assignedId !== expectedAssignedId) {
+      return false;
+    }
+  }
+
+  if (searchQuery?.trim()) {
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+    const memberName = getMemberName(row.memberId);
+    const memberEmail = String(row.memberId?.email || '').toLowerCase();
+    const memberMobile = String(row.memberId?.mobile || '').toLowerCase();
+
+    if (![memberName, memberEmail, memberMobile].some((value) => value.includes(normalizedSearch))) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 const usePastoralCare = (searchQuery) => {
   const [state, setState] = useState({
     data: [],
@@ -130,20 +164,62 @@ const usePastoralCare = (searchQuery) => {
     setState((prev) => ({ ...prev, saving: true, error: null }));
 
     try {
-      const { success, errorMessage } = await zat(CARE_FOLLOW_UP.updateOne, updates, VERBS.PUT, { id });
+      const { assignedToData, ...requestUpdates } = updates;
+      const { success, errorMessage } = await zat(CARE_FOLLOW_UP.updateOne, requestUpdates, VERBS.PUT, { id });
 
       if (success) {
-        await Promise.all([
-          handleFetchCase(id),
-          handleFetchDashboard(),
-          handleFetch({
-            pageIndex: state.tableQuery.pageIndex,
-            pageSize: state.tableQuery.pageSize,
-            sortBy: state.tableQuery.sortBy
-          })
-        ]);
+        setState((prev) => {
+          const selectedCaseDraft = prev.selectedCase?._id === id
+            ? {
+                ...prev.selectedCase,
+                ...requestUpdates,
+                assignedTo: assignedToData !== undefined ? assignedToData : prev.selectedCase.assignedTo
+              }
+            : prev.selectedCase;
 
-        setState((prev) => ({ ...prev, saving: false }));
+          const updatedRow = prev.data.find((row) => row._id === id)
+            ? {
+                ...prev.data.find((row) => row._id === id),
+                ...requestUpdates,
+                assignedTo: assignedToData !== undefined ? assignedToData : prev.data.find((row) => row._id === id).assignedTo,
+                updatedAt: new Date().toISOString()
+              }
+            : null;
+
+          const nextData = updatedRow
+            ? prev.data.reduce((rows, row) => {
+                if (row._id !== id) {
+                  rows.push(row);
+                  return rows;
+                }
+
+                if (matchesSelectedFilters({
+                  row: updatedRow,
+                  selectedStatus: prev.selectedStatus,
+                  selectedAssignedTo: prev.selectedAssignedTo,
+                  selectedPriority: prev.selectedPriority,
+                  searchQuery,
+                  currentUserId: prev.dashboard?.currentUserId
+                })) {
+                  rows.push(updatedRow);
+                }
+
+                return rows;
+              }, [])
+            : prev.data;
+
+          return {
+            ...prev,
+            selectedCase: selectedCaseDraft,
+            data: nextData,
+            totalCount: updatedRow && !nextData.find((row) => row._id === id)
+              ? Math.max(0, prev.totalCount - 1)
+              : prev.totalCount,
+            saving: false
+          };
+        });
+
+        handleFetchDashboard();
         return true;
       }
 
@@ -153,7 +229,7 @@ const usePastoralCare = (searchQuery) => {
       handleError('An unexpected error occurred while updating pastoral care case.');
       return false;
     }
-  }, [handleFetch, handleFetchCase, handleFetchDashboard, state.tableQuery.pageIndex, state.tableQuery.pageSize, state.tableQuery.sortBy]);
+  }, [handleFetchDashboard, searchQuery]);
 
   const handleSelectStatus = useCallback((status) => {
     setState((prev) => ({

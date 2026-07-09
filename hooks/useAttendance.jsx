@@ -3,6 +3,55 @@ import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { ATTENDANCE, REGULAR_SERVICE, CARE_FOLLOW_UP, USER } from '../utils/apiUrl';
 
+const FILTER_STORAGE_KEY = 'attendanceDashboardFilters';
+
+const getLastSundayDateString = () => {
+  const currentDate = new Date();
+  const result = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+  const day = result.getDay();
+
+  result.setDate(result.getDate() - day);
+
+  const year = result.getFullYear();
+  const month = `${result.getMonth() + 1}`.padStart(2, '0');
+  const date = `${result.getDate()}`.padStart(2, '0');
+
+  return `${year}-${month}-${date}`;
+};
+
+const getStoredFilters = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const rawFilters = window.localStorage.getItem(FILTER_STORAGE_KEY);
+    return rawFilters ? JSON.parse(rawFilters) : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+const buildDateRange = (selectedDate) => {
+  if (!selectedDate) {
+    return {};
+  }
+
+  const [year, month, day] = selectedDate.split('-').map(Number);
+
+  if (!year || !month || !day) {
+    return {};
+  }
+
+  const startDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+  const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
+
+  return {
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString()
+  };
+};
+
 const STATUS_FILTERS = [
   'PRESENT_IN_CHURCH',
   'JOINED_ONLINE',
@@ -16,6 +65,7 @@ const STATUS_FILTERS = [
 ];
 
 const useAttendance = (searchQuery = '') => {
+  const storedFilters = getStoredFilters();
   const [state, setState] = useState({
     attendanceData: [],
     services: [],
@@ -23,8 +73,9 @@ const useAttendance = (searchQuery = '') => {
     loading: false,
     error: null,
     totalCount: 0,
-    selectedService: null,
-    selectedQueue: 'ALL',
+    selectedService: storedFilters?.selectedService || null,
+    selectedDate: storedFilters?.selectedDate || getLastSundayDateString(),
+    selectedQueue: storedFilters?.selectedQueue || 'ALL',
     statistics: null,
     dashboard: null,
     tableQuery: {
@@ -52,7 +103,9 @@ const useAttendance = (searchQuery = '') => {
         setState((prev) => ({
           ...prev,
           services: data || [],
-          selectedService: prev.selectedService || data?.[0]?._id || null
+          selectedService: data.some((service) => service._id === prev.selectedService)
+            ? prev.selectedService
+            : data?.[0]?._id || null
         }));
       } else {
         console.warn('Failed to fetch services:', errorMessage);
@@ -89,11 +142,13 @@ const useAttendance = (searchQuery = '') => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
+      const dateRange = buildDateRange(state.selectedDate || getLastSundayDateString());
       const params = {
         serviceId: state.selectedService,
         page: pageIndex === 0 ? 1 : pageIndex,
         limit: pageSize,
-        searchQuery
+        searchQuery,
+        ...dateRange
       };
 
       if (state.selectedQueue !== 'ALL') {
@@ -132,13 +187,15 @@ const useAttendance = (searchQuery = '') => {
       handleError('An unexpected error occurred while fetching attendance.');
       return false;
     }
-  }, [searchQuery, state.selectedService, state.selectedQueue]);
+  }, [searchQuery, state.selectedDate, state.selectedService, state.selectedQueue]);
 
-  const handleFetchStatistics = useCallback(async (serviceId) => {
+  const handleFetchStatistics = useCallback(async (serviceId, selectedDate = state.selectedDate) => {
     try {
+      const dateRange = buildDateRange(selectedDate || getLastSundayDateString());
       const { data, success } = await zat(ATTENDANCE.getStatistics, null, VERBS.GET, {
         action: 'statistics',
-        serviceId
+        serviceId,
+        ...dateRange
       });
 
       if (success) {
@@ -150,13 +207,15 @@ const useAttendance = (searchQuery = '') => {
     } catch (error) {
       console.warn('Error fetching statistics:', error);
     }
-  }, []);
+  }, [state.selectedDate]);
 
-  const handleFetchDashboard = useCallback(async (serviceId) => {
+  const handleFetchDashboard = useCallback(async (serviceId, selectedDate = state.selectedDate) => {
     try {
+      const dateRange = buildDateRange(selectedDate || getLastSundayDateString());
       const { data, success } = await zat(ATTENDANCE.dashboard, null, VERBS.GET, {
         action: 'dashboard',
-        ...(serviceId ? { serviceId } : {})
+        ...(serviceId ? { serviceId } : {}),
+        ...dateRange
       });
 
       if (success) {
@@ -170,7 +229,7 @@ const useAttendance = (searchQuery = '') => {
     } catch (error) {
       console.warn('Error fetching attendance dashboard:', error);
     }
-  }, []);
+  }, [state.selectedDate]);
 
   const handleCreateFollowUp = async (followUpData) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
@@ -185,8 +244,8 @@ const useAttendance = (searchQuery = '') => {
           sortBy: state.tableQuery.sortBy
         });
         await Promise.all([
-          handleFetchStatistics(state.selectedService),
-          handleFetchDashboard(state.selectedService)
+          handleFetchStatistics(state.selectedService, state.selectedDate),
+          handleFetchDashboard(state.selectedService, state.selectedDate)
         ]);
         setState((prev) => ({ ...prev, loading: false }));
         return true;
@@ -205,6 +264,18 @@ const useAttendance = (searchQuery = '') => {
       ...prev,
       selectedService: serviceId,
       selectedQueue: 'ALL',
+      tableQuery: {
+        pageIndex: 1,
+        pageSize: prev.tableQuery.pageSize,
+        sortBy: prev.tableQuery.sortBy
+      }
+    }));
+  };
+
+  const handleSelectDate = (selectedDate) => {
+    setState((prev) => ({
+      ...prev,
+      selectedDate: selectedDate || getLastSundayDateString(),
       tableQuery: {
         pageIndex: 1,
         pageSize: prev.tableQuery.pageSize,
@@ -232,10 +303,25 @@ const useAttendance = (searchQuery = '') => {
 
   useEffect(() => {
     if (state.selectedService) {
-      handleFetchDashboard(state.selectedService);
-      handleFetchStatistics(state.selectedService);
+      handleFetchDashboard(state.selectedService, state.selectedDate);
+      handleFetchStatistics(state.selectedService, state.selectedDate);
     }
-  }, [state.selectedQueue, state.selectedService, handleFetchDashboard, handleFetchStatistics]);
+  }, [state.selectedDate, state.selectedQueue, state.selectedService, handleFetchDashboard, handleFetchStatistics]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const existingFilters = getStoredFilters() || {};
+
+    window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify({
+      ...existingFilters,
+      selectedService: state.selectedService,
+      selectedDate: state.selectedDate,
+      selectedQueue: state.selectedQueue
+    }));
+  }, [state.selectedDate, state.selectedQueue, state.selectedService]);
 
   return {
     ...state,
@@ -243,6 +329,7 @@ const useAttendance = (searchQuery = '') => {
     handleFetchAssignableUsers,
     handleFetchAttendance,
     handleSelectService,
+    handleSelectDate,
     handleSelectQueue,
     handleCreateFollowUp,
     handleFetchStatistics,

@@ -124,8 +124,17 @@ const getAttentionCountFromStats = (stats) => {
     + (stats.pastorContactRequested || 0);
 };
 
-const getOpenCareCaseCountForService = async (serviceId) => {
-  const attendanceIds = await Attendance.find({ serviceId }).distinct('_id');
+const getOpenCareCaseCountForService = async (serviceId, options = {}) => {
+  const { startDate, endDate } = options;
+  const attendanceQuery = { serviceId };
+
+  if (startDate || endDate) {
+    attendanceQuery.submittedAt = {};
+    if (startDate) attendanceQuery.submittedAt.$gte = new Date(startDate);
+    if (endDate) attendanceQuery.submittedAt.$lte = new Date(endDate);
+  }
+
+  const attendanceIds = await Attendance.find(attendanceQuery).distinct('_id');
 
   if (!attendanceIds.length) {
     return 0;
@@ -139,7 +148,7 @@ const getOpenCareCaseCountForService = async (serviceId) => {
 
 const getAttendanceDashboard = async (churchId, options = {}) => {
   try {
-    const { serviceId } = options;
+    const { serviceId, startDate, endDate } = options;
     const [expectedMembers, services] = await Promise.all([
       Member.countDocuments({
         church: churchId,
@@ -150,15 +159,15 @@ const getAttendanceDashboard = async (churchId, options = {}) => {
 
     const activeServiceId = serviceId || services[0]?._id?.toString() || null;
     const stats = activeServiceId
-      ? await getAttendanceStatistics(churchId, { serviceId: activeServiceId })
-      : await getAttendanceStatistics(churchId, {});
+      ? await getAttendanceStatistics(churchId, { serviceId: activeServiceId, startDate, endDate })
+      : await getAttendanceStatistics(churchId, { startDate, endDate });
 
     const [openCareCases, serviceCards] = await Promise.all([
-      activeServiceId ? getOpenCareCaseCountForService(activeServiceId) : Promise.resolve(0),
+      activeServiceId ? getOpenCareCaseCountForService(activeServiceId, { startDate, endDate }) : Promise.resolve(0),
       Promise.all(
         services.map(async (service) => {
-          const serviceStats = await getAttendanceStatistics(churchId, { serviceId: service._id.toString() });
-          const serviceOpenCases = await getOpenCareCaseCountForService(service._id);
+          const serviceStats = await getAttendanceStatistics(churchId, { serviceId: service._id.toString(), startDate, endDate });
+          const serviceOpenCases = await getOpenCareCaseCountForService(service._id, { startDate, endDate });
           const submitted = serviceStats.totalSubmissions || 0;
           const attendanceRate = expectedMembers > 0
             ? Math.round((submitted / expectedMembers) * 100)
@@ -609,12 +618,17 @@ const getAttendanceById = async (attendanceId) => {
 
 const getAttendanceByService = async (serviceId, options = {}) => {
   try {
-    const { page = 1, limit = 10, status, queue, searchQuery } = options;
+    const { page = 1, limit = 10, status, queue, searchQuery, startDate, endDate } = options;
     const skip = (page - 1) * limit;
 
     const query = { serviceId: new mongoose.Types.ObjectId(serviceId) };
     if (status && !['ALL', 'ATTENTION_REQUIRED', 'OPEN_CARE_CASES', 'URGENT', 'NEEDS_CARE'].includes(status)) {
       query.status = status;
+    }
+    if (startDate || endDate) {
+      query.submittedAt = {};
+      if (startDate) query.submittedAt.$gte = new Date(startDate);
+      if (endDate) query.submittedAt.$lte = new Date(endDate);
     }
 
     const records = await Attendance.find(query)
