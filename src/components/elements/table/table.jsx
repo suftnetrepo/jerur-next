@@ -37,6 +37,10 @@ function Table({ data, columns, pageCount: controlledPageCount, fetchData, empty
 
   const hasRows = page.length > 0;
 
+  const resolveColumnClassName = (value) => (typeof value === 'string' ? value : undefined);
+
+  const resolveColumnStyle = (value) => (value && typeof value === 'object' ? value : undefined);
+
   return (
     <>
       <div className="table-responsive">
@@ -51,9 +55,11 @@ function Table({ data, columns, pageCount: controlledPageCount, fetchData, empty
                     const headerProps = column.getHeaderProps(column.getSortByToggleProps());
                     // Extract the key
                     const { key, ...restHeaderProps } = headerProps;
+                    const headerClassName = resolveColumnClassName(column.headerClassName);
+                    const headerStyle = resolveColumnStyle(column.headerClassName);
                     
                     return (
-                      <th key={key} {...restHeaderProps}>
+                      <th key={key} {...restHeaderProps} className={headerClassName} style={headerStyle}>
                         {column.render('Header')}
                         <span>
                           {column.isSorted
@@ -78,8 +84,10 @@ function Table({ data, columns, pageCount: controlledPageCount, fetchData, empty
                   <tr key={rowProps.key} {...rowProps}>
                     {row.cells.map(cell => {
                       const cellProps = cell.getCellProps();
+                      const cellClassName = resolveColumnClassName(cell.column.className);
+                      const cellStyle = resolveColumnStyle(cell.column.className);
                       return (
-                        <td key={cellProps.key} {...cellProps}>
+                        <td key={cellProps.key} {...cellProps} className={cellClassName} style={cellStyle}>
                           {cell.render('Cell')}
                         </td>
                       );
@@ -95,6 +103,9 @@ function Table({ data, columns, pageCount: controlledPageCount, fetchData, empty
                     <div className="fw-semibold mb-1">{emptyState.title}</div>
                     {emptyState.description ? (
                       <div className="text-muted small">{emptyState.description}</div>
+                    ) : null}
+                    {emptyState.action ? (
+                      <div className="mt-3">{emptyState.action}</div>
                     ) : null}
                   </div>
                 </td>

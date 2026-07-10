@@ -4,8 +4,146 @@ import { donationValidator } from '../validation/donationValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import { logger } from '../../utils/logger';
 import { mongoConnect } from '../../utils/connectDb';
+import { DONATION_TYPE_VALUES } from '../../utils/donationConstants';
 
 mongoConnect();
+
+const DEFAULT_DONATION_SUMMARY = {
+  totalAmount: 0,
+  onlineAmount: 0,
+  offlineAmount: 0,
+  transactionCount: 0
+};
+
+const buildDonationObjectId = (value) => (value instanceof Types.ObjectId ? value : new Types.ObjectId(value));
+
+const escapeRegex = (value = '') => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const getStartOfDay = (value) => {
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
+const getEndOfDay = (value) => {
+  const date = new Date(value);
+  date.setHours(23, 59, 59, 999);
+  return date;
+};
+
+const buildDonationSearchFilter = (search) => {
+  if (!search) {
+    return {};
+  }
+
+  const trimmedSearch = String(search).trim();
+
+  if (!trimmedSearch) {
+    return {};
+  }
+
+  const regex = new RegExp(escapeRegex(trimmedSearch), 'i');
+
+  return {
+    $or: [
+      { donation_type: { $regex: regex } },
+      { first_name: { $regex: regex } },
+      { last_name: { $regex: regex } },
+      {
+        $expr: {
+          $regexMatch: {
+            input: {
+              $trim: {
+                input: {
+                  $concat: [
+                    { $ifNull: ['$first_name', ''] },
+                    ' ',
+                    { $ifNull: ['$last_name', ''] }
+                  ]
+                }
+              }
+            },
+            regex: escapeRegex(trimmedSearch),
+            options: 'i'
+          }
+        }
+      }
+    ]
+  };
+};
+
+const buildDonationQuery = ({
+  suid,
+  donationType,
+  donation_type,
+  startDate,
+  endDate,
+  paymentMethod,
+  search,
+  searchQuery
+}) => {
+  const query = {
+    suid: buildDonationObjectId(suid),
+    ...buildDonationSearchFilter(search || searchQuery)
+  };
+  const normalizedDonationType = donationType || donation_type;
+
+  if (normalizedDonationType && normalizedDonationType !== 'ALL' && DONATION_TYPE_VALUES.includes(normalizedDonationType)) {
+    query.donation_type = normalizedDonationType;
+  }
+
+  if (paymentMethod === 'ONLINE') {
+    query.online = true;
+  }
+
+  if (paymentMethod === 'OFFLINE') {
+    query.online = false;
+  }
+
+  if (startDate || endDate) {
+    query.date_donated = {};
+
+    if (startDate) {
+      query.date_donated.$gte = getStartOfDay(startDate);
+    }
+
+    if (endDate) {
+      query.date_donated.$lte = getEndOfDay(endDate);
+    }
+  }
+
+  return query;
+};
+
+const getDonationSummary = async (query) => {
+  const [summary] = await Donation.aggregate([
+    { $match: query },
+    {
+      $group: {
+        _id: null,
+        totalAmount: { $sum: '$amount' },
+        onlineAmount: {
+          $sum: {
+            $cond: ['$online', '$amount', 0]
+          }
+        },
+        offlineAmount: {
+          $sum: {
+            $cond: ['$online', 0, '$amount']
+          }
+        },
+        transactionCount: { $sum: 1 }
+      }
+    }
+  ]);
+
+  return summary ? {
+    totalAmount: summary.totalAmount || 0,
+    onlineAmount: summary.onlineAmount || 0,
+    offlineAmount: summary.offlineAmount || 0,
+    transactionCount: summary.transactionCount || 0
+  } : DEFAULT_DONATION_SUMMARY;
+};
 
 async function addDonation( suid , body) {
   try {
@@ -226,39 +364,51 @@ async function getByDonationTypeAggregates(suid ) {
   }
 }
 
-async function getDonations({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
+async function getDonations({
+  suid,
+  page = 1,
+  limit = 10,
+  sortField,
+  sortOrder,
+  search,
+  searchQuery,
+  donationType,
+  startDate,
+  endDate,
+  paymentMethod
+}) {
   const skip = (page - 1) * limit;
 
   try {
-    const sortOptions = {};
-    if (sortField) {
-      sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
-    }
-
-    const searchFilter = searchQuery
-      ? {
-          $or: [
-            { donation_type: { $regex: searchQuery, $options: 'i' } },
-            { first_name: { $regex: searchQuery, $options: 'i' } },
-            { last_name: { $regex: searchQuery, $options: 'i' } },
-        
-          ]
-        }
-      : {};
-
-    const query = {
+    const sortOptions = sortField
+      ? { [sortField]: sortOrder === 'desc' ? -1 : 1 }
+      : { date_donated: -1 };
+    const query = buildDonationQuery({
       suid,
-      ...searchFilter
-    };
+      donationType,
+      startDate,
+      endDate,
+      paymentMethod,
+      search,
+      searchQuery
+    });
 
-    const [donations, totalCount] = await Promise.all([
+    const [donations, totalCount, summary] = await Promise.all([
       Donation.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
-      Donation.countDocuments({suid})
+      Donation.countDocuments(query),
+      getDonationSummary(query)
     ]);
 
     return {
       data: donations,
-      totalCount
+      donations,
+      totalCount,
+      summary,
+      pagination: {
+        page,
+        limit,
+        totalCount
+      }
     };
   } catch (error) {
     console.error(error);
@@ -282,24 +432,21 @@ async function filterDonationsByDate(suid , startDateStr, endDateStr, donation_t
       throw new Error('Invalid date format');
     }
 
-    const filter = {
-      date_donated: {
-        $gte: startDate,
-        $lte: endDate
-      },
-      suid
-    };
-
-    if (donation_type) {
-      filter.donation_type = donation_type;
-    }
-
-    const donations = await Donation.find(filter);
-    const totalAmount = donations.reduce((total, donation) => total + donation.amount, 0);
+    const filter = buildDonationQuery({
+      suid,
+      startDate: startDateStr,
+      endDate: endDateStr,
+      donation_type
+    });
+    const [donations, summary] = await Promise.all([
+      Donation.find(filter).sort({ date_donated: -1 }),
+      getDonationSummary(filter)
+    ]);
 
     return {
       donations,
-      totalAmount
+      totalAmount: summary.totalAmount,
+      summary
     };
   } catch (error) {
     logger.error(error);

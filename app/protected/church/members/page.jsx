@@ -14,8 +14,17 @@ import RenderUserOffcanvas from './renderOffcanvas';
 import Tooltip from '@mui/material/Tooltip';
 import { capitalizeFirstLetter, getStatusStyle } from '../../../../utils/helpers';
 
+const MEMBER_STATUS_FILTERS = [
+  { key: 'ALL', label: 'All' },
+  { key: 'active', label: 'Active' },
+  { key: 'provisional', label: 'Provisional' },
+  { key: 'under discipline', label: 'Under Discipline' },
+  { key: 'inactive', label: 'Inactive' }
+];
+
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [show, setShow] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -28,6 +37,7 @@ const Page = () => {
     success,
     loading,
     totalCount,
+    statusCounts,
     handleFetch,
     handleDelete,
     handleEdit,
@@ -36,7 +46,7 @@ const Page = () => {
     handleReset,
     handleChange,
     handleSelect
-  } = useMember(debouncedSearchQuery);
+  } = useMember(debouncedSearchQuery, selectedStatus);
 
   const handleClose = useCallback(() => {
     handleReset();
@@ -94,7 +104,8 @@ const Page = () => {
       {
         Header: 'Actions',
         disableSortBy: true,
-        className: 'center',
+       headerClassName: 'text-center actions-header',
+        className: 'text-center actions-cell',
         Cell: ({ row }) => (
           <div className="d-flex justify-content-center align-items-center">
             <Tooltip title="Edit Member" arrow>
@@ -129,6 +140,14 @@ const Page = () => {
     [handleDelete, handleSelect, handleShow]
   );
 
+  const getStatusCount = useCallback((statusKey) => {
+    if (statusKey === 'ALL') {
+      return statusCounts?.all ?? totalCount;
+    }
+
+    return statusCounts?.[statusKey] ?? 0;
+  }, [statusCounts, totalCount]);
+
   return (
     <>
       <div className={`ms-5 me-5 mt-2 ${!loading ? 'overlay__block' : null}`}>
@@ -153,7 +172,30 @@ const Page = () => {
               + Add Member
             </Button>
           </div>
-          <Table data={data} columns={columns} pageCount={totalCount} loading={loading} fetchData={handleFetch} />
+          <div className="mb-4">
+            <div className="small fw-semibold mb-2">Status</div>
+            <div className="d-flex gap-2 flex-wrap">
+              {MEMBER_STATUS_FILTERS.map((status) => (
+                <Button
+                  key={status.key}
+                  variant={selectedStatus === status.key ? 'primary' : 'outline-secondary'}
+                  size="sm"
+                  onClick={() => setSelectedStatus(status.key)}
+                  className="text-nowrap"
+                >
+                  {status.label} ({getStatusCount(status.key)})
+                </Button>
+              ))}
+            </div>
+          </div>
+          <Table
+            key={selectedStatus}
+            data={data}
+            columns={columns}
+            pageCount={totalCount}
+            loading={loading}
+            fetchData={handleFetch}
+          />
         </div>
       </div>
       {!loading && <span className="overlay__block" />}

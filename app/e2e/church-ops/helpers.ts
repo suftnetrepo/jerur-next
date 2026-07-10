@@ -9,7 +9,7 @@ import Sermon from '../../models/sermon';
 import { createAttendance } from '../../services/attendanceService';
 import { mongoConnect } from '../../../utils/connectDb';
 
-const baseUrl = 'http://localhost:3000';
+const baseUrl = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
 const testRunId = Date.now();
 
 const attendanceStatuses = [
@@ -40,6 +40,16 @@ type SetupData = {
   midweekAttendanceSearchName: string;
   pastoralSearchName: string;
   submissionMembers: Record<(typeof attendanceStatuses)[number], string>;
+  sermonIds: {
+    draft: string;
+    published: string;
+    archived: string;
+  };
+  sermonTitles: {
+    draft: string;
+    published: string;
+    archived: string;
+  };
   creatableAttendance: {
     attendanceId: string;
     memberId: string;
@@ -52,7 +62,9 @@ const identifiers = {
   churchEmail: `e2e-church-${testRunId}@example.com`,
   primaryEmail: `e2e-admin-${testRunId}@example.com`,
   secondaryEmail: `e2e-pastor-${testRunId}@example.com`,
-  sermonTitle: `E2E Sermon ${testRunId}`
+  sermonTitleDraft: `E2E Sermon Draft ${testRunId}`,
+  sermonTitlePublished: `E2E Sermon Published ${testRunId}`,
+  sermonTitleArchived: `E2E Sermon Archived ${testRunId}`
 };
 
 const buildChurch = () => ({
@@ -89,6 +101,47 @@ const buildService = (churchId: string, title: string, sequency_no: number, day:
   sequency_no,
   days: [day],
   agenda: []
+});
+
+const buildSermon = ({
+  churchId,
+  createdBy,
+  updatedBy,
+  title,
+  speakerName,
+  serviceId,
+  status,
+  preachedAt,
+  durationMinutes,
+  summary
+}: {
+  churchId: string;
+  createdBy: string;
+  updatedBy?: string;
+  title: string;
+  speakerName: string;
+  serviceId: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  preachedAt: Date;
+  durationMinutes: number;
+  summary: string;
+}) => ({
+  churchId,
+  title,
+  speakerName,
+  serviceId,
+  summary,
+  media: {
+    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    audioUrl: '',
+    videoUrl: '',
+    thumbnail: ''
+  },
+  durationMinutes,
+  preachedAt,
+  status,
+  createdBy,
+  updatedBy
 });
 
 const buildMember = (churchId: string, first_name: string, last_name: string, index: number) => ({
@@ -401,15 +454,43 @@ async function setupChurchOpsFixtures(): Promise<SetupData> {
     }
   ]);
 
-  await Sermon.create({
-    title: identifiers.sermonTitle,
-    preacher: 'E2E Pastor',
-    scripture: 'John 3:16',
-    description: 'Sermon used for regression validation',
-    sermonDate: new Date('2026-07-06T10:00:00Z'),
-    tags: ['e2e'],
-    createdBy: primaryUser._id
-  });
+  const [draftSermon, publishedSermon, archivedSermon] = await Sermon.insertMany([
+    buildSermon({
+      churchId: String(church._id),
+      createdBy: String(primaryUser._id),
+      title: identifiers.sermonTitleDraft,
+      speakerName: 'Primary Pastor',
+      serviceId: String(sundayService._id),
+      status: 'DRAFT',
+      preachedAt: new Date('2026-07-06T10:00:00Z'),
+      durationMinutes: 42,
+      summary: 'Draft sermon used for Sermons E2E validation.'
+    }),
+    buildSermon({
+      churchId: String(church._id),
+      createdBy: String(primaryUser._id),
+      updatedBy: String(primaryUser._id),
+      title: identifiers.sermonTitlePublished,
+      speakerName: 'Assistant Pastor',
+      serviceId: String(midweekService._id),
+      status: 'PUBLISHED',
+      preachedAt: new Date('2026-07-07T19:00:00Z'),
+      durationMinutes: 38,
+      summary: 'Published sermon used for Sermons E2E validation.'
+    }),
+    buildSermon({
+      churchId: String(church._id),
+      createdBy: String(primaryUser._id),
+      updatedBy: String(primaryUser._id),
+      title: identifiers.sermonTitleArchived,
+      speakerName: 'Primary Pastor',
+      serviceId: String(sundayService._id),
+      status: 'ARCHIVED',
+      preachedAt: new Date('2026-07-08T09:00:00Z'),
+      durationMinutes: 35,
+      summary: 'Archived sermon used for Sermons E2E validation.'
+    })
+  ]);
 
   return {
     churchId: String(church._id),
@@ -427,6 +508,16 @@ async function setupChurchOpsFixtures(): Promise<SetupData> {
     midweekAttendanceSearchName: `${attendanceMembers[12].first_name} ${attendanceMembers[12].last_name}`,
     pastoralSearchName: `${attendanceMembers[13].first_name} ${attendanceMembers[13].last_name}`,
     submissionMembers: submissionMembersMap,
+    sermonIds: {
+      draft: String(draftSermon._id),
+      published: String(publishedSermon._id),
+      archived: String(archivedSermon._id)
+    },
+    sermonTitles: {
+      draft: identifiers.sermonTitleDraft,
+      published: identifiers.sermonTitlePublished,
+      archived: identifiers.sermonTitleArchived
+    },
     creatableAttendance: {
       attendanceId: String(savedAttendance[2]._id),
       memberId: String(attendanceMembers[2]._id)
@@ -456,7 +547,7 @@ async function cleanupChurchOpsFixtures() {
     ]
   });
 
-  await Sermon.deleteMany({ title: identifiers.sermonTitle });
+  await Sermon.deleteMany({ churchId });
   await Attendance.deleteMany({ church: churchId });
   await ServiceTime.deleteMany({ suid: churchId });
   await Member.deleteMany({ church: churchId });
@@ -466,19 +557,36 @@ async function cleanupChurchOpsFixtures() {
 
 async function login(page: any, email: string, password: string) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    await page.goto(`${baseUrl}/login`);
-    await page.locator('#email').fill(email);
-    await page.locator('#loginPassword').fill(password);
-    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.goto(`${baseUrl}/login`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle').catch(() => undefined);
+
+    if (/\/protected\/church\/dashboard$/.test(page.url())) {
+      await page.getByText('Total Members').waitFor({ state: 'visible', timeout: 30000 });
+      return;
+    }
+
+    const emailField = page.getByLabel('Email').or(page.getByPlaceholder('Email')).first();
+    const passwordField = page.locator('#loginPassword').or(page.getByPlaceholder('Password')).first();
+    const signInButton = page.getByRole('button', { name: 'Sign In' });
+
+    await emailField.waitFor({ state: 'visible', timeout: 30000 });
+    await emailField.fill(email);
+    await passwordField.fill(password);
+    await signInButton.click();
+
+    const reachedDashboardQuickly = await page.waitForURL('**/protected/church/dashboard', { timeout: 5000 }).then(() => true).catch(() => false);
+
+    if (!reachedDashboardQuickly) {
+      const hasInvalidAlert = await page.getByText('Invalid email or password').isVisible().catch(() => false);
+
+      if (!hasInvalidAlert) {
+        await signInButton.click();
+      }
+    }
 
     try {
-      await page.waitForURL('**/protected/church/dashboard', { timeout: 15000 });
-      await page.waitForFunction(async () => {
-        const response = await fetch('/api/sermon?action=latest&limit=1');
-        const contentType = response.headers.get('content-type') || '';
-
-        return response.ok && contentType.includes('application/json');
-      }, { timeout: 15000 });
+      await page.waitForURL('**/protected/church/dashboard', { timeout: 60000 });
+      await page.getByText('Total Members').waitFor({ state: 'visible', timeout: 60000 });
       return;
     } catch (error) {
       const hasInvalidAlert = await page.getByText('Invalid email or password').isVisible().catch(() => false);
@@ -528,13 +636,90 @@ async function createDuplicateCareCaseViaApi(page: any, payload: Record<string, 
   }, payload);
 }
 
+async function createSermonViaApi(page: any, payload: Record<string, unknown>) {
+  return page.evaluate(async (body) => {
+    const response = await fetch('/api/sermon', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const json = await response.json();
+    return {
+      ok: response.ok,
+      status: response.status,
+      body: json
+    };
+  }, payload);
+}
+
+async function updateSermonViaApi(page: any, id: string, payload: Record<string, unknown>, action?: string) {
+  return page.evaluate(async ({ sermonId, body, requestAction }) => {
+    const params = new URLSearchParams({ id: sermonId, ...(requestAction ? { action: requestAction } : {}) });
+    const response = await fetch(`/api/sermon?${params.toString()}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const json = await response.json();
+    return {
+      ok: response.ok,
+      status: response.status,
+      body: json
+    };
+  }, { sermonId: id, body: payload, requestAction: action });
+}
+
+async function deleteSermonViaApi(page: any, id: string) {
+  return page.evaluate(async (sermonId) => {
+    const response = await fetch(`/api/sermon?id=${sermonId}`, {
+      method: 'DELETE'
+    });
+
+    const json = await response.json();
+    return {
+      ok: response.ok,
+      status: response.status,
+      body: json
+    };
+  }, id);
+}
+
+async function listSermonsViaApi(page: any, queryParams: Record<string, string | number> = {}) {
+  return page.evaluate(async (params) => {
+    const searchParams = new URLSearchParams(
+      Object.entries(params).reduce<Record<string, string>>((accumulator, [key, value]) => {
+        accumulator[key] = String(value);
+        return accumulator;
+      }, {})
+    );
+    const response = await fetch(`/api/sermon?${searchParams.toString()}`);
+    const json = await response.json();
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      body: json
+    };
+  }, queryParams);
+}
+
 export {
   attendanceStatuses,
   baseUrl,
   cleanupChurchOpsFixtures,
   createAttendanceViaApi,
   createDuplicateCareCaseViaApi,
+  createSermonViaApi,
+  deleteSermonViaApi,
+  listSermonsViaApi,
   login,
   setupChurchOpsFixtures,
+  updateSermonViaApi,
   type SetupData
 };

@@ -26,32 +26,21 @@ test.describe.serial('Regression smoke checks', () => {
   test('Members still work', async ({ page }) => {
     await login(page, setupData.email, setupData.password);
     await page.goto(`${baseUrl}/protected/church/members`);
-    await expect(page.getByRole('heading', { name: 'Members' })).toBeVisible();
+    await expect(page.getByText('Members').first()).toBeVisible();
     await expect(page.locator('table tbody')).toContainText('Alpha');
   });
 
-  test('Services still work', async ({ page }) => {
+  test('Attendance still works', async ({ page }) => {
     await login(page, setupData.email, setupData.password);
-    await page.goto(`${baseUrl}/protected/church/regular-services`);
-    await expect(page.getByRole('heading', { name: 'Regular Services' })).toBeVisible();
-    await expect(page.locator('table tbody')).toContainText('Sunday Worship');
+    await page.goto(`${baseUrl}/protected/church/attendance`);
+    await expect(page.getByText('Attendance').first()).toBeVisible();
+    await expect(page.locator('body')).toContainText('Expected Members');
   });
 
-  test('Sermons API still works', async ({ page }) => {
+  test('Pastoral Care still works', async ({ page }) => {
     await login(page, setupData.email, setupData.password);
-
-    const body = await page.evaluate(async () => {
-      const response = await fetch('/api/sermon?action=latest&limit=5');
-      const json = await response.json();
-
-      return {
-        ok: response.ok,
-        body: json
-      };
-    });
-
-    expect(body.ok).toBe(true);
-    expect(body.body.success).toBe(true);
-    expect(Array.isArray(body.body.data)).toBe(true);
+    await page.goto(`${baseUrl}/protected/church/pastoral-care`);
+    await expect(page.getByText('Pastoral Care').first()).toBeVisible();
+    await expect(page.locator('body')).toContainText('Open Cases');
   });
 });

@@ -24,18 +24,36 @@ export const GET = async (req) => {
       const sortField = url.searchParams.get('sortField');
       const sortOrder = url.searchParams.get('sortOrder');
       const searchQuery = url.searchParams.get('searchQuery');
+      const search = url.searchParams.get('search');
+      const donationType = url.searchParams.get('donationType') || url.searchParams.get('donation_type');
+      const startDate = url.searchParams.get('startDate');
+      const endDate = url.searchParams.get('endDate');
+      const paymentMethod = url.searchParams.get('paymentMethod');
       const page = parseInt(url.searchParams.get('page') || '1', 10);
       const limit = parseInt(url.searchParams.get('limit') || '10', 10);
 
-      const { data, totalCount } = await getDonations({
+      const { data, donations, totalCount, summary, pagination } = await getDonations({
         suid: user?.church,
         page,
         limit,
         sortField,
         sortOrder,
-        searchQuery
+        searchQuery,
+        search,
+        donationType,
+        startDate,
+        endDate,
+        paymentMethod
       });
-      return NextResponse.json({ data, totalCount });
+
+      return NextResponse.json({
+        data,
+        donations,
+        totalCount,
+        summary,
+        pagination,
+        success: true
+      });
     }
 
     if (action === 'aggregateByMonth') {

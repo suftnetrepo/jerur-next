@@ -1,19 +1,40 @@
 import Validator from 'fastest-validator';
 
+const hasAtLeastOneMediaUrl = (value = {}) => {
+  return Boolean(value.youtubeUrl || value.videoUrl || value.audioUrl);
+};
+
 function sermonValidator(data) {
   const validator = new Validator();
   const schema = {
+    churchId: { type: 'string', empty: false },
     title: { type: 'string', empty: false, max: 200 },
-    preacher: { type: 'string', max: 100, optional: true },
-    scripture: { type: 'string', max: 200, optional: true },
-    description: { type: 'string', max: 2000, optional: true },
-    audioUrl: { type: 'string', optional: true },
-    videoUrl: { type: 'string', optional: true },
-    thumbnailUrl: { type: 'string', optional: true },
-    sermonDate: { type: 'date', optional: true },
-    tags: { type: 'array', items: 'string', optional: true },
-    createdBy: { type: 'string', empty: false }
+    speakerName: { type: 'string', empty: false, max: 120 },
+    serviceId: { type: 'string', empty: false },
+    summary: { type: 'string', max: 5000, optional: true },
+    media: {
+      type: 'object',
+      empty: false,
+      props: {
+        youtubeUrl: { type: 'url', optional: true, empty: true },
+        audioUrl: { type: 'url', optional: true, empty: true },
+        videoUrl: { type: 'url', optional: true, empty: true },
+        thumbnail: { type: 'url', optional: true, empty: true }
+      },
+      custom: (value) => hasAtLeastOneMediaUrl(value) ? true : [{ type: 'mediaUrlRequired', actual: value }]
+    },
+    durationMinutes: { type: 'number', positive: true, integer: true, optional: true },
+    preachedAt: { type: 'date' },
+    status: {
+      type: 'enum',
+      values: ['DRAFT', 'PUBLISHED', 'ARCHIVED']
+    },
+    createdBy: { type: 'string', empty: false },
+    updatedBy: { type: 'string', empty: false, optional: true }
   };
+
+  validator.addMessage('mediaUrlRequired', 'At least one media URL is required');
+
   return validator.validate(data, schema);
 }
 

@@ -1,17 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { MEMBER } from '../utils/apiUrl';
 import { memberValidator } from '../validator/rules';
 
-const useMember = (searchQuery) => {
+const EMPTY_STATUS_COUNTS = {
+  all: 0,
+  active: 0,
+  provisional: 0,
+  'under discipline': 0,
+  inactive: 0
+};
+
+const useMember = (searchQuery, selectedStatus = 'ALL') => {
+  const tableQueryRef = useRef({ pageIndex: 1, pageSize: 10, sortBy: [] });
   const [state, setState] = useState({
     data: [],
     fields: memberValidator.fields,
     loading: false,
     success:false,
     error: null,
-    totalCount: 0
+    totalCount: 0,
+    statusCounts: EMPTY_STATUS_COUNTS
   });
 
   const handleError = (error) => {
@@ -60,13 +70,8 @@ const useMember = (searchQuery) => {
     const { success, errorMessage } = await zat(MEMBER.removeOne, null, VERBS.DELETE, { id: id });
 
     if (success) {
-      setState((prevState) => ({
-        ...prevState,
-        data: prevState.data.filter((user) => user._id !== id),
-        totalCount: prevState.totalCount - 1,
-        loading: false,
-        success: true
-      }));
+      await handleFetch(tableQueryRef.current);
+      setState((prevState) => ({ ...prevState, success: true }));
       return true;
     } else {
       handleError(errorMessage || 'Failed to delete the member.');
@@ -103,12 +108,8 @@ const useMember = (searchQuery) => {
     const { success, errorMessage, data } = await zat(MEMBER.createOne, body, VERBS.POST);
 
     if (success) {
-      setState((prevState) => ({
-        ...prevState,
-        data: [data, ...prevState.data],
-        loading: false,
-        success: true
-      }));
+      await handleFetch(tableQueryRef.current);
+      setState((prevState) => ({ ...prevState, success: true }));
       return true;
     } else {
       handleError(errorMessage || 'Failed to update the member.');
@@ -116,25 +117,41 @@ const useMember = (searchQuery) => {
     }
   }
 
-  const handleFetch = useCallback(async ({ pageIndex = 1, pageSize = 10, sortBy = [], searchQuery = '' }) => {
+  const handleFetch = useCallback(async ({ pageIndex = 1, pageSize = 10, sortBy = [] } = {}) => {
+    setState((prevState) => ({ ...prevState, loading: true, error: null }));
     const sortField = sortBy.length > 0 ? sortBy[0].id : null;
     const sortOrder = sortBy.length > 0 ? (sortBy[0].desc ? 'desc' : 'asc') : null;
+    const normalizedPageIndex = pageIndex === 0 ? 1 : pageIndex;
+
+    tableQueryRef.current = {
+      pageIndex: normalizedPageIndex,
+      pageSize,
+      sortBy
+    };
 
     try {
-      const { data, success, errorMessage, totalCount } = await zat(MEMBER.fetch, null, VERBS.GET, {
+      const { data, members, success, errorMessage, totalCount, pagination, statusCounts, aggregates } = await zat(MEMBER.fetch, null, VERBS.GET, {
         action: 'getAll',
-        page: pageIndex === 0 ? 1 : pageIndex,
+        page: normalizedPageIndex,
         limit: pageSize,
         ...(sortField && { sortField }),
         ...(sortOrder && { sortOrder }),
-        searchQuery
+        ...(searchQuery ? { searchQuery } : {}),
+        ...(selectedStatus !== 'ALL' ? { status: selectedStatus } : {})
       });
 
       if (success) {
         setState((pre) => ({
           ...pre,
-          data: data,
-          totalCount: totalCount,
+          data: members || data || [],
+          totalCount: pagination?.totalCount ?? totalCount ?? 0,
+          statusCounts: aggregates ? {
+            all: aggregates.total ?? 0,
+            active: aggregates.active ?? 0,
+            provisional: aggregates.provisional ?? 0,
+            'under discipline': aggregates.underDiscipline ?? 0,
+            inactive: aggregates.inactive ?? 0
+          } : (statusCounts || EMPTY_STATUS_COUNTS),
           loading: false
         }));
         return true;
@@ -146,29 +163,21 @@ const useMember = (searchQuery) => {
       handleError('An unexpected error occurred while fetching member.');
       return false;
     }
-  }, []);
+  }, [searchQuery, selectedStatus]);
 
   async function handleEdit(body, id) {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     const { success, errorMessage } = await zat(MEMBER.updateOne, body, VERBS.PUT, { id: id });
 
     if (success) {
-      setState((prevState) => ({
-        ...prevState,
-        data: prevState.data.map((user) => (user._id === id ? body : user)),
-        loading: false,
-        success:true
-      }));
+      await handleFetch(tableQueryRef.current);
+      setState((prevState) => ({ ...prevState, success: true }));
       return true;
     } else {
       handleError(errorMessage || 'Failed to update the member.');
       return false;
     }
   }
-
-  useEffect(() => {
-    handleFetch({ searchQuery });
-  }, [searchQuery, handleFetch]);
 
   return {
     ...state,

@@ -43,7 +43,71 @@ const generateToken = (currentUser, expiresIn) => {
   return { token, member };
 };
 
-async function getMembers({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery }) {
+const MEMBER_STATUS_ORDER = ['active', 'provisional', 'under discipline', 'inactive'];
+
+const getEmptyMemberStatusCounts = () => ({
+  all: 0,
+  active: 0,
+  provisional: 0,
+  'under discipline': 0,
+  inactive: 0
+});
+
+const buildMemberSearchFilter = (searchQuery) => {
+  if (!searchQuery) {
+    return {};
+  }
+
+  return {
+    $or: [
+      { first_name: { $regex: searchQuery, $options: 'i' } },
+      { last_name: { $regex: searchQuery, $options: 'i' } },
+      { mobile: { $regex: searchQuery, $options: 'i' } },
+      { status: { $regex: searchQuery, $options: 'i' } },
+      { email: { $regex: searchQuery, $options: 'i' } }
+    ]
+  };
+};
+
+const normalizeMemberAggregateQuery = (query = {}) => {
+  if (!query.church) {
+    return query;
+  }
+
+  if (query.church instanceof mongoose.Types.ObjectId) {
+    return query;
+  }
+
+  return {
+    ...query,
+    church: new mongoose.Types.ObjectId(query.church)
+  };
+};
+
+const getMemberStatusCounts = async (query) => {
+  const statusCounts = getEmptyMemberStatusCounts();
+  const data = await Member.aggregate([
+    { $match: normalizeMemberAggregateQuery(query) },
+    {
+      $group: {
+        _id: '$status',
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  data.forEach((item) => {
+    if (Object.prototype.hasOwnProperty.call(statusCounts, item._id)) {
+      statusCounts[item._id] = item.count;
+    }
+  });
+
+  statusCounts.all = MEMBER_STATUS_ORDER.reduce((total, status) => total + statusCounts[status], 0);
+
+  return statusCounts;
+};
+
+async function getMembers({ suid, page = 1, limit = 10, sortField, sortOrder, searchQuery, status }) {
   const skip = (page - 1) * limit;
 
   try {
@@ -52,31 +116,29 @@ async function getMembers({ suid, page = 1, limit = 10, sortField, sortOrder, se
       sortOptions[sortField] = sortOrder === 'desc' ? -1 : 1;
     }
 
-    const searchFilter = searchQuery
-      ? {
-          $or: [
-            { first_name: { $regex: searchQuery, $options: 'i' } },
-            { last_name: { $regex: searchQuery, $options: 'i' } },
-            { mobile: { $regex: searchQuery, $options: 'i' } },
-            { status: { $regex: searchQuery, $options: 'i' } },
-            { email: { $regex: searchQuery, $options: 'i' } },
-          ]
-        }
-      : {};
-
-    const query = {
-      church:suid,
-      ...searchFilter
+    const baseQuery = {
+      church: suid,
+      ...buildMemberSearchFilter(searchQuery)
     };
+    const filteredQuery = status ? { ...baseQuery, status } : baseQuery;
 
-    const [members, totalCount] = await Promise.all([
-      Member.find(query).sort(sortOptions).skip(skip).limit(limit).exec(),
-      Member.countDocuments({church:suid})
+    const [members, totalCount, statusCounts] = await Promise.all([
+      Member.find(filteredQuery).sort(sortOptions).skip(skip).limit(limit).exec(),
+      Member.countDocuments(filteredQuery),
+      getMemberStatusCounts(baseQuery)
     ]);
 
     return {
       data: members,
-      totalCount
+      totalCount,
+      aggregates: {
+        total: statusCounts.all,
+        active: statusCounts.active,
+        provisional: statusCounts.provisional,
+        underDiscipline: statusCounts['under discipline'],
+        inactive: statusCounts.inactive
+      },
+      statusCounts
     };
   } catch (error) {
     logger.error(error);
@@ -327,22 +389,11 @@ const getRecentMembers = async (suid, limit = 10) => {
 
 const aggregateMemberByRole = async (church) => {
   try {
-    const data = await Member.aggregate([
-      { $match: { church: new mongoose.Types.ObjectId(church) } },
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      },
-      {
-        $project: {
-          role: '$_id',
-          count: 1,
-          _id: 0
-        }
-      }
-    ]);
+    const statusCounts = await getMemberStatusCounts({ church: new mongoose.Types.ObjectId(church) });
+    const data = MEMBER_STATUS_ORDER.map((status) => ({
+      role: status,
+      count: statusCounts[status] || 0
+    }));
 
     return data;
   } catch (error) {

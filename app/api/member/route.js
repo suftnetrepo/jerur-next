@@ -24,19 +24,33 @@ export const GET = async (req) => {
       const sortField = url.searchParams.get('sortField');
       const sortOrder = url.searchParams.get('sortOrder');
       const searchQuery = url.searchParams.get('searchQuery');
+      const status = url.searchParams.get('status');
       const page = parseInt(url.searchParams.get('page') || '1', 10);
       const limit = parseInt(url.searchParams.get('limit') || '10', 10);
 
-      const { data, totalCount } = await getMembers({
+      const { data, totalCount, statusCounts, aggregates } = await getMembers({
         suid: user?.church,
         page,
         limit,
         sortField,
         sortOrder,
-        searchQuery
+        searchQuery,
+        status
       });
 
-      return NextResponse.json({ data, success: true, totalCount }, { status: 200 });
+      return NextResponse.json({
+        data,
+        members: data,
+        success: true,
+        totalCount,
+        statusCounts,
+        aggregates,
+        pagination: {
+          page,
+          limit,
+          totalCount
+        }
+      }, { status: 200 });
     }
 
     if (action === 'count') {

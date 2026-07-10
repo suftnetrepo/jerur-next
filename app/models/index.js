@@ -7,6 +7,7 @@ import Campaign from './campaign'
 import Donation from './donation'
 import Fellowship from './fellowship'
 import Member from './member'
+import Sermon from './sermon'
 import Testimonies from './testimonies'
 
 const models = {
@@ -18,6 +19,7 @@ const models = {
   Donation,
   Fellowship,
   Member,
+  Sermon,
   Testimonies
 }
 

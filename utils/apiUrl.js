@@ -185,6 +185,13 @@ export const TESTIMONY = {
   removeOne: `${HOST}testimony/delete`
 };
 
+export const SERMON = {
+  createOne: `${HOST}sermon`,
+  updateOne: `${HOST}sermon`,
+  fetch: `${HOST}sermon`,
+  removeOne: `${HOST}sermon`
+};
+
 export const EVENT_REGISTER = {
   createOne: `${HOST}event/register`,
   updateOne: `${HOST}event/register`,

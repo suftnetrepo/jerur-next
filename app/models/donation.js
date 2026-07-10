@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
+import { DONATION_TYPE_VALUES } from '../../utils/donationConstants';
 
 const DonationSchema = new Schema(
   {
-    donation_type: { type: String, required: true, max: 20 },
+    donation_type: { type: String, enum: DONATION_TYPE_VALUES, required: true, max: 30 },
     first_name: {
       type: String,
       trim: true,

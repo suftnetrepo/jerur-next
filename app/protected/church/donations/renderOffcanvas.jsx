@@ -3,6 +3,7 @@ import { Offcanvas, Button, Form } from 'react-bootstrap';
 import { validate } from '../../../../validator/validator';
 import { ConfirmationDialogue, OkDialogue } from '../../../../src/components/elements/ConfirmDialogue';
 import { donationValidator } from '../../../../validator/rules';
+import { DONATION_TYPES } from '../../../../utils/donationConstants';
 
 const RenderUserOffcanvas = ({
   show,
@@ -13,9 +14,11 @@ const RenderUserOffcanvas = ({
   handleReset,
   handleSave,
   handleEdit,
-  fields
+  fields,
+  viewOnly = false
 }) => {
   const [errorMessages, setErrorMessages] = useState({});
+  const isReadOnly = viewOnly;
 
   const resetFields = () => {};
 
@@ -55,10 +58,14 @@ const RenderUserOffcanvas = ({
                   value={fields.donation_type}
                   className="border-dark"
                   onChange={(e) => handleChange('donation_type', e.target.value)}
+                  disabled={isReadOnly}
                 >
                   <option value="">Select a donation type</option>
-                  <option value="tithe">Tithe</option>
-                  <option value="offering">Offering</option>
+                  {DONATION_TYPES.map((donationType) => (
+                    <option key={donationType.value} value={donationType.value}>
+                      {donationType.label}
+                    </option>
+                  ))}
                 </Form.Select>
                 {errorMessages.donation_type?.message && (
                   <span className="text-danger">{errorMessages.donation_type?.message}</span>
@@ -75,6 +82,7 @@ const RenderUserOffcanvas = ({
                   value={fields.amount}
                   onChange={(e) => handleChange('amount', e.target.value)}
                   className="border-dark"
+                  disabled={isReadOnly}
                 />
                 {errorMessages.amount?.message && <span className="text-danger">{errorMessages.amount?.message}</span>}
               </Form.Group>
@@ -92,6 +100,7 @@ const RenderUserOffcanvas = ({
                   value={fields.first_name}
                   onChange={(e) => handleChange('first_name', e.target.value)}
                   className="border-dark"
+                  disabled={isReadOnly}
                 />
                 {errorMessages.first_name?.message && (
                   <span className="text-danger">{errorMessages.first_name?.message}</span>
@@ -108,6 +117,7 @@ const RenderUserOffcanvas = ({
                   value={fields.last_name}
                   onChange={(e) => handleChange('last_name', e.target.value)}
                   className="border-dark"
+                  disabled={isReadOnly}
                 />
                 {errorMessages.last_name?.message && (
                   <span className="text-danger">{errorMessages.last_name?.message}</span>
@@ -127,6 +137,7 @@ const RenderUserOffcanvas = ({
                   value={fields.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   className="border-dark"
+                  disabled={isReadOnly}
                 />
                 {errorMessages.email?.message && <span className="text-danger">{errorMessages.email?.message}</span>}
               </Form.Group>
@@ -141,6 +152,7 @@ const RenderUserOffcanvas = ({
                   value={fields.mobile}
                   onChange={(e) => handleChange('mobile', e.target.value)}
                   className="border-dark"
+                  disabled={isReadOnly}
                 />
                 {errorMessages.mobile?.message && (
                   <span className="text-danger alert-danger">{errorMessages.mobile?.message}</span>
@@ -159,6 +171,7 @@ const RenderUserOffcanvas = ({
                   checked={fields.online}
                   onChange={(e) => handleChange('online', e.target.checked)}
                   className="text-dark border-dark"
+                  disabled={isReadOnly}
                 />
               </Form.Group>
             </div>
@@ -166,15 +179,17 @@ const RenderUserOffcanvas = ({
 
           <div className="d-flex justify-content-start">
             <Button variant="secondary" className="me-2" onClick={handleClose}>
-              Cancel
+              {isReadOnly ? 'Close' : 'Cancel'}
             </Button>
-            <Button type="button" variant="primary" onClick={() => handleSubmit()}>
-              Save Changes
-            </Button>
+            {!isReadOnly && (
+              <Button type="button" variant="primary" onClick={() => handleSubmit()}>
+                Save Changes
+              </Button>
+            )}
           </div>
         </Form>
       </Offcanvas.Body>
-      {success && (
+      {success && !isReadOnly && (
         <>
           {fields?._id ? (
             <OkDialogue

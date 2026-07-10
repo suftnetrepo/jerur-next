@@ -1,3 +1,7 @@
+import { DONATION_TYPE_VALUES } from '../utils/donationConstants';
+
+const donationTypePattern = new RegExp(`^(${DONATION_TYPE_VALUES.join('|')})$`);
+
 export const regularServiceValidator = {
   rules: {
     title: [
@@ -481,6 +485,10 @@ export const churchValidator = {
 
 export const donationValidator = {
   rules: {
+    donation_type: [
+      { pattern: /^.+$/, message: 'donation type is required' },
+      { pattern: donationTypePattern, message: 'select a valid donation type' }
+    ],
     amount: [
       { pattern: /^.+$/, message: 'amount is required' },
       {
@@ -572,6 +580,134 @@ export const testimoniesValidator = {
     last_name: '',
     description: '',
     status: false
+  }
+};
+
+const isOptionalValidUrl = (value) => {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    new URL(value);
+    return undefined;
+  } catch (error) {
+    return 'Please enter a valid URL';
+  }
+};
+
+export const sermonUiValidator = {
+  rules: {
+    title: [
+      {
+        pattern: /^.+$/,
+        message: 'title is required'
+      },
+      {
+        pattern: /^.{0,200}$/,
+        message: 'title must not be more than 200 characters'
+      }
+    ],
+    speakerName: [
+      {
+        pattern: /^.+$/,
+        message: 'speaker is required'
+      },
+      {
+        pattern: /^.{0,120}$/,
+        message: 'speaker must not be more than 120 characters'
+      }
+    ],
+    serviceId: [
+      {
+        pattern: /^.+$/,
+        message: 'service is required'
+      }
+    ],
+    preachedAt: [
+      {
+        pattern: /^.+$/,
+        message: 'date is required'
+      }
+    ],
+    status: [
+      {
+        pattern: /^.+$/,
+        message: 'status is required'
+      }
+    ],
+    durationMinutes: [
+      {
+        validate: (value) => {
+          if (value === '' || value === null || value === undefined) {
+            return undefined;
+          }
+
+          const parsed = Number(value);
+
+          if (Number.isNaN(parsed) || parsed <= 0) {
+            return 'duration must be a positive number';
+          }
+
+          return undefined;
+        },
+        message: 'duration must be a positive number'
+      }
+    ],
+    youtubeUrl: [
+      {
+        validate: isOptionalValidUrl,
+        message: 'Please enter a valid URL'
+      }
+    ],
+    audioUrl: [
+      {
+        validate: isOptionalValidUrl,
+        message: 'Please enter a valid URL'
+      }
+    ],
+    videoUrl: [
+      {
+        validate: isOptionalValidUrl,
+        message: 'Please enter a valid URL'
+      }
+    ],
+    thumbnail: [
+      {
+        validate: isOptionalValidUrl,
+        message: 'Please enter a valid URL'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      _id: '',
+      title: '',
+      speakerName: '',
+      serviceId: '',
+      preachedAt: '',
+      durationMinutes: '',
+      status: 'DRAFT',
+      summary: '',
+      youtubeUrl: '',
+      audioUrl: '',
+      videoUrl: '',
+      thumbnail: ''
+    };
+  },
+  fields: {
+    _id: '',
+    title: '',
+    speakerName: '',
+    serviceId: '',
+    preachedAt: '',
+    durationMinutes: '',
+    status: 'DRAFT',
+    summary: '',
+    youtubeUrl: '',
+    audioUrl: '',
+    videoUrl: '',
+    thumbnail: ''
   }
 };
 

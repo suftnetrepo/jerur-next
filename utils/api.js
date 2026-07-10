@@ -47,14 +47,20 @@ export const zat = async (url, body, method, queryParams = null) => {
     // Parse the response JSON
     const json = await response.json();
 
-    // Handle DELETE separately if required
-    const results = method === "DELETE" ? true : json;
+    if (method === "DELETE") {
+      return {
+        success: true,
+        data: true
+      };
+    }
 
-    // Return success result
+    // Preserve the full response payload for callers that need metadata,
+    // while keeping the existing `data` and `totalCount` contract intact.
     return {
       success: true,
-      data: results?.data || results,
-      totalCount: results?.totalCount
+      ...json,
+      data: json?.data || json,
+      totalCount: json?.totalCount
     };
   } catch (error) {
     // Return error result
