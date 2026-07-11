@@ -355,6 +355,20 @@ const ChurchSchema = new mongoose.Schema(
         required: false,
         default: ''
       }
+    },
+    onboarding: {
+      welcomeModalDismissed: {
+        type: Boolean,
+        default: false
+      },
+      setupChecklistDismissed: {
+        type: Boolean,
+        default: false
+      },
+      onboardingCompleted: {
+        type: Boolean,
+        default: false
+      }
     }
 
   },

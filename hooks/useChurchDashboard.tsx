@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { CHURCH_DASHBOARD } from '../utils/apiUrl';
@@ -8,6 +8,7 @@ interface Initialize {
   aggregateData: null | any;
   chartData: null | any;
   trentData: null | any;
+  statisticsData: null | any;
   memberCount: number;
   loading: boolean;
   error: null | string;
@@ -20,19 +21,20 @@ const useChurchDashboard = () => {
     aggregateData: null,
     chartData: null,
     trentData: null,
+    statisticsData: null,
     memberCount: 0,
     loading: false,
     error: null,
 
   });
 
-  const handleError = (error: string) => {
+  const handleError = useCallback((error: string) => {
     setState((pre) => {
       return { ...pre, error: error, loading: false };
     });
-  };
+  }, []);
 
-  const fetchDataHandler = async (url: string, field: keyof Initialize) => {
+  const fetchDataHandler = useCallback(async (url: string, field: keyof Initialize) => {
     const { data, success, errorMessage } = await zat(url, null, VERBS.GET);
     if (success) {
       setState((prev) => ({ ...prev, [field]: data }));
@@ -40,9 +42,9 @@ const useChurchDashboard = () => {
     }
     setState((prev) => ({ ...prev, error: errorMessage }));
     return { success: false, error: errorMessage };
-  };
+  }, []);
 
-  const handleDashboardAggregates = async () => {
+  const handleDashboardAggregates = useCallback(async () => {
     setState((pre) => {
       return { ...pre, loading: true };
     });
@@ -55,11 +57,11 @@ const useChurchDashboard = () => {
       });
       return { success, data: data };
     } else {
-      handleError(errorMessage);
+      return handleError(errorMessage);
     }
-  };
+  }, [handleError]);
 
-  const handleDashboardStatistics = async () => {
+  const handleDashboardStatistics = useCallback(async () => {
     setState((pre) => {
       return { ...pre, loading: true };
     });
@@ -68,50 +70,52 @@ const useChurchDashboard = () => {
 
     if (success) {
       setState((pre) => {
-        return { ...pre, data: data, loading: false };
+        return { ...pre, statisticsData: data, loading: false };
       });
       return { success, data: data };
     } else {
-      handleError(errorMessage);
+      return handleError(errorMessage);
     }
-  };
+  }, [handleError]);
 
-  const handleRecent = async () => fetchDataHandler(CHURCH_DASHBOARD.recent, 'recentData');
+  const handleRecent = useCallback(async () => fetchDataHandler(CHURCH_DASHBOARD.recent, 'recentData'), [fetchDataHandler]);
 
-  const handleAggregate = async () => fetchDataHandler(CHURCH_DASHBOARD.aggregate, 'aggregateData');
+  const handleAggregate = useCallback(async () => fetchDataHandler(CHURCH_DASHBOARD.aggregate, 'aggregateData'), [fetchDataHandler]);
 
-  const handleChartAggregate = async () => fetchDataHandler(CHURCH_DASHBOARD.chart, 'chartData');
+  const handleChartAggregate = useCallback(async () => fetchDataHandler(CHURCH_DASHBOARD.chart, 'chartData'), [fetchDataHandler]);
 
-  const handleMemberCount = async () => fetchDataHandler(CHURCH_DASHBOARD.memberCount, 'memberCount');
+  const handleMemberCount = useCallback(async () => fetchDataHandler(CHURCH_DASHBOARD.memberCount, 'memberCount'), [fetchDataHandler]);
 
-  const handleAttendanceTrent = async () => fetchDataHandler(CHURCH_DASHBOARD.trend, 'trentData');
+  const handleAttendanceTrent = useCallback(async () => fetchDataHandler(CHURCH_DASHBOARD.trend, 'trentData'), [fetchDataHandler]);
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const results = await Promise.all([
+        handleDashboardAggregates(),
         handleRecent(),
-        handleAggregate(),
         handleChartAggregate(),
-        handleMemberCount(),
-        handleAttendanceTrent()
+        handleAttendanceTrent(),
+        handleDashboardStatistics()
       ]);
 
       const hasError = results.some((result) => !result.success);
       if (hasError) {
         const oneError = results.find((result) => !result.success)?.error;
-        handleError(oneError.message || 'An error occurred');
+        handleError(oneError?.message || oneError || 'An error occurred');
+      } else {
+        setState((prev) => ({ ...prev, loading: false }));
       }
     } catch (error) {
       handleError(error instanceof Error ? error.message : 'An unknown error occurred');
     }
-  };
+  }, [handleAttendanceTrent, handleChartAggregate, handleDashboardAggregates, handleDashboardStatistics, handleError, handleRecent]);
 
   useEffect(() => {
     fetchAll();
-  }, []);
+  }, [fetchAll]);
 
-  return { ...state, handleDashboardAggregates, handleDashboardStatistics, handleRecent, handleAggregate, handleChartAggregate, handleMemberCount, handleAttendanceTrent };
+  return { ...state, fetchAll, handleDashboardAggregates, handleDashboardStatistics, handleRecent, handleAggregate, handleChartAggregate, handleMemberCount, handleAttendanceTrent };
 };
 
 export { useChurchDashboard };

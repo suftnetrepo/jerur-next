@@ -52,7 +52,8 @@ const Page = () => {
       {
         Header: 'Actions',
         disableSortBy: true,
-        headerClassName: { textAlign: 'center' },
+        headerClassName: 'text-center actions-header',
+        className: 'text-center actions-cell',
         Cell: ({ row }) => (
           <div className="d-flex justify-content-center align-items-center">
             <Tooltip title="Edit Event" arrow>
