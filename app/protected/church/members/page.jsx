@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Table } from '../../../../src/components/elements/table/table';
 import { Button } from 'react-bootstrap';
@@ -22,7 +22,7 @@ const MEMBER_STATUS_FILTERS = [
   { key: 'inactive', label: 'Inactive' }
 ];
 
-const Page = () => {
+const MembersPageContent = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [show, setShow] = useState(false);
@@ -214,5 +214,11 @@ const Page = () => {
     </>
   );
 };
+
+const Page = () => (
+  <Suspense fallback={null}>
+    <MembersPageContent />
+  </Suspense>
+);
 
 export default Page;
