@@ -1,5 +1,5 @@
 import { mongoConnect } from '../../../utils/connectDb';
-import { createUser } from '../../services/userServices';
+import { createUser, verifyEmail } from '../../services/userServices';
 import { createChurch } from '../../services/subscriberServices';
 import { NextResponse } from 'next/server';
 
@@ -9,6 +9,19 @@ export async function POST(req) {
   try {
     const body = await req.json();
     console.log('Received body:', body); // Debug log to check the received data
+    const { email } = body;
+
+    const { message, exists } = await verifyEmail(email);
+
+    if (exists) {
+      return NextResponse.json(
+        {
+          error: message
+        },
+        { status: 400 }
+      );
+    }
+
     const church = await createChurch({ ...body, status: 'inactive' });
     
     const userPayload = {
@@ -24,7 +37,6 @@ export async function POST(req) {
     
     return response;
   } catch (err) {
-    console.error(err);
     return NextResponse.json(
       {
         error: err.message

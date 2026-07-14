@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { logger } from '../../../utils/logger';
+// import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
 
 import {
@@ -34,7 +34,7 @@ export async function POST(req) {
 
   try {
     // Log request headers for debugging
-    logger.info('Webhook Headers:', {
+    console.log('Webhook Headers:', {
       'content-type': req.headers.get('content-type'),
       'stripe-signature': req.headers.get('stripe-signature') ? 'present' : 'missing'
     });
@@ -42,9 +42,9 @@ export async function POST(req) {
     try {
       // Try to get raw body using the stream method
       rawBody = await getRawBody(req);
-      logger.info('Raw body length:', rawBody.length);
+      console.log('Raw body length:', rawBody.length);
     } catch (bodyError) {
-      logger.error('Body parsing error:', bodyError);
+      console.error('Body parsing error:', bodyError);
       return NextResponse.json(
         { error: 'Could not parse request body' },
         { status: 400 }
@@ -58,9 +58,9 @@ export async function POST(req) {
         req.headers.get('stripe-signature'),
         process.env.STRIPE_WEBHOOK_SECRET_LOCAL || process.env.STRIPE_CONNECT_WEBHOOK_SECRET
       );
-      logger.info('Webhook event constructed successfully:', { type: event.type });
+      console.log('Webhook event constructed successfully:', { type: event.type });
     } catch (signatureError) {
-      logger.error('Signature verification failed:', signatureError.message);
+      console.error('Signature verification failed:', signatureError.message);
       return NextResponse.json(
         { error: 'Webhook signature verification failed' },
         { status: 400 }
@@ -82,15 +82,15 @@ export async function POST(req) {
 
     if (handlers[event.type]) {
       await handlers[event.type](event);
-      logger.info(`Successfully processed ${event.type} event`);
+      console.log(`Successfully processed ${event.type} event`);
     } else {
-      logger.warn(`Unhandled event type: ${event.type}`);
+      console.warn(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true }, { status: 200 });
 
   } catch (error) {
-    logger.error('Webhook processing error:', {
+    console.error('Webhook processing error:', {
       message: error.message,
       stack: error.stack,
       eventType: event?.type,

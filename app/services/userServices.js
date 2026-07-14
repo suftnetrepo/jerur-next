@@ -125,12 +125,6 @@ async function getUserById(id) {
 }
 
 async function createUser(body) {
-  const { email } = body;
-
-  const existingUser = await User.findOne({ email: email });
-  if (existingUser) {
-    throw new Error('User with this email already exists');
-  }
 
   const bodyErrors = userValidator(body);
   if (bodyErrors.length) {
@@ -212,6 +206,20 @@ async function removeUser(id) {
   }
 }
 
+async function verifyEmail(email) {
+  try {
+    const user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
+    if (!user) {
+      return { message: 'User not found', exists: false };
+    }else {
+      return { message: 'User with this email already exists.', exists: true };
+    }
+  } catch (error) {
+    logger.error(error);
+    throw new Error('An unexpected error occurred. Please try again.');
+  }
+}
+
 async function searchUsers(searchTerm) {
   try {
     const regex = new RegExp(searchTerm, 'i');
@@ -278,5 +286,6 @@ export {
   getUserById,
   changePassword,
   createUser,
-  authenticateUser
+  authenticateUser,
+  verifyEmail
 };

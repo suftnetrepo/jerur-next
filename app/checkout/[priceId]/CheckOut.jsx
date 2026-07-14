@@ -40,7 +40,7 @@ const CheckOut = () => {
     const userData = await handleSuccess(userPayload);
 
     if (!userData) {
-      handleError('User creation failed.');
+      // handleError('User creation failed.');
       return false;
     }
 
