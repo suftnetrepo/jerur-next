@@ -16,6 +16,7 @@ import BankTransfer from './bank-transfer';
 import SocialMedia from './social_media';
 import Features from './features';
 import ConfigPage from './config';
+import ClientKeyPage from './client-key';
 import Pastor from './others/pastor';
 import Prophetic from './others/prophetic';
 
@@ -406,6 +407,9 @@ const SettingsPage = () => {
             </Tab>
             <Tab eventKey="config" title="Configs">
               <ConfigPage data={data} />
+            </Tab>
+            <Tab eventKey="client_key" title="Client Secret">
+              <ClientKeyPage client_secret={data?.client_secret} />
             </Tab>
           </Tabs>
         );

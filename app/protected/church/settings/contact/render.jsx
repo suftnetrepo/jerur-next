@@ -17,7 +17,10 @@ const RenderContactOffcanvas = ({
 }) => {
   const [errorMessages, setErrorMessages] = useState({});
 
-  const resetFields = () => {};
+  const resetFields = () => {
+    handleReset();
+        setErrorMessages({});
+  };
 
   const handleSubmit = async () => {
     setErrorMessages({});

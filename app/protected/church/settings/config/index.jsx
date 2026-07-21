@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
-import { validate } from '../../../../../validator/validator';
 import { useConfig } from '../../../../../hooks/useSettings';
-import CurrencyDropdown from '../../../../../src/components/reuseable/CurrencyDropdown';
-import { configValidator } from '../../../../../validator/rules';
 import Select from '../../../../../src/components/reuseable/Select';
 
 const ConfigPage = ({ data }) => {

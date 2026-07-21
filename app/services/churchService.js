@@ -182,8 +182,8 @@ async function getChurchByIdentifier(id) {
       throw error;
     }
 
-    const church = await Church.findById(id);
-    return church;
+    const result = await Church.findById(id).lean();
+    return result;
   } catch (error) {
     logger.error(error);
     throw new Error('Error fetching church');
@@ -422,18 +422,14 @@ async function updateChurchStatus(stripeCustomerId, body) {
 }
 async function getVerifySubscriptionStatus(id) {
   try {
-
-    const result = await Church.findOne({
-      stripeCustomerId: id
-    }).select('status').lean();
-
+    const result = await Church.findOne({ stripeCustomerId: id });
+    
     return {
-      active: result && result.status === 'active'
+      active: result?.status === 'active'
     };
-
   } catch (error) {
-    logger.error(error);
-    throw new Error('Error fetching church');
+    logger.error(`Failed to verify subscription for customer ${id}:`, error);
+    throw new Error(`Unable to verify subscription status`);
   }
 }
 

@@ -46,7 +46,8 @@ const Contact = () => {
       { Header: 'Phone', accessor: 'phone' },
       {
         Header: 'Status',
-        accessor: 'user_status',
+        accessor: 'status',
+    
         Cell: ({ value }) => (
           <div className="d-flex justify-content-start align-items-center">
             {value ? (
@@ -64,7 +65,8 @@ const Contact = () => {
       {
         Header: 'Actions',
         disableSortBy: true,
-        className: 'center',
+            headerClassName: 'text-center actions-header',
+        className: 'text-center actions-cell',
         Cell: ({ row }) => (
           <div className="d-flex justify-content-center align-items-center">
             <Tooltip title="Edit User" arrow>
@@ -130,6 +132,7 @@ const Contact = () => {
           fields={fields}
           success={success}
           handleEdit={handleEdit}
+          handleReset={handleReset}
         />
     </div>
   );

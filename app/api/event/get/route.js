@@ -17,6 +17,9 @@ export const GET = async (req) => {
 
     const identifier = decrypt(clientId);
     const data = await getTop10Events(identifier);
+
+    console.log('Fetched top 10 events:', data); // Log the fetched data for debugging
+
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);

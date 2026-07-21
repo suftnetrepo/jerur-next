@@ -56,7 +56,7 @@ export async function POST(req) {
       event = stripe.webhooks.constructEvent(
         rawBody,
         req.headers.get('stripe-signature'),
-        process.env.STRIPE_WEBHOOK_SECRET_LOCAL || process.env.STRIPE_CONNECT_WEBHOOK_SECRET
+        process.env.STRIPE_WEBHOOK_SECRET
       );
       console.log('Webhook event constructed successfully:', { type: event.type });
     } catch (signatureError) {

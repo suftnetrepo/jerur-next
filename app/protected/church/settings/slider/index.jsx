@@ -79,7 +79,8 @@ const Slider = () => {
       {
         Header: 'Actions',
         disableSortBy: true,
-        className: 'center',
+           headerClassName: 'text-center actions-header',
+        className: 'text-center actions-cell',
         Cell: ({ row }) => (
           <div className="d-flex justify-content-center align-items-center">
             <Tooltip title="Edit Slider" arrow>

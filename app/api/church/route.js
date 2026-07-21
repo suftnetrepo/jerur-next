@@ -1,5 +1,6 @@
 import { getChurchByIdentifier } from '../../services/churchService';
 import { logger } from '../../../utils/logger';
+import { encrypt } from '../../../utils/helpers';
 import { NextResponse } from 'next/server';
 import { getUserSession } from '../../../utils/generateToken';
 
@@ -12,7 +13,8 @@ export const GET = async (req) => {
     }
 
     const data = await getChurchByIdentifier(user.church);
-    return NextResponse.json({ data, success: true });
+    const responseData = { ...data, client_secret: encrypt(data._id.toString()) };
+    return NextResponse.json({ data: responseData, success: true });
   } catch (error) {
     logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
