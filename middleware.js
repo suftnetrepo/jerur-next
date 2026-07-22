@@ -17,6 +17,19 @@ export async function middleware(req) {
     });
 
     if (token) {
+      const path = req.nextUrl.pathname;
+      const isPlatformAdmin = !token.church;
+
+      // Platform admins (no church) must not access church-specific routes
+      if (isPlatformAdmin && path.startsWith('/protected/church')) {
+        return NextResponse.redirect(new URL('/protected/admin/dashboard', req.url));
+      }
+
+      // Church users must not access platform admin routes
+      if (!isPlatformAdmin && path.startsWith('/protected/admin')) {
+        return NextResponse.redirect(new URL('/protected/church/dashboard', req.url));
+      }
+
       return NextResponse.next();
     }
 

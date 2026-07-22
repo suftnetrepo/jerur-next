@@ -98,31 +98,15 @@ const QUICK_ACTIONS = [
   { title: 'Add Member', description: 'Register a new church member', href: '/protected/church/members', icon: BsPersonPlus, tone: 'primary' },
   { title: 'Create Service', description: 'Plan a new church service', href: '/protected/church/regular-services', icon: BsCalendarEvent, tone: 'purple' },
   { title: 'Add Event', description: 'Schedule a church event', href: '/protected/church/events/create', icon: BsCalendarEvent, tone: 'warning' },
-  { title: 'Add Sermon', description: 'Upload a new sermon', href: '/protected/church/sermons', icon: BsSpeaker, tone: 'success' },
-  { title: 'Record Attendance', description: 'Take attendance for a service', href: '/protected/church/attendance', icon: BsCheckCircle, tone: 'info' }
-];
+ ];
 
 const FLAT_SETUP_TASKS = [
-  { key: 'churchProfile',  label: 'Add Church Information',    href: '/protected/church/settings' },
   { key: 'firstService',  label: 'Create Your First Service',  href: '/protected/church/regular-services' },
   { key: 'members',       label: 'Add Members',                href: '/protected/church/members' },
-  { key: 'leaders',       label: 'Add Pastors / Leaders',      href: '/protected/church/members' },
-  { key: 'fellowships',   label: 'Create Fellowship Groups',   href: '/protected/church/fellowships' },
-  { key: 'attendance',    label: 'Record Your First Attendance', href: '/protected/church/attendance' },
-  { key: 'sermons',       label: 'Add Your First Sermon',      href: '/protected/church/sermons' }
+  { key: 'events',        label: 'Add Event',                  href: '/protected/church/events/create' }
 ];
 
 const SETUP_GUIDE_SECTIONS = [
-  {
-    title: 'Church Information',
-    purpose: 'Configure your church details.',
-    icon: BsCheckCircle,
-    tone: 'primary',
-    items: ['Church Name', 'Address', 'Time Zone', 'Contact Details'],
-    itemStyle: 'check',
-    buttonLabel: 'Go to Settings',
-    href: '/protected/church/settings'
-  },
   {
     title: 'Create Your First Service',
     purpose: 'Services are required for attendance and sermons.',
@@ -144,34 +128,14 @@ const SETUP_GUIDE_SECTIONS = [
     href: '/protected/church/members'
   },
   {
-    title: 'Record Attendance',
-    purpose: 'Attendance powers:',
-    icon: BsCheck2Circle,
-    tone: 'success',
-    items: ['Dashboard', 'Pastoral Care', 'Reports'],
-    itemStyle: 'bullet',
-    buttonLabel: 'Go to Attendance',
-    href: '/protected/church/attendance'
-  },
-  {
-    title: 'Fellowship Groups (Optional)',
-    purpose: 'Create home cells or fellowship groups.',
-    icon: BsPeople,
+    title: 'Add Event',
+    purpose: 'Schedule church events for your members.',
+    icon: BsCalendarEvent,
     tone: 'warning',
-    note: 'This can be completed later.',
-    buttonLabel: 'Go to Fellowships',
-    href: '/protected/church/fellowships'
-  },
-  {
-    title: 'Upload Sermons (Optional)',
-    purpose: 'Upload sermons for members to listen to from the mobile app.',
-    icon: BsSpeaker,
-    tone: 'secondary',
-    noteLabel: 'Supported',
-    items: ['YouTube', 'Audio URL', 'Video URL'],
+    items: ['Conferences', 'Outreach', 'Special Services'],
     itemStyle: 'bullet',
-    buttonLabel: 'Go to Sermons',
-    href: '/protected/church/sermons'
+    buttonLabel: 'Go to Events',
+    href: '/protected/church/events/create'
   }
 ];
 
@@ -179,10 +143,10 @@ const DEFAULT_ONBOARDING = {
   dismissed: false,
   setupChecklistDismissed: false,
   completedCount: 0,
-  totalCount: 7,
+  totalCount: 3,
   percentage: 0,
   completed: false,
-  tasks: { churchProfile: false, firstService: false, members: false, leaders: false, fellowships: false, attendance: false, sermons: false }
+  tasks: { firstService: false, members: false, events: false }
 };
 
 /* Bottom-right onboarding tour: 5 short stops introducing the shell. Only
@@ -389,8 +353,8 @@ const ChecklistRow = ({ task, onboarding, onNavigate }) => {
 };
 
 const SetupChecklistCard = ({ onboarding, onNavigate, onDismiss, onOpenGuide, checklistRef }) => {
-  const leftCol  = FLAT_SETUP_TASKS.slice(0, 4);
-  const rightCol = FLAT_SETUP_TASKS.slice(4);
+  const leftCol  = FLAT_SETUP_TASKS.slice(0, 2);
+  const rightCol = FLAT_SETUP_TASKS.slice(2);
 
   return (
     <div
@@ -415,8 +379,6 @@ const SetupChecklistCard = ({ onboarding, onNavigate, onDismiss, onOpenGuide, ch
           .jerur-checklist-2col { display: none; }
           .jerur-checklist-3col {
             display: grid;
-            grid-auto-flow: column;
-            grid-template-rows: repeat(3, auto);
             grid-template-columns: repeat(3, minmax(150px, auto));
             column-gap: 36px;
             row-gap: 4px;
@@ -686,7 +648,7 @@ const SetupGuideDrawer = ({ show, onClose, onNavigate }) => (
             <div>
               <div className="fw-semibold mb-1" style={{ fontSize: 15, color: '#101828' }}>Setup Checklist</div>
               <div className="text-muted" style={{ fontSize: 13.5, lineHeight: 1.6 }}>
-                Follow the first four steps to start recording attendance, viewing reports, and managing daily ministry operations.
+                Complete these three steps to activate your church workspace and start managing daily ministry operations.
               </div>
             </div>
           </div>
@@ -708,7 +670,7 @@ const SetupGuideDrawer = ({ show, onClose, onNavigate }) => (
         >
           <div className="fw-semibold mb-1" style={{ fontSize: 14, color: '#92400E' }}>💡 Tip</div>
           <div style={{ fontSize: 13.5, color: '#7C2D12', lineHeight: 1.6 }}>
-            Complete the first four steps to unlock the full church dashboard.
+            Complete all three steps to unlock the full church dashboard.
           </div>
         </div>
       </div>

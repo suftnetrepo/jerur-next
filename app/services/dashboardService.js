@@ -12,7 +12,7 @@ import { logger } from '../../utils/logger';
 
 mongoConnect();
 
-const ONBOARDING_TOTAL_TASKS = 7;
+const ONBOARDING_TOTAL_TASKS = 3;
 
 const normalizeObjectId = (value) => (value instanceof mongoose.Types.ObjectId ? value : new mongoose.Types.ObjectId(value));
 
@@ -24,34 +24,11 @@ const calculateCompletionPercentage = (completedCount, totalCount) => {
   return Math.round((completedCount / totalCount) * 100);
 };
 
-const isChurchProfileCompleted = (church) => {
-  if (!church) {
-    return false;
-  }
-
-  const hasAddress = Boolean(
-    church.address?.completeAddress
-    || (church.address?.addressLine1 && church.address?.town && church.address?.country)
-  );
-
-  return Boolean(
-    church.name?.trim()
-    && church.email?.trim()
-    && church.mobile?.trim()
-    && church.description?.trim()
-    && hasAddress
-  );
-};
-
 const buildOnboardingPayload = ({ church, counts }) => {
   const tasks = {
-    churchProfile: isChurchProfileCompleted(church),
     firstService: counts.services > 0,
     members: counts.members > 0,
-    leaders: counts.leaders > 0,
-    fellowships: counts.fellowships > 0,
-    attendance: counts.attendance > 0,
-    sermons: counts.sermons > 0
+    events: counts.events > 0
   };
   const completedCount = Object.values(tasks).filter(Boolean).length;
   const completed = completedCount === ONBOARDING_TOTAL_TASKS;
@@ -218,13 +195,9 @@ export async function getDashboardAggregates(churchId = null) {
           percentage: 0,
           completed: false,
           tasks: {
-            churchProfile: false,
             firstService: false,
             members: false,
-            leaders: false,
-            fellowships: false,
-            attendance: false,
-            sermons: false
+            events: false
           }
         }
       }

@@ -103,27 +103,6 @@ async function cleanupFreshChurchFixture() {
 async function completeRequiredSetupTasks(churchId: string) {
   await mongoConnect();
 
-  await Church.updateOne(
-    { _id: churchId },
-    {
-      $set: {
-        description: 'E2E setup church ready for operations.',
-        address: {
-          addressLine1: '1 Setup Road',
-          town: 'London',
-          country: 'United Kingdom',
-          county: 'Greater London',
-          postcode: 'SW1A 1AA',
-          completeAddress: '1 Setup Road, London, SW1A 1AA',
-          location: {
-            type: 'Point',
-            coordinates: [-0.1278, 51.5074]
-          }
-        }
-      }
-    }
-  );
-
   const [service] = await ServiceTime.create([
     {
       suid: churchId,
@@ -164,52 +143,15 @@ async function completeRequiredSetupTasks(churchId: string) {
     }
   ]);
 
-  await Attendance.create({
-    church: churchId,
-    member: member._id,
-    service: service._id,
-    status: 'PRESENT_IN_CHURCH',
-    count: 1,
-    message: 'Present in service',
-    checkedInVia: 'MANUAL',
-    wantsPastorContact: false,
-    submittedAt: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date()
-  });
-
-  await Fellowship.create({
+  const event = await Event.create({
     suid: churchId,
-    name: 'North Fellowship',
-    addressLine1: '2 Fellowship Lane',
-    town: 'London',
-    country: 'United Kingdom',
-    county: 'Greater London',
-    postcode: 'SW1A 1AB',
-    completeAddress: '2 Fellowship Lane, London, SW1A 1AB',
-    status: true,
-    mobile: '07000000004'
+    title: 'E2E Setup Event',
+    start_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000),
+    status: true
   });
 
-  await Sermon.create({
-    churchId,
-    title: 'Faith for the Journey',
-    speakerName: 'Setup Admin',
-    serviceId: service._id,
-    summary: 'E2E sermon fixture.',
-    media: {
-      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      audioUrl: '',
-      videoUrl: '',
-      thumbnail: ''
-    },
-    durationMinutes: 35,
-    preachedAt: new Date(),
-    status: 'PUBLISHED',
-    createdBy: (await User.findOne({ email: identifiers.adminEmail }).lean())?._id
-  });
-
-  return { serviceId: String(service._id), leaderId: String(leader._id), memberId: String(member._id) };
+  return { serviceId: String(service._id), leaderId: String(leader._id), memberId: String(member._id), eventId: String(event._id) };
 }
 
 async function getOnboardingState(churchId: string) {
@@ -338,26 +280,19 @@ test.describe.serial('Church setup dashboard e2e validation', () => {
     }
 
     await expect(page.getByText('Follow these simple steps to get the most out of Jerur.')).toBeVisible();
-    await expect(page.getByText('0 of 7 Complete')).toBeVisible();
+    await expect(page.getByText('0 of 3 Complete')).toBeVisible();
     await expect(page.getByText('0%')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add Church Information' }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Create Your First Service' }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Add Members' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add Pastors / Leaders' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Record Your First Attendance' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Create Fellowship Groups' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add Your First Sermon' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add Event' }).first()).toBeVisible();
 
     await page.getByRole('button', { name: 'View Setup Guide' }).click();
     const drawer = page.getByRole('dialog');
     await expect(drawer.getByText('Getting Started with Jerur')).toBeVisible();
     await expect(drawer.getByText('Complete these steps to prepare your church for daily use.')).toBeVisible();
-    await expect(drawer.getByRole('heading', { name: 'Church Information' })).toBeVisible();
     await expect(drawer.getByRole('heading', { name: 'Create Your First Service' })).toBeVisible();
     await expect(drawer.getByRole('heading', { name: 'Add Members' })).toBeVisible();
-    await expect(drawer.getByRole('heading', { name: 'Record Attendance' })).toBeVisible();
-    await expect(drawer.getByRole('heading', { name: 'Fellowship Groups (Optional)' })).toBeVisible();
-    await expect(drawer.getByRole('heading', { name: 'Upload Sermons (Optional)' })).toBeVisible();
+    await expect(drawer.getByRole('heading', { name: 'Add Event' })).toBeVisible();
     await expect(drawer.getByText('Tip')).toBeVisible();
 
     const headerBefore = await drawer.getByText('Getting Started with Jerur').boundingBox();

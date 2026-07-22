@@ -33,11 +33,6 @@ const SettingsPage = () => {
   const [key, setKey] = useState('bank_transfer');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // console.log("...............................data", encrypt(data?._id))
-  // console.log("...............................data", decrypt('443d4762f5dbd5802d79954944d0bbca:025dab65d4bc3a9fc4232a1c8a3a83f4cd4d1488b46d98db6c2e0d30740965f3'))
-  // console.log("...............................data", data)
-
   useEffect(() => {
     return () => {
       if (previewUrl) {

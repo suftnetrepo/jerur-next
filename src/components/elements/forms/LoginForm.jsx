@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import NextLink from '../../reuseable/links/NextLink';
 import Button from 'react-bootstrap/Button';
 import { useRouter } from 'next/navigation';
-import { signIn, getCsrfToken } from 'next-auth/react';
+import { signIn, getCsrfToken, getSession } from 'next-auth/react';
 import { loginValidator } from '../../../../validator/loginValidator';
 import { validate } from '../../../../validator/validator';
 import { useSecure } from '../../../../hooks/useSecure';
@@ -47,12 +47,12 @@ const LoginForm = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const returnUrl = urlParams.get('returnUrl');
 
-    let redirectPath;
     if (returnUrl) {
-      redirectPath = returnUrl;
       router.push(returnUrl);
     } else {
-      router.push('/protected/church/dashboard');
+      const session = await getSession();
+      const isPlatformAdmin = !session?.user?.church;
+      router.push(isPlatformAdmin ? '/protected/admin/dashboard' : '/protected/church/dashboard');
     }
   };
 

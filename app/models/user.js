@@ -5,7 +5,10 @@ const UserSchema = new mongoose.Schema({
   church: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Church',
-    required: true
+    required: function () {
+      return this.role === 'user';
+    },
+    default: null
   },
   first_name: {
     type: String,
