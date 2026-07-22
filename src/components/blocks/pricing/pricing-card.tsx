@@ -24,7 +24,7 @@ const PricingCard: FC<PricingCardProps> = (props) => {
 
     const yearClasses = activeYearly ? 'price-show' : 'price-hide price-hidden';
     const monthClasses = !activeYearly ? 'price-show' : 'price-hide price-hidden';
-    const checkoutPriceId = process.env.NODE_ENV === 'production' ? live_priceId : priceId;
+    const checkout_priceId = process.env.NEXT_PUBLIC_ENV === 'production' ? live_priceId : priceId;
 
     return (
       <div className="pricing card shadow-lg text-center bg-link">
@@ -48,7 +48,7 @@ const PricingCard: FC<PricingCardProps> = (props) => {
           </ul>
 
           <NextLink
-            href={`/checkout/${checkoutPriceId}`}
+            href={`/checkout/${checkout_priceId}`}
             title="Choose Plan"
             className={`text-white btn text-white btn-primary rounded-pill`}
           />
