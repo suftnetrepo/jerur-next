@@ -8,7 +8,6 @@ mongoConnect();
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log('Received body:', body); // Debug log to check the received data
     const { email } = body;
 
     const { message, exists } = await verifyEmail(email);

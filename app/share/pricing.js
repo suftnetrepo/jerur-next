@@ -1,45 +1,69 @@
 export const pricingList = [
   {
-    monthlyPrice: 9,
-    yearlyPrice: 99,   
-    price: '£10',
-    raw: '10',
+    monthlyPrice: 25,
+    yearlyPrice: 280,
+    price: '£25',
+    raw_price: 25,
     duration: '30 days',
     billingCycle: 'Monthly',
     index: 1,
     currency: '£',
-    live_priceId: 'price_1JJEZ2LJUyk9CjU7Snxgf8Pa',
-    priceId: 'price_1NOjSxIT5ljozdpimi188tO4',
+    live_priceId: 'price_1TvzmRJ9QQF7JMlNn5Ik7tAG',
+    priceId: 'price_1HDVRhJ9QQF7JMlNSdnkB7l4',
     planName: 'Basic Plan',
-    features: ['1 Project', '100K API Access', '100MB Storage', 'Weekly Reports', '7/24 Support']
+    features: [
+     'Service Time Management',
+      'Fundraising Campaigns',
+      'Online Giving ',
+      'Multi-Platform Access',
+      'Event Management',
+      'Dedicated Customer Support',
+      'Data Security and Privacy',    
+    ]
   },
-  {   
-    monthlyPrice: 19,
-    yearlyPrice: 199,
-    price: '£50',
-    raw: '50',
-    duration: 'Every 6 months',
+  {
+    monthlyPrice: 25,
+    yearlyPrice: 280,
+    price: '£140',
+    raw_price: 140,
+    duration: '6 months',
     billingCycle: 'Every 6 months',
     planName: 'Premium',
     currency: '£',
     index: 2,
-    live_priceId: 'price_1JJEZ2LJUyk9CjU7hLsimtyH',
-    priceId: 'price_1NOjTgIT5ljozdpiVuGC6Wo7',
-    features: ['5 Projects', '100K API Access', '200MB Storage', 'Weekly Reports', '7/24 Support']
+    live_priceId: 'price_1Tvzo4J9QQF7JMlNnpzMdacv',
+    priceId: 'price_1HDVRhJ9QQF7JMlNxp77CsjK',
+    features: [
+      'Service Time Management',
+      'Fundraising Campaigns',
+      'Online Giving ',
+      'Multi-Platform Access',
+      'Event Management',
+      'Dedicated Customer Support',
+      'Data Security and Privacy',     
+    ]
   },
   {
-    monthlyPrice: 49,
-    yearlyPrice: 499,   
-    price: '£100',
-    raw: '100',
-    duration: 'Yearly',
+    monthlyPrice: 25,
+    yearlyPrice: 280,
+    price: '£280',
+    raw_price: 280,
+    duration: '1 Year',
     billingCycle: 'Yearly',
     planName: 'Premium Plus',
     currency: '£',
     index: 3,
-    live_priceId: 'price_1JJEZ2LJUyk9CjU7WqYguOQ6',
-    priceId: 'price_1NOjUEIT5ljozdpibTo9ZWFG',
-    features: ['20 Projects', '300K API Access', '500MB Storage', 'Weekly Reports', '7/24 Support']
+    live_priceId: 'price_1TvzpLJ9QQF7JMlNBXe8Yscy',
+    priceId: 'price_1HHWPsJ9QQF7JMlN2X4BTJC3',
+    features: [
+      'Service Time Management',
+      'Fundraising Campaigns',
+      'Online Giving ',
+      'Multi-Platform Access',
+      'Event Management',
+      'Dedicated Customer Support',
+      'Data Security and Privacy',
+    ]
   }
 ];
 
