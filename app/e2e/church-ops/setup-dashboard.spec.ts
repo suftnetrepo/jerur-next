@@ -156,7 +156,7 @@ async function completeRequiredSetupTasks(churchId: string) {
 
 async function getOnboardingState(churchId: string) {
   await mongoConnect();
-  const church = await Church.findById(churchId).lean();
+  const church = await Church.findById(churchId).lean() as { onboarding?: { onboardingCompleted?: boolean } } | null;
   return church?.onboarding || null;
 }
 
