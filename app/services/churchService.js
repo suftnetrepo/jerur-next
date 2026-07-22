@@ -424,7 +424,7 @@ async function getVerifySubscriptionStatus(id) {
   try {
     const result = await Church.findOne({ stripeCustomerId: id });
 
-    consoile.log(`Subscription status for customer ${id}:`, result);
+    console.log(`Subscription status for customer ${id}:`, result);
     
     return {
       active: result?.status === 'active'
