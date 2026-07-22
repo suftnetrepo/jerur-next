@@ -34,16 +34,6 @@ export const regularServiceValidator = {
         message: 'end time must be no more than 10 characters'
       }
     ],
-    remote_link: [
-      {
-        pattern: /^.+$/,
-        message: 'remote link is required'
-      },
-      {
-        pattern: /^.{0,200}$/,
-        message: 'remote link must be no more than 200 characters'
-      }
-    ]
   },
 
   reset: () => {

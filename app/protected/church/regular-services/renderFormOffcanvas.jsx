@@ -25,10 +25,15 @@ const RenderFormOffcanvas = ({
 
   const handleSubmit = async () => {
     setErrorMessages({});
+
     const validationResult = validate(fields, regularServiceValidator.rules);
 
+    if (fields?.remote && !fields?.remote_link) {
+      setErrorMessages({ ...errorMessages, remote_link: 'Remote link is required' });
+    }
+
     if (validationResult.hasError) {
-      setErrorMessages(validationResult.errors);
+      setErrorMessages({ ...errorMessages, ...validationResult.errors });
       return;
     }
 
@@ -91,16 +96,21 @@ const RenderFormOffcanvas = ({
                 handleReset();
               }}
               onConfirm={() => {
-              
                 handleReset();
               }}
             />
           )}
         </>
       )}
-      {error && <ErrorDialogue showError={error} onClose={() => { 
-        handleReset()  
-        setShow(false)}} />}
+      {error && (
+        <ErrorDialogue
+          showError={error}
+          onClose={() => {
+            handleReset();
+            setShow(false);
+          }}
+        />
+      )}
     </Offcanvas>
   );
 };
