@@ -1,8 +1,8 @@
 // -------- icons -------- //
-import User from 'icons/lineal/User';
-import Check from 'icons/lineal/Check';
-import AwardTwo from 'icons/lineal/AwardTwo';
-import BriefcaseTwo from 'icons/lineal/BriefcaseTwo';
+import User from 'src/icons/lineal/User';
+import Check from 'src/icons/lineal/Check';
+import AwardTwo from 'src/icons/lineal/AwardTwo';
+import BriefcaseTwo from 'src/icons/lineal/BriefcaseTwo';
 
 // used in the facts-2 block
 export const factList1 = [

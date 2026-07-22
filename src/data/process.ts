@@ -1,16 +1,16 @@
 // -------- icons -------- //
 import Bulb from 'icons/solid-mono/Bulb';
-import Shield from 'icons/lineal/Shield';
-import Rocket from 'icons/lineal/Rocket';
-import Design from 'icons/lineal/Design';
-import Loading from 'icons/lineal/Loading';
+import Shield from 'src/icons/lineal/Shield';
+import Rocket from 'src/icons/lineal/Rocket';
+import Design from 'src/icons/lineal/Design';
+import Loading from 'src/icons/lineal/Loading';
 import Compare from 'icons/solid-mono/Compare';
-import Savings from 'icons/lineal/Savings';
-import LightBulb from 'icons/lineal/LightBulb';
+import Savings from 'src/icons/lineal/Savings';
+import LightBulb from 'src/icons/lineal/LightBulb';
 import DeliveryBox from 'icons/solid-mono/DeliveryBox';
-import PieChartTwo from 'icons/lineal/PieChartTwo';
-import SmartphoneTwo from 'icons/lineal/SmartphoneTwo';
-import CloudComputing from 'icons/lineal/CloudComputing';
+import PieChartTwo from 'src/icons/lineal/PieChartTwo';
+import SmartphoneTwo from 'src/icons/lineal/SmartphoneTwo';
+import CloudComputing from 'src/icons/lineal/CloudComputing';
 
 // used in the process-1, process-7, process-14 block
 export const processList1 = [
