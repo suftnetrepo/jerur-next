@@ -9,6 +9,7 @@ type PricingCardProps = {
   yearlyPrice: number;
   monthlyPrice: number;
   priceId: string;
+  live_priceId: string;
   activeYearly: boolean;
   roundedButton?: boolean;
   Icon: (props: any) => JSX.Element;
@@ -19,10 +20,11 @@ type PricingCardProps = {
 
 
 const PricingCard: FC<PricingCardProps> = (props) => {
-    const { planName, features, yearlyPrice, duration, raw_price, priceId, activeYearly, roundedButton, Icon } = props;
+    const { planName, features, duration, raw_price, live_priceId, priceId, activeYearly, Icon } = props;
 
     const yearClasses = activeYearly ? 'price-show' : 'price-hide price-hidden';
     const monthClasses = !activeYearly ? 'price-show' : 'price-hide price-hidden';
+    const checkoutPriceId = process.env.NODE_ENV === 'production' ? live_priceId : priceId;
 
     return (
       <div className="pricing card shadow-lg text-center bg-link">
@@ -46,7 +48,7 @@ const PricingCard: FC<PricingCardProps> = (props) => {
           </ul>
 
           <NextLink
-            href={`/checkout/${priceId}`}
+            href={`/checkout/${checkoutPriceId}`}
             title="Choose Plan"
             className={`text-white btn text-white btn-primary rounded-pill`}
           />

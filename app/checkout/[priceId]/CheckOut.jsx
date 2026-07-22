@@ -25,7 +25,7 @@ const CheckOut = () => {
   const userCreatedRef = useRef(false);
   const [clientSecret, setClientSecret] = useState(null);
   const { priceId } = params;
-  const { handleNewSubscriber, handleErrorReset, handleSuccess, loading, subscription, handleError, error, pricing } =
+  const { handleNewSubscriber, handleErrorReset, handleSuccess, loading, handleError, error, pricing } =
     useSubscriber(priceId);
 
   useEffect(() => {
