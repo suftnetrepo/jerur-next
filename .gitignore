@@ -62,3 +62,6 @@ logs/error.log.4
 .env
 .env.production
 .env.stage
+
+# Local admin scripts
+scripts/create-admin.ts
