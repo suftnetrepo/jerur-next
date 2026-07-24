@@ -68,10 +68,10 @@ const ChurchSchema = new mongoose.Schema(
       type: String,
       trim: false,
       required: false,
-      max: 50,
+      max: 100,
       default: ''
     },
-    email: { type: String, unique: true, max: 50, lowercase: true },
+    email: { type: String, unique: true, max: 100, lowercase: true },
     description: {
       type: String,
       min: 3,

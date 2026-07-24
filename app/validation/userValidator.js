@@ -29,10 +29,10 @@ function passwordValidator(data) {
 function userValidator(data) {
   const validator = new Validator()
   const schema = {
-    email: { type: 'email', empty: false, max: 50 },
+    email: { type: 'email', empty: false, max: 100 },
     first_name: { type: 'string', empty: false, max: 50 },
     last_name: { type: 'string', empty: false, max: 50 },
-    mobile: { type: 'string', empty: false, max: 20 },
+    mobile: { type: 'string', empty: false, max: 100 },
     role: { type: 'string', empty: false, max: 10 }
   }
   return validator.validate(data, schema)

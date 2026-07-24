@@ -20,9 +20,9 @@ function updateAddressValidator(data) {
 function contactValidator(data) {
   const validator = new Validator();
   const schema = {
-    email: { type: 'email', empty: false, max: 50 },
-    name: { type: 'string', empty: false, max: 50 },
-    mobile: { type: 'string', empty: false, max: 20 },
+    email: { type: 'email', empty: false, max: 100 },
+    name: { type: 'string', empty: false, max: 100 },
+    mobile: { type: 'string', empty: false, max: 100 },
   };
   return validator.validate(data, schema);
 }
@@ -42,7 +42,7 @@ function pastorValidator(data) {
   const schema = {
     first_name: { type: 'string', empty: false, max: 50 },
     last_name: { type: 'string', empty: false, max: 50 },
-    mobile: { type: 'string', empty: false, max: 20 },
+    mobile: { type: 'string', empty: false, max: 100 },
     description: { type: 'string', empty: false, max: 1000 },
   };
   return validator.validate(data, schema);
@@ -73,12 +73,12 @@ function updateFeatureValidator(data) {
 function churchValidator(data) {
   const validator = new Validator();
   const schema = {
-      email: { type: 'email', empty: false, max: 50 },
-      name: { type: 'string', empty: false, max: 50 },
+      email: { type: 'email', empty: false, max: 100 },
+      name: { type: 'string', empty: false, max: 100 },
       subscriptionId: { type: 'string', empty: false},
       priceId: { type: 'string', empty: false },
       stripeCustomerId: { type: 'string', empty: false },
-      mobile: { type: 'string', empty: false, max: 50 },
+      mobile: { type: 'string', empty: false, max: 100 },
   };
   return validator.validate(data, schema);
 }
@@ -86,9 +86,9 @@ function churchValidator(data) {
 function churchUpdateValidator(data) {
   const validator = new Validator();
   const schema = {
-      email: { type: 'email', empty: false, max: 50 },
-      name: { type: 'string', empty: false, max: 50 },        
-      mobile: { type: 'string', empty: false, max: 50 },
+      email: { type: 'email', empty: false, max: 100 },
+      name: { type: 'string', empty: false, max: 100 },
+      mobile: { type: 'string', empty: false, max: 100 },
   };
   return validator.validate(data, schema);
 }
