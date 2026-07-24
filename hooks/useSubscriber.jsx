@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { VERBS } from '../config';
 import { STRIPE, SUBSCRIBER } from '../utils/apiUrl';
 import { zat } from '../utils/api';
-import { pricingList } from '../src/data/pricing';
+import { pricingList, findPrice } from '../src/data/pricing';
 
 const useSubscriber = (priceId) => {
   const [state, setState] = useState({
@@ -16,7 +16,7 @@ const useSubscriber = (priceId) => {
   });
 
   const handlePricing = (priceId) => {
-    const plan = pricingList.find((j) => j.priceId === priceId);
+    const plan = findPrice(priceId, process.env.NEXT_PUBLIC_ENV === 'development' ? false : true);
     setState((pre) => {
       return { ...pre, pricing: plan };
     });
