@@ -422,7 +422,7 @@ export const churchValidator = {
   rules: {
     name: [
       { pattern: /^.+$/, message: 'Name is required' },
-      { pattern: /^.{0,250}$/, message: 'Name must not exceed 100 characters' }
+      { pattern: /^.{0,100}$/, message: 'Name must not exceed 100 characters' }
     ],
     email: [
       { pattern: /.+/, message: 'email address is required' },
@@ -431,15 +431,15 @@ export const churchValidator = {
         message: 'Please enter a valid email address'
       },
       {
-        pattern: /^.{0,50}$/,
-        message: 'email address must not be more than 50 characters'
+        pattern: /^.{0,100}$/,
+        message: 'email address must not be more than 100 characters'
       }
     ],
     mobile: [
       { pattern: /^.+$/, message: 'mobile is required' },
       {
-        pattern: /^.{0,50}$/,
-        message: 'mobile number must not be more than 20 characters'
+        pattern: /^.{0,100}$/,
+        message: 'mobile number must not be more than 100 characters'
       }
     ]
   },

@@ -211,7 +211,7 @@ const CheckOut = () => {
                           value={fields.last_name}
                           placeholder=""
                           className="form-control border-0"
-                          maxLength={20}
+                          maxLength={100}
                           onChange={handleChange}
                         />
                         <label htmlFor="last_name" className="text-dark">
@@ -232,7 +232,7 @@ const CheckOut = () => {
                           value={fields.email}
                           className="form-control border-0"
                           placeholder=""
-                          maxLength={50}
+                          maxLength={100}
                           onChange={handleChange}
                         />
                         <label htmlFor="email" className="text-dark">
