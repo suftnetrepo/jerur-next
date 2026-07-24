@@ -208,11 +208,11 @@ async function removeUser(id) {
 
 async function verifyEmail(email) {
   try {
-    const user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
+const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return { message: 'User not found', exists: false };
+      return { message: 'Church not found', exists: false };
     }else {
-      return { message: 'User with this email already exists.', exists: true };
+      return { message: 'Church with this email already exists.', exists: true };
     }
   } catch (error) {
     logger.error(error);

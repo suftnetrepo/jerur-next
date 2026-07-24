@@ -82,7 +82,7 @@ const CheckOut = () => {
     const { name, value, type, checked } = e.target;
     setFields({
       ...fields,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value?.toLowerCase()
     });
   };
 

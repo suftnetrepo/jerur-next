@@ -22,7 +22,6 @@ export async function POST(req) {
     }
 
     const church = await createChurch({ ...body, status: 'inactive' });
-    
     const userPayload = {
       ...body,
       church: church._id,
@@ -36,6 +35,15 @@ export async function POST(req) {
     
     return response;
   } catch (err) {
+   
+    if(err.code === 11000) {
+      return NextResponse.json(
+        {
+          error: 'Email already exists'
+        },
+        { status: 400 }
+      );
+    } 
     return NextResponse.json(
       {
         error: err.message
