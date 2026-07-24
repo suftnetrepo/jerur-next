@@ -82,7 +82,7 @@ const CheckOut = () => {
     const { name, value, type, checked } = e.target;
     setFields({
       ...fields,
-      [name]: type === 'checkbox' ? checked : value?.toLowerCase()
+      [name]: type === 'checkbox' ? checked : value
     });
   };
 
@@ -233,7 +233,7 @@ const CheckOut = () => {
                           className="form-control border-0"
                           placeholder=""
                           maxLength={100}
-                          onChange={handleChange}
+                          onChange={(e)=> handleChange(e.target.value.toLowerCase())}
                         />
                         <label htmlFor="email" className="text-dark">
                           Email *
