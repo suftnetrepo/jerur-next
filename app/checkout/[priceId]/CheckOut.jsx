@@ -233,7 +233,7 @@ const CheckOut = () => {
                           className="form-control border-0"
                           placeholder=""
                           maxLength={100}
-                          onChange={(e)=> handleChange(e.target.value.toLowerCase())}
+                          onChange={(e)=> {setFields({...fields, email: e.target.value.toLowerCase()})}}
                         />
                         <label htmlFor="email" className="text-dark">
                           Email *
