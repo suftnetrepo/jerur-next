@@ -3,7 +3,7 @@ const checkoutValidator = {
     name: [
       {
         pattern: /^.+$/,
-        message: 'company is required'
+        message: 'church is required'
       }
     ],
     first_name: [
@@ -13,14 +13,14 @@ const checkoutValidator = {
       },
       {
         pattern: /^.{0,50}$/,
-        message: 'first name must be 50 characters'
+        message: 'first name must not be more than 50 characters'
       }
     ],
     last_name: [
       { pattern: /^.+$/, message: 'last name is required' },
       {
         pattern: /^.{0,50}$/,
-        message: 'last name must be 50 characters'
+        message: 'last name must not be more than 50 characters'
       }
     ],
     mobile: [
@@ -36,8 +36,8 @@ const checkoutValidator = {
         message: 'Please enter a valid email address',
       },
       {
-        pattern: /^.{0,50}$/,
-        message: 'email address must be no more than 50 characters',
+        pattern: /^.{0,100}$/,
+        message: 'email address must be no more than 100 characters',
       },
     ],
   },
