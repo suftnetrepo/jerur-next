@@ -68,9 +68,7 @@ const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleC
             >
               <option value="">Select a Service Type</option>
               <option value="prayer">Prayer</option>
-              <option value="sunday_service">Sunday Service</option>
-              <option value="bible_study">Bible Study</option>
-              <option value="night_vigil">Night Vigil</option>
+              <option value="service">Service</option>
             </Form.Select>
             {errorMessages.role?.message && <span className="text-danger">{errorMessages.role?.message}</span>}
           </Form.Group>
@@ -185,7 +183,7 @@ const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleC
               value={fields?.remote_link}
               onChange={(e) => handleChange('remote_link', e.target.value)}
               className="border-dark"
-              maxLength={200}
+              maxLength={1000}
             />
             {errorMessages?.remote_link?.message && (
               <span className="text-danger fs-13 ms-2">{errorMessages?.remote_link?.message}</span>

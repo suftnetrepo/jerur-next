@@ -439,9 +439,7 @@ const featuresOptions = FEATURES.map(feature => ({
 }));
 
 const serviceType = {
-  'sunday_service': 'Sunday Service',
-  'bible_study': 'Bible Study',
-  'night_vigil': 'Night Vigil',
+  'service': 'Service',
   'prayer': 'Prayer'
 }
 

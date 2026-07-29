@@ -1,4 +1,4 @@
-import { getAllServiceTimes } from '../../../services/serviceTime';
+import { getServicesTimeByType } from '../../../services/serviceTime';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
 import { decrypt } from '../../../../utils/helpers';
@@ -17,7 +17,7 @@ export const GET = async (req) => {
 
     const identifier = decrypt(clientId);
 
-    const data = await getAllServiceTimes(identifier, true);
+    const data = await getServicesTimeByType(identifier, true, 'service');
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);
