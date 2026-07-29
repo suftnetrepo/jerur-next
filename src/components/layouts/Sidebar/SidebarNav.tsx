@@ -47,7 +47,7 @@ const ChurchSidebarNav = () => {
       <SidebarNavItem icon={faClipboardList} href="/protected/church/attendance">
         Attendance
       </SidebarNavItem>
-      <SidebarNavItem icon={faClipboardList} href="/protected/church/pastoral-care">
+      <SidebarNavItem icon={faFileImage} href="/protected/church/pastoral-care">
         Pastoral Care
       </SidebarNavItem>
       <SidebarNavItem icon={faProjectDiagram} href="/protected/church/regular-services">

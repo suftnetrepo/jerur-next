@@ -47,7 +47,7 @@ const Render = () => {
       {
         Header: 'Status',
         accessor: 'status',
-        headerClassName: { textAlign: 'center' },
+        headerClassName: { textAlign: 'left' },
         Cell: ({ value }) => (
           <div className="d-flex justify-content-start align-items-center">
             <span className={`badge ${getYesNoColorCode(value)}`}>{value ? 'Yes' : 'No'}</span>

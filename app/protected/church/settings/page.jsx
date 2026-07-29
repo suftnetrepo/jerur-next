@@ -150,7 +150,7 @@ const SettingsPage = () => {
                 <Row className="mb-1">
                   <Col>
                     <Form.Group>
-                      <Form.Label className="text-dark">Church</Form.Label>
+                      <Form.Label className="text-dark">Church Name</Form.Label>
                       <Form.Control
                         type="text"
                         value={fields?.name}
@@ -223,9 +223,13 @@ const SettingsPage = () => {
                 Save Changes
               </Button>
               <div className='me-2'></div>
-              <Button type="button" variant="secondary" onClick={() => handleSeeds()}>
-                Seeds
-              </Button>
+              {
+                process.env.NODE_ENV === 'development' && (
+                  <Button type="button" variant="secondary" onClick={() => handleSeeds()}>
+                    Seeds
+                  </Button>
+                )
+              }
             </div>
           </Form>
         );
@@ -391,17 +395,17 @@ const SettingsPage = () => {
             <Tab eventKey="social_media" title="Social Media">
               <SocialMedia data={data} />
             </Tab>
-            <Tab eventKey="feature" title="Mobile Features">
-              <Features data={data} />
-            </Tab>
             <Tab eventKey="pastor" title="Pastor">
               <Pastor data={data?.pastor_section} />
             </Tab>
             <Tab eventKey="prophetic" title="Prophetic Theme">
               <Prophetic data={data?.prophetic_focus} />
             </Tab>
-            <Tab eventKey="config" title="Configs">
+            <Tab eventKey="config" title="Other Configurations">
               <ConfigPage data={data} />
+            </Tab>
+            <Tab eventKey="feature" title="Mobile Features">
+              <Features data={data} />
             </Tab>
             <Tab eventKey="client_key" title="Client Secret">
               <ClientKeyPage client_secret={data?.client_secret} />
@@ -461,19 +465,12 @@ const SettingsPage = () => {
             >
               Subscription
             </div>
-            <div
-              onClick={() => setSelectedMenu('ChangePassword')}
-              className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'ChangePassword' ? 'active-menu' : ''
-                }`}
-            >
-              Change Password
-            </div>
              <div
               onClick={() => setSelectedMenu('general')}
               className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'general' ? 'active-menu' : ''
                 }`}
             >
-              Others
+              More...
             </div>
           </div>
         </Col>

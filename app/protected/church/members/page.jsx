@@ -84,7 +84,7 @@ const MembersPageContent = () => {
       {
         Header: 'Role',
         accessor: 'role',
-        headerClassName: { textAlign: 'center' },
+        headerClassName: { textAlign: 'left' },
         Cell: ({ value }) => (
           <div className="d-flex justify-content-start align-items-center">
             <span >{capitalizeFirstLetter(value)}</span>
@@ -94,7 +94,7 @@ const MembersPageContent = () => {
       {
         Header: 'Status',
         accessor: 'status',
-        headerClassName: { textAlign: 'center' },
+        headerClassName: { textAlign: 'left' },
         Cell: ({ value }) => (
           <div className="d-flex justify-content-start align-items-center">
             <span style={getStatusStyle(value)}>{capitalizeFirstLetter(value)}</span>

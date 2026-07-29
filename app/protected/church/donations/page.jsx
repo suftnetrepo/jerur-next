@@ -262,7 +262,7 @@ const Page = () => {
       {
         Header: 'Payment Method',
         accessor: 'online',
-        headerClassName: { textAlign: 'center' },
+        headerClassName: { textAlign: 'left' },
         Cell: ({ value }) => (
           <div className="d-flex justify-content-start align-items-center">
             <span className={`badge ${value ? 'bg-primary' : 'bg-secondary'}`}>{getPaymentMethodLabel(value)}</span>
