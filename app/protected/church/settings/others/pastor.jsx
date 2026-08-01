@@ -22,8 +22,8 @@ const Pastor = ({ data }) => {
       handleSelect(data);
       setIsDataLoaded(true);
       // Reset file and preview when new data is loaded
-      setFile(null);
-      setPreviewUrl(null);
+      // setFile(null);
+      // setPreviewUrl(null);
     }
   }, [data, handleSelect, isDataLoaded]);
 
@@ -73,23 +73,17 @@ const Pastor = ({ data }) => {
     formData.append('first_name', fields.first_name);
     formData.append('last_name', fields.last_name);
 
-    await handleUpdate(formData);
+    handleUpdate(formData).then(() => {
+      // Reset the data loaded flag to allow reload if needed
+      setIsDataLoaded(false);
+    });
     
     // Reset the data loaded flag to allow reload if needed
     // But keep the fields as they are after successful update
   };
 
   const handleResetForm = () => {
-    handleReset();
-    setIsDataLoaded(false);
-    setFile(null);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-      setPreviewUrl(null);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = null;
-    }
+   
   };
 
   return (
