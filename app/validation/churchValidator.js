@@ -42,7 +42,6 @@ function pastorValidator(data) {
   const schema = {
     first_name: { type: 'string', empty: false, max: 50 },
     last_name: { type: 'string', empty: false, max: 50 },
-    mobile: { type: 'string', empty: false, max: 100 },
     description: { type: 'string', empty: false, max: 1000 },
   };
   return validator.validate(data, schema);

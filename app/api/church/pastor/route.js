@@ -30,7 +30,6 @@ export const PUT = async (req) => {
         const title = formData.get('title');
         const first_name = formData.get('first_name');
         const last_name = formData.get('last_name');
-        const mobile = formData.get('mobile');
         const description = formData.get('description');
         const file = formData.get('file');
 
@@ -65,7 +64,6 @@ export const PUT = async (req) => {
                 description,
                 first_name,
                 last_name,
-                mobile,
                 ...(result && {
                     public_id: result.public_id,
                     secure_url: result.secure_url
