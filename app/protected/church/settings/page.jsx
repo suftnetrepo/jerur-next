@@ -451,13 +451,13 @@ const SettingsPage = () => {
             >
               Slider
             </div>
-            <div
+            {/* <div
               onClick={() => setSelectedMenu('push_notification')}
               className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'push_notification' ? 'active-menu' : ''
                 }`}
             >
               Push Notification
-            </div>
+            </div> */}
             <div
               onClick={() => setSelectedMenu('Subscription')}
               className={`py-1 ps-8 d-flex justify-content-start menu-item ${selectedMenu === 'Subscription' ? 'active-menu' : ''
