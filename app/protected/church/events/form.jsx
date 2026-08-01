@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
-import Editor from '../../../../src/components/reuseable/editor';
 import 'react-datetime/css/react-datetime.css';
 import FindAddress from '../../../share/findAddress';
 import { ImageUploader } from '../../../../src/components/elements/image';
@@ -11,12 +10,6 @@ const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSe
 
   const handleImageChange = (file) => {
     handleChange('file', file);
-  };
-
-  const handlePaste = (e) => {
-    const pastedText = e.clipboardData.getData('text');
-    handleChange('description', pastedText);
-    e.preventDefault();
   };
 
   return (
@@ -206,10 +199,13 @@ const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSe
         <div className="col-md-12">
           <Form.Group controlId="formFirstName" className="mb-3 mt-3">
             <Form.Label className="text-dark">Description</Form.Label>
-            <Editor
-              onChange={(e) => handleChange('description', e)}
-              onPaste={handlePaste}
-              value={fields?.description}
+            <Form.Control
+              as="textarea"
+              rows={5}
+              placeholder="Enter description"
+              value={fields?.description || ''}
+              onChange={(e) => handleChange('description', e.target.value)}
+              className="border-dark"
             />
             {errorMessages?.description?.message && (
               <span className="text-danger fs-13">{errorMessages.description?.message}</span>
