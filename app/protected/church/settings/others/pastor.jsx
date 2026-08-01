@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
@@ -10,27 +10,48 @@ const Pastor = ({ data }) => {
   const [errorMessages, setErrorMessages] = useState({});
   const [previewUrl, setPreviewUrl] = useState(null);
   const [file, setFile] = useState(null);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const fileInputRef = useRef(null);
 
+  console.log('Pastor data:', data); // Debugging line to check the data prop
+  console.log('Pastor success:', success); // Debugging line to check the fields state
+
+  // Only load data once when component mounts or when data prop changes AND it's a different data
   useEffect(() => {
-    data && handleSelect(data);
+    if (data && !isDataLoaded) {
+      handleSelect(data);
+      setIsDataLoaded(true);
+      // Reset file and preview when new data is loaded
+      setFile(null);
+      setPreviewUrl(null);
+    }
+  }, [data, handleSelect, isDataLoaded]);
+
+  // Clean up preview URL on unmount
+  useEffect(() => {
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
     };
-  }, [data, previewUrl]);
+  }, [previewUrl]);
 
   const handleImageClick = () => {
-    document.getElementById('file-input').click();
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = (e) => {
-    setPreviewUrl(null);
     const selectedFile = e.target.files[0];
 
     if (selectedFile && selectedFile.type.startsWith('image/')) {
+      // Revoke previous preview URL if exists
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setFile(selectedFile);
       setPreviewUrl(URL.createObjectURL(selectedFile));
+      // Reset file input value to allow selecting the same file again
+      e.target.value = null;
     }
   };
 
@@ -53,6 +74,22 @@ const Pastor = ({ data }) => {
     formData.append('last_name', fields.last_name);
 
     await handleUpdate(formData);
+    
+    // Reset the data loaded flag to allow reload if needed
+    // But keep the fields as they are after successful update
+  };
+
+  const handleResetForm = () => {
+    handleReset();
+    setIsDataLoaded(false);
+    setFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
   };
 
   return (
@@ -86,7 +123,7 @@ const Pastor = ({ data }) => {
                     type="text"
                     placeholder="Enter first name"
                     name="first_name"
-                    value={fields.first_name}
+                    value={fields?.first_name ?? ''}
                     onChange={(e) => handleChange('first_name', e.target.value)}
                     className="border-dark"
                   />
@@ -102,7 +139,7 @@ const Pastor = ({ data }) => {
                     type="text"
                     placeholder="Enter last name"
                     name="last_name"
-                    value={fields.last_name}
+                    value={fields?.last_name ?? ''}
                     onChange={(e) => handleChange('last_name', e.target.value)}
                     className="border-dark"
                   />
@@ -121,7 +158,7 @@ const Pastor = ({ data }) => {
                     maxLength={500}
                     as="textarea"
                     rows={3}
-                    value={fields?.description}
+                    value={fields?.description ?? ''}
                     className="border-dark"
                     onChange={(e) => handleChange('description', e.target.value)}
                   />
@@ -133,70 +170,84 @@ const Pastor = ({ data }) => {
               <Button type="button" variant="primary" onClick={() => onSubmit()}>
                 Save Changes
               </Button>
+              <Button 
+                type="button" 
+                variant="secondary" 
+                className="ms-2"
+                onClick={handleResetForm}
+              >
+                Reset
+              </Button>
             </div>
           </Form>
         </Col>
 
         <Col xs={12} md={4}>
-           <div className="d-flex flex-column justify-content-start align-items-start">
-                <div
-                  style={{
-                    width: 460,
-                    height: 579,
-                    borderRadius: '8%',
-                    overflow: 'hidden',
-                    backgroundColor: '#ccc',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative'
+          <div className="d-flex flex-column justify-content-start align-items-start">
+            <div
+              style={{
+                width: 460,
+                height: 579,
+                borderRadius: '8%',
+                overflow: 'hidden',
+                backgroundColor: '#ccc',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative'
+              }}
+              className="mb-3"
+            >
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Avatar Preview"
+                  className="img-fluid"
+                  style={{ width: '460px', height: '579px', objectFit: 'cover', cursor: 'pointer' }}
+                  onClick={handleImageClick}
+                />
+              ) : fields?.secure_url ? (
+                <img
+                  src={fields.secure_url}
+                  alt="Avatar"
+                  className="img-fluid"
+                  style={{ width: '460px', height: '579px', objectFit: 'cover', cursor: 'pointer' }}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/img/blank_insert.png';
                   }}
-                  className="mb-3"
-                >
-                  {previewUrl ? (
-                    <img
-                      src={previewUrl}
-                      alt="Avatar Preview"
-                      className="img-fluid"
-                      style={{ width: '460px', height: '579px', objectFit: 'cover' }}
-                    />
-                  ) : fields.secure_url ? (
-                    <img
-                      src={fields.secure_url}
-                      alt="Avatar"
-                      className="img-fluid"
-                      style={{ width: '460px', height: '579px', objectFit: 'cover' }}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/img/blank_insert.png';
-                      }}
-                    />
-                  ) : (
-                   
-                    <img
-                      src='/img/blank_insert.png'
-                      alt="Avatar"
-                      className="img-fluid"
-                      style={{ width: '460px', height: '579px', objectFit: 'cover' }}
-                      onClick={handleImageClick}
-                    />
-                  )}
-                </div>
-              </div>
+                  onClick={handleImageClick}
+                />
+              ) : (
+                <img
+                  src='/img/blank_insert.png'
+                  alt="Avatar"
+                  className="img-fluid"
+                  style={{ width: '460px', height: '579px', objectFit: 'cover', cursor: 'pointer' }}
+                  onClick={handleImageClick}
+                />
+              )}
+            </div>
+          </div>
         </Col>
       </Row>
 
       {success && (
         <OkDialogue
           show={success}
-          message="Your changes was save successfully"
-          onConfirm={() => {
-            handleReset();
-          }}
+          message="Your changes were saved successfully"
+          onConfirm={handleResetForm}
         />
       )}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
-      <input type="file" id="file-input" accept="image/*" onChange={handleFileChange} hidden />
+      <input 
+        type="file" 
+        id="file-input" 
+        ref={fileInputRef}
+        accept="image/*" 
+        onChange={handleFileChange} 
+        hidden 
+      />
     </div>
   );
 };

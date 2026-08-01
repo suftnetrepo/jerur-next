@@ -1001,20 +1001,12 @@ export const pastorValidator = {
         message: 'last name must not be more than 50 characters'
       }
     ],
-    mobile: [
-      { pattern: /^.+$/, message: 'mobile is required' },
-      {
-        pattern: /^.{0,50}$/,
-        message: 'mobile number must not be more than 20 characters'
-      }
-    ]
   },
   reset: () => {
     return {
       title: '',
       first_name: '',
       last_name: '',
-      mobile: '',
       description: '',
       secure_url: '',
       public_id: '',
@@ -1024,7 +1016,6 @@ export const pastorValidator = {
     title: '',
     first_name: '',
     last_name: '',
-    mobile: '',
     description: '',
     secure_url: '',
     public_id: '',
