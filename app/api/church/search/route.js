@@ -1,11 +1,18 @@
 import { searchChurches, searchChurchesWithinRadius } from '../../../services/churchService';
 import { logger } from '../../../../utils/logger';
+import { encrypt } from '../../../../utils/helpers';
 import { NextResponse } from 'next/server';
 
 const parseCoordinate = (value) => {
   const parsed = Number.parseFloat(value);
   return Number.isFinite(parsed) ? parsed : null;
 };
+
+const withExternalId = (churches) =>
+  churches.map((church) => {
+    const churchObj = typeof church.toObject === 'function' ? church.toObject() : church;
+    return { ...churchObj, externalId: encrypt(churchObj._id?.toString()) };
+  });
 
 export const GET = async (req) => {
   try {
@@ -20,7 +27,7 @@ export const GET = async (req) => {
       }
 
       const data = await searchChurches(searchQuery);
-      return NextResponse.json({ data, success: true });
+      return NextResponse.json({ data: withExternalId(data), success: true });
     }
 
     if (action === 'radius') {
@@ -36,7 +43,7 @@ export const GET = async (req) => {
       }
 
       const data = await searchChurchesWithinRadius(latitude, longitude, radius);
-      return NextResponse.json({ data, success: true });
+      return NextResponse.json({ data: withExternalId(data), success: true });
     }
 
     return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
