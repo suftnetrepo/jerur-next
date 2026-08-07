@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "create-admin": "tsx scripts/create-admin.ts",
+    "migrate": "tsx scripts/run-migrations.js",
     "dev": "next dev",
     "lint": "next lint",
     "build": "next build",

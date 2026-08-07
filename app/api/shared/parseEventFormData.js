@@ -1,17 +1,13 @@
-import { Buffer } from 'buffer';
-import { v2 as cloudinary } from 'cloudinary';
-
 export const config = {
-    api: { bodyParser: false }
-  };
-  
-  cloudinary.config({
-    cloud_name: process.env.NEXT_PUBLIC_CLOUD_NAME,
-    api_key: process.env.NEXT_PUBLIC_CLOUD_API_KEY,
-    api_secret: process.env.NEXT_PUBLIC_CLOUD_SECRETE
-  });
+  api: { bodyParser: false }
+};
 
-export async function parseEventFormData(req, user) {
+// Pulls the plain fields + the raw image File (if any) off the multipart
+// form. Uploading that file to Cloudinary is the event service's job (it's
+// the only layer that knows whether this is a create or an edit, and - for
+// edits - what the previous image's public_id was), so this stays a pure
+// parser with no Cloudinary/network calls of its own.
+export async function parseEventFormData(req) {
   const formData = await req.formData();
 
   const title = formData.get('title');
@@ -34,30 +30,8 @@ export async function parseEventFormData(req, user) {
   }
 
   const file = formData.get('file');
-  let uploadedImage = null;
 
-  if (file) {
-    const fileBuffer = await file.arrayBuffer();
-    const base64Data = Buffer.from(fileBuffer).toString('base64');
-    const fileUri = `data:${file.type};base64,${base64Data}`;
-
-    const uploadToCloudinary = () => {
-      return new Promise((resolve, reject) => {
-        cloudinary.uploader
-          .upload(fileUri, {
-            folder: `${process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER}/${user?.church}`,
-            resource_type: 'auto',
-            invalidate: true
-          })
-          .then(resolve)
-          .catch(reject);
-      });
-    };
-
-    uploadedImage = await uploadToCloudinary();
-  }
-
-  const eventData = {
+  return {
     title,
     status,
     description,
@@ -69,13 +43,9 @@ export async function parseEventFormData(req, user) {
     country,
     postcode,
     completeAddress,
-    location
+    location,
+    // Present only when the admin actually picked a new image; the service
+    // layer treats a missing/falsy `file` as "keep the existing image".
+    file: file || null
   };
-
-  if (uploadedImage) {
-    eventData.secure_url = uploadedImage.secure_url;
-    eventData.public_id = uploadedImage.public_id;
-  }
-
-  return eventData;
 }

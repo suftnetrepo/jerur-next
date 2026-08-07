@@ -49,6 +49,7 @@ export const CHURCH = {
   single: `${HOST}church/single/`,
   uploadOne: `${HOST}church/update/`,
   uploadPastor: `${HOST}church/pastor/`,
+  uploadNotification: `${HOST}church/notification/`,
 };
 
 export const ADDRESS = {

@@ -356,6 +356,27 @@ const ChurchSchema = new mongoose.Schema(
         default: ''
       }
     },
+    notification: {
+      title: {
+        type: String,
+        trim: true,
+        required: false,
+        default: '',
+        max: 100
+      },
+      message: {
+        type: String,
+        trim: true,
+        required: false,
+        default: '',
+        max: 300
+      },
+      expiry_date: {
+        type: Date,
+        required: false,
+        default: null
+      }
+    },
     onboarding: {
       welcomeModalDismissed: {
         type: Boolean,

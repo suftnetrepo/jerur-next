@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Form, Button, Image, InputGroup, Tabs, Tab } from 'react-bootstrap';
+import { Row, Col, Form, Button, InputGroup, Tabs, Tab } from 'react-bootstrap';
 import dynamic from 'next/dynamic';
 import { dateFormatted, encrypt, decrypt } from '../../../../utils/helpers';
 import { useSettings } from '../../../../hooks/useSettings';
@@ -19,6 +19,8 @@ import ConfigPage from './config';
 import ClientKeyPage from './client-key';
 import Pastor from './others/pastor';
 import Prophetic from './others/prophetic';
+import NotificationSettings from './others/notification';
+import About from './about';
 
 const AddressForm = dynamic(() => import('./address'), { ssr: false });
 
@@ -41,18 +43,10 @@ const SettingsPage = () => {
     };
   }, [previewUrl]);
 
-  const handleImageClick = () => {
-    document.getElementById('file-input').click();
-  };
-
-  const handleFileChange = (e) => {
+  const handleImageSelect = (selectedFile) => {
     setPreviewUrl(null);
-    const selectedFile = e.target.files[0];
-
-    if (selectedFile && selectedFile.type.startsWith('image/')) {
-      setFile(selectedFile);
-      setPreviewUrl(URL.createObjectURL(selectedFile));
-    }
+    setFile(selectedFile);
+    setPreviewUrl(URL.createObjectURL(selectedFile));
   };
 
   const onSubmit = async () => {
@@ -97,141 +91,15 @@ const SettingsPage = () => {
     switch (selectedMenu) {
       case 'profile':
         return (
-          <Form>
-            <Row className="mb-3">
-              <Col xs={12} md={4}>
-                <div className="d-flex flex-column justify-content-start align-items-start">
-                  <div
-                    style={{
-                      width: 150,
-                      height: 150,
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                      backgroundColor: '#ccc',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'relative'
-                    }}
-                    className="mb-3"
-                  >
-                    {previewUrl ? (
-                      <img
-                        src={previewUrl}
-                        alt="Avatar Preview"
-                        className="img-fluid rounded-circle"
-                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-                      />
-                    ) : fields.secure_url ? (
-                      <img
-                        src={fields.secure_url}
-                        alt="Avatar"
-                        className="img-fluid rounded-circle"
-                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/img/blank.png';
-                        }}
-                      />
-                    ) : (
-                      <span>150 x 150</span>
-                    )}
-                  </div>
-
-                  <Button variant="success" className="mb-2 mt-3" onClick={handleImageClick}>
-                    Change picture
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col md={6}>
-                <Row className="mb-1">
-                  <Col>
-                    <Form.Group>
-                      <Form.Label className="text-dark">Church Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={fields?.name}
-                        className="border-dark"
-                        onChange={(e) => handleChange('name', e.target.value)}
-                      />
-                    </Form.Group>
-                    {errorMessages?.name?.message && (
-                      <span className="text-danger fs-13">{errorMessages?.name?.message}</span>
-                    )}
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col md={6}>
-                <Row className="mb-1">
-                  <Col>
-                    <Form.Group>
-                      <Form.Label className="text-dark">Email</Form.Label>
-                      <Form.Control
-                        type="text"
-                        maxLength={50}
-                        value={fields?.email}
-                        readOnly
-                        className="border-dark"
-                        onChange={(e) => handleChange('email', e.target.value)}
-                      />
-                    </Form.Group>
-                    {errorMessages?.email?.message && (
-                      <span className="text-danger fs-13">{errorMessages?.email?.message}</span>
-                    )}
-                  </Col>
-                  <Col>
-                    <Form.Group>
-                      <Form.Label className="text-dark">Mobile</Form.Label>
-                      <Form.Control
-                        type="text"
-                        maxLength={50}
-                        value={fields?.mobile}
-                        className="border-dark"
-                        onChange={(e) => handleChange('mobile', e.target.value)}
-                      />
-                    </Form.Group>
-                    {errorMessages?.mobile?.message && (
-                      <span className="text-danger fs-13">{errorMessages?.mobile?.message}</span>
-                    )}
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-
-              <div className="row col-9">
-              <Form.Group className="mb-3">
-                <Form.Label className="text-dark">Description</Form.Label>
-                <Form.Control
-                  maxLength={500}
-                  as="textarea"
-                  rows={3}
-                  value={fields?.description}
-                  className="border-dark"
-                  onChange={(e) => handleChange('description', e.target.value)}
-                />
-              </Form.Group>
-            </div>
-
-            <div className="d-flex justify-content-start">
-              <Button type="button" variant="primary" onClick={() => onSubmit()}>
-                Save Changes
-              </Button>
-              <div className='me-2'></div>
-              {
-                process.env.NODE_ENV === 'development' && (
-                  <Button type="button" variant="secondary" onClick={() => handleSeeds()}>
-                    Seeds
-                  </Button>
-                )
-              }
-            </div>
-          </Form>
+          <About
+            fields={fields}
+            errorMessages={errorMessages}
+            handleChange={handleChange}
+            onSubmit={onSubmit}
+            handleSeeds={handleSeeds}
+            previewUrl={previewUrl}
+            onImageSelect={handleImageSelect}
+          />
         );
       case 'Subscription':
         return (
@@ -401,6 +269,9 @@ const SettingsPage = () => {
             <Tab eventKey="prophetic" title="Prophetic Theme">
               <Prophetic data={data?.prophetic_focus} />
             </Tab>
+            <Tab eventKey="notification" title="Notification">
+              <NotificationSettings data={data?.notification} />
+            </Tab>
             <Tab eventKey="config" title="Other Configurations">
               <ConfigPage data={data} />
             </Tab>
@@ -479,7 +350,6 @@ const SettingsPage = () => {
           {renderContent(fields)}
         </Col>
       </Row>
-      <input type="file" id="file-input" accept="image/*" onChange={handleFileChange} hidden />
       {!loading && <span className="overlay__block" />}
       {success && <OkDialogue showSuccess={success} onClose={() => { }} />}
       {error && <ErrorDialogue showError={error} onClose={() => { }} />}

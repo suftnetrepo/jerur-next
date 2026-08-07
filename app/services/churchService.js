@@ -7,12 +7,16 @@ import {
   updateFeatureValidator,
   churchUpdateValidator,
   pastorValidator,
-  propheticValidator
+  propheticValidator,
+  notificationValidator
 } from '../validation/churchValidator';
 import { logger } from '../../utils/logger';
 import { mongoConnect } from '../../utils/connectDb';
+import CloudinaryService from '../../lib/CloudinaryService';
 
 mongoConnect();
+
+const churchImageFolder = (suid) => `${process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER}/${suid}`;
 
 async function updateProphetic(suid, body) {
   try {
@@ -45,6 +49,71 @@ async function updateProphetic(suid, body) {
   }
 }
 
+const buildNotificationResponse = (notification) => {
+  const title = notification?.title || '';
+  const message = notification?.message || '';
+  const expiry_date = notification?.expiry_date || null;
+
+  return {
+    title,
+    message,
+    expiry_date,
+    isExpired: expiry_date ? new Date(expiry_date) < new Date() : false
+  };
+};
+
+async function getNotification(suid) {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const church = await Church.findById(suid).select('notification').lean();
+    return buildNotificationResponse(church?.notification);
+  } catch (error) {
+    logger.error(error);
+    throw new Error(error.message || 'Error fetching church notification');
+  }
+}
+
+async function updateNotification(suid, body) {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const bodyErrors = notificationValidator(body);
+    if (bodyErrors.length) {
+      const error = new Error(bodyErrors.map((it) => it.message).join(','));
+      error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const { title, message, expiry_date } = body;
+
+    if (new Date(expiry_date) < new Date(new Date().toDateString())) {
+      const error = new Error('Expiry date must not be in the past');
+      error.invalidArgs = 'expiry_date';
+      throw error;
+    }
+
+    // $set only the notification object so the existing value is overwritten in place,
+    // never appended, and the rest of the Church document is left untouched.
+    await Church.findByIdAndUpdate(suid, { $set: { notification: { title, message, expiry_date } } }, { new: true });
+
+    return buildNotificationResponse({ title, message, expiry_date });
+  } catch (error) {
+    logger.error(error);
+    throw new Error(error.message || 'Error updating church notification');
+  }
+}
+
 async function updatePastor(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
@@ -54,15 +123,40 @@ async function updatePastor(suid, body) {
       throw error;
     }
 
-    const bodyErrors = pastorValidator(body.pastor_section);
+    const { file, ...pastorFields } = body;
+    const bodyErrors = pastorValidator(pastorFields);
     if (bodyErrors.length) {
       const error = new Error(bodyErrors.map((it) => it.message).join(','));
       error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
       throw error;
     }
-    await Church.findByIdAndUpdate(suid, body, {
-      new: true
+
+    const existingChurch = await Church.findById(suid).select('pastor_section');
+    const existingPastorSection = existingChurch?.pastor_section || {};
+
+    // No new file -> CASE 1: keep the existing secure_url/public_id.
+    // New file -> CASE 2: delete the old Cloudinary image, upload the new
+    // one, and persist its secure_url/public_id.
+    //
+    // pastor_section is a single embedded (non-array) subdocument, so a
+    // plain `{ pastor_section: {...} }` update fully replaces it rather
+    // than merging - public_id/secure_url must always be explicitly
+    // included (new or carried-forward) or they'd be reset to their schema
+    // defaults on every save.
+    const uploaded = await CloudinaryService.replaceImage(file, existingPastorSection.public_id, {
+      folder: churchImageFolder(suid)
     });
+
+    const pastor_section = {
+      title: pastorFields.title,
+      description: pastorFields.description,
+      first_name: pastorFields.first_name,
+      last_name: pastorFields.last_name,
+      public_id: uploaded ? uploaded.public_id : existingPastorSection.public_id,
+      secure_url: uploaded ? uploaded.secure_url : existingPastorSection.secure_url
+    };
+
+    await Church.findByIdAndUpdate(suid, { pastor_section }, { new: true });
 
     return true;
   } catch (error) {
@@ -150,7 +244,24 @@ async function deleteChurch(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    await Church.findByIdAndRemove(id);
+
+    const church = await Church.findById(id).select('public_id pastor_section sliders');
+
+    if (church) {
+      // Every Cloudinary image that lives directly on this Church document
+      // (logo, pastor photo, slider images) is about to become unreachable
+      // once the document is removed - clean each one up first. Best-effort:
+      // logged failures must not block the record deletion itself.
+      const publicIds = [
+        church.public_id,
+        church.pastor_section?.public_id,
+        ...(church.sliders || []).map((slider) => slider.public_id)
+      ].filter(Boolean);
+
+      await Promise.all(publicIds.map((publicId) => CloudinaryService.deleteImage(publicId)));
+    }
+
+    await Church.findByIdAndDelete(id);
     return true;
   } catch (error) {
     logger.error(error);
@@ -166,8 +277,11 @@ async function getChurch(id) {
       throw error;
     }
 
-    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description address features sliders contacts currency bank_name account_number sort_code tax_rate').lean();
-    return data;
+    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description address features sliders contacts currency bank_name account_number sort_code tax_rate notification').lean();
+    return {
+      ...data,
+      notification: buildNotificationResponse(data?.notification)
+    };
   } catch (error) {
     logger.error(error);
     throw new Error(error.message || 'Error fetching church');
@@ -206,7 +320,32 @@ async function updateBulk(suid, body) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    await Church.findByIdAndUpdate(suid, body);
+
+    // Only the "About Us" (church logo) save passes a `file`; every other
+    // caller of this generic bulk-update (bank transfer, social media, ...)
+    // never includes one, so this block is a no-op for them.
+    const { file, ...fields } = body;
+
+    if (file) {
+      const existingChurch = await Church.findById(suid).select('public_id');
+
+      // No new file never reaches here. A new file -> CASE 2: delete the
+      // old Cloudinary logo, upload the new one, and persist its
+      // secure_url/public_id. public_id/secure_url are top-level scalar
+      // fields on Church, so simply omitting them from `fields` below (as
+      // already happened before this change) correctly leaves the existing
+      // ones untouched for CASE 1 (no file selected).
+      const uploaded = await CloudinaryService.replaceImage(file, existingChurch?.public_id, {
+        folder: churchImageFolder(suid)
+      });
+
+      if (uploaded) {
+        fields.public_id = uploaded.public_id;
+        fields.secure_url = uploaded.secure_url;
+      }
+    }
+
+    await Church.findByIdAndUpdate(suid, fields);
     return true;
   } catch (error) {
     console.error(error);
@@ -456,5 +595,7 @@ export {
   updateFeatures,
   updateChurchContact,
   updatePastor,
-  updateProphetic
+  updateProphetic,
+  getNotification,
+  updateNotification
 };

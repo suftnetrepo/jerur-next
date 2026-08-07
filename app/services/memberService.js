@@ -1,5 +1,6 @@
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 import { memberValidator, pinValidator, loginValidator } from '../validation/userValidator';
 import { identifierValidator } from '../validation/identifierValidator';
 import Member from '../models/member';
@@ -11,37 +12,41 @@ import { mongoConnect } from '../../utils/connectDb';
 
 mongoConnect();
 
-const generateToken = (currentUser, expiresIn) => {
-  const { _id, email, first_name, last_name, mobile, role, user_status } = currentUser;
+const PIN_SALT_ROUNDS = 10;
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+const MEMBER_TOKEN_EXPIRY = '30d';
 
-  const token = jwt.sign(
-    {
-      userId: _id,
-      email,
-      first_name,
-      mobile,
-      last_name,
-      role,
-      suid: currentUser.church._id
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn
-    }
-  );
+// NOTE: assumes a JWT_SECRET env var already exists (or is added) alongside
+// whatever other secrets this project keeps — separate from any staff/User
+// JWT secret if one exists, so a compromised member token can never be
+// used to mint a staff session or vice versa.
+const JWT_SECRET = process.env.MEMBER_JWT_SECRET;
 
-  const member = {
-    _id,
-    church: currentUser.church._id,
-    email,
-    first_name,
-    mobile,
-    last_name,
-    role,
-    user_status
-  };
-  return { token, member };
-};
+class MemberAuthError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.code = code; // 'INVALID_CREDENTIALS' | 'LOCKED' | 'NOT_FOUND'
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Admin-facing CRUD (church dashboard "Members" page). Restored after being
+// dropped when this file was refactored for mobile self-service auth below —
+// app/api/member/route.js (and create/update/delete/verify routes) import
+// these by name, so removing them 500'd the Members page.
+//
+// The one required adaptation: Member.pin (plaintext) was replaced on the
+// schema by Member.pinHash (bcrypt, select:false) — see app/models/member.js.
+// Anywhere the old code wrote a plaintext `pin`, it now writes a hashed
+// `pinHash` instead so admin-created members can still authenticate via
+// authenticateMember() below. verificationPin/verifyPin/sendVerificationCode
+// (the email one-time-code flow) still reference the old `pin` field, which
+// no longer exists on the schema — restored as-is (fails safe: Mongoose's
+// strict schema silently drops the unknown field rather than corrupting
+// pinHash), but that flow needs a real fix/decision before it's relied on
+// again, e.g. its own verificationCode/verificationCodeExpiry fields.
+// ---------------------------------------------------------------------------
 
 const MEMBER_STATUS_ORDER = ['active', 'provisional', 'under discipline', 'inactive'];
 
@@ -146,7 +151,7 @@ async function getMembers({ suid, page = 1, limit = 10, sortField, sortOrder, se
   }
 }
 
-async function getMemberCount( suid ) {
+async function getMemberCount(suid) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -154,13 +159,14 @@ async function getMemberCount( suid ) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
-    const members = await Member.countDocuments({church:suid})
-    return members ;
+    const members = await Member.countDocuments({ church: suid });
+    return members;
   } catch (error) {
     logger.error('Error getting member count:', error);
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
+
 function getMember(id) {
   try {
     const identifierValidateResult = identifierValidator(id);
@@ -176,8 +182,8 @@ function getMember(id) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function addMember(suid, body) {
 
+async function addMember(suid, body) {
   try {
     const identifierValidateResult = identifierValidator(suid);
     if (identifierValidateResult.length) {
@@ -195,7 +201,10 @@ async function addMember(suid, body) {
 
     const newUser = await Member.create({
       church: suid,
-      pin: 1234,
+      // Default PIN for admin-created members, hashed the same way as
+      // self-service registration (Member.pin was removed from the schema
+      // in favour of Member.pinHash — see app/models/member.js).
+      pinHash: await bcrypt.hash('1234', PIN_SALT_ROUNDS),
       role: 'member',
       ...body
     });
@@ -204,8 +213,7 @@ async function addMember(suid, body) {
       throw new Error('create new member failed');
     }
 
-    const token = generateToken(newUser, '30m');
-    return token;
+    return newUser;
   } catch (error) {
     logger.error(error);
     if (error.code === 11000) {
@@ -215,6 +223,7 @@ async function addMember(suid, body) {
     }
   }
 }
+
 async function addMemberManual(body) {
   const { suid } = body;
   try {
@@ -234,7 +243,7 @@ async function addMemberManual(body) {
 
     const newUser = await Member.create({
       church: suid,
-      pin: 1234,
+      pinHash: await bcrypt.hash('1234', PIN_SALT_ROUNDS),
       role: 'member',
       ...body
     });
@@ -253,8 +262,8 @@ async function addMemberManual(body) {
     }
   }
 }
-async function updateMember(id, body) {
 
+async function updateMember(id, body) {
   try {
     const identifierValidateResult = identifierValidator(id);
     if (identifierValidateResult.length) {
@@ -284,83 +293,8 @@ async function updateMember(id, body) {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
-async function verificationPin( email, pin ) {
-  try {
-    const validateResult = pinValidator({ email, pin });
-    if (validateResult.length) {
-      const error = new Error(validateResult.map((it) => it.message).join(','));
-      error.invalidArgs = validateResult.map((it) => it.field).join(',');
-      throw error;
-    }
 
-    const member = await Member.findOne({ email: new RegExp(email, 'i') });
-
-    if (!member) {
-      throw new Error('No Member found with this credentials.');
-    }
-
-    if (member.pin !== pin) {
-      throw new Error('Invalid code');
-    }
-
-    await member.save();
-
-    const token = generateToken(member, '30m');
-    return token;
-  } catch (error) {
-    logger.error(error);
-    throw new Error(error.message);
-  }
-}
-async function verifyPin( email ) {
-  const validateResult = loginValidator({ email });
-  if (validateResult.length) {
-    const error = new Error(validateResult.map((it) => it.message).join(','));
-    error.invalidArgs = validateResult.map((it) => it.field).join(',');
-    throw error;
-  }
-
-  const member = await Member.findOne({ email: new RegExp(email, 'i') });
-  if (!member) {
-    throw new Error('No Member found with this login credentials.');
-  }
-
-  await sendVerificationCode(member);
-  return true;
-}
-async function sendVerificationCode(member) {
-  try {
-    const code = Math.floor(1000 + Math.random() * 9000);
-    member.pin = code;
-    await member.save();
-
-    const { first_name, last_name, email } = member;
-
-    const template = await compileEmailTemplate(
-      emailTemplates.codeVerification({
-        name: `${first_name} ${last_name}`,
-        code: code,
-        contact_email: process.env.CONTACT_EMAIL,
-        team: process.env.TEAM
-      })
-    );
-
-    const mailOptions = {
-      from: process.env.USER_NAME,
-      to: `${email}`,
-      subject: 'Your code verification',
-      text: 'Your code verification',
-      html: template
-    };
-
-    sendEmail(mailOptions);
-    return true;
-  } catch (error) {
-    logger.error(error);
-    throw new Error('An unexpected error occurred. Please try again.');
-  }
-}
-async function removeMember( suid , id) {
+async function removeMember(suid, id) {
   try {
     const identifierValidateResult = identifierValidator(id);
     if (identifierValidateResult.length) {
@@ -402,7 +336,206 @@ const aggregateMemberByRole = async (church) => {
   }
 };
 
+// ---------------------------------------------------------------------------
+// Legacy email one-time-code verification flow. Restored verbatim from
+// before the mobile self-service refactor. NOTE: this still reads/writes
+// Member.pin, which no longer exists on the schema (replaced by pinHash —
+// see app/models/member.js and the block comment above). Mongoose's strict
+// schema mode means member.pin = code; member.save() silently does not
+// persist that field, so this flow will run without throwing but will never
+// actually succeed (verificationPin() will always see an undefined pin and
+// reject the code). Left in place, not repurposed onto pinHash, because
+// doing so would mean every "resend code" email silently overwrites the
+// member's real login PIN with the emailed one-time code — a real change in
+// login behaviour, not something to decide implicitly here. This needs its
+// own verificationCode/verificationCodeExpiry fields (or an equivalent) as a
+// follow-up before it's relied on again.
+// ---------------------------------------------------------------------------
+
+async function verificationPin(email, pin) {
+  try {
+    const validateResult = pinValidator({ email, pin });
+    if (validateResult.length) {
+      const error = new Error(validateResult.map((it) => it.message).join(','));
+      error.invalidArgs = validateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    const member = await Member.findOne({ email: new RegExp(email, 'i') });
+
+    if (!member) {
+      throw new Error('No Member found with this credentials.');
+    }
+
+    if (member.pin !== pin) {
+      throw new Error('Invalid code');
+    }
+
+    await member.save();
+
+    return member;
+  } catch (error) {
+    logger.error(error);
+    throw new Error(error.message);
+  }
+}
+
+async function verifyPin(email) {
+  const validateResult = loginValidator({ email });
+  if (validateResult.length) {
+    const error = new Error(validateResult.map((it) => it.message).join(','));
+    error.invalidArgs = validateResult.map((it) => it.field).join(',');
+    throw error;
+  }
+
+  const member = await Member.findOne({ email: new RegExp(email, 'i') });
+  if (!member) {
+    throw new Error('No Member found with this login credentials.');
+  }
+
+  await sendVerificationCode(member);
+  return true;
+}
+
+async function sendVerificationCode(member) {
+  try {
+    const code = Math.floor(1000 + Math.random() * 9000);
+    member.pin = code;
+    await member.save();
+
+    const { first_name, last_name, email } = member;
+
+    const template = await compileEmailTemplate(
+      emailTemplates.codeVerification({
+        name: `${first_name} ${last_name}`,
+        code: code,
+        contact_email: process.env.CONTACT_EMAIL,
+        team: process.env.TEAM
+      })
+    );
+
+    const mailOptions = {
+      from: process.env.USER_NAME,
+      to: `${email}`,
+      subject: 'Your code verification',
+      text: 'Your code verification',
+      html: template
+    };
+
+    sendEmail(mailOptions);
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('An unexpected error occurred. Please try again.');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Mobile self-service auth (member/register, member/login).
+// ---------------------------------------------------------------------------
+
+export async function registerMember({ church, first_name, last_name, mobile, email, pin }) {
+  if (!first_name || !last_name || !pin) {
+    throw new Error('first_name, last_name, and pin are required.');
+  }
+  if (!mobile && !email) {
+    throw new Error('Either mobile or email is required.');
+  }
+  if (!/^\d{4,6}$/.test(String(pin))) {
+    throw new Error('PIN must be 4 to 6 digits.');
+  }
+
+  // Prevent duplicate self-registration for the same person at the same church.
+  const existing = await Member.findOne({
+    church,
+    $or: [mobile ? { mobile } : null, email ? { email: email.toLowerCase() } : null].filter(Boolean)
+  });
+  if (existing) {
+    throw new Error('A member with this phone or email already exists at this church.');
+  }
+
+  const pinHash = await bcrypt.hash(String(pin), PIN_SALT_ROUNDS);
+
+  const member = await Member.create({
+    church,
+    first_name,
+    last_name,
+    mobile: mobile ?? '',
+    email: email ? email.toLowerCase() : undefined,
+    pinHash,
+    // Self-registered members start as "provisional" — matches the
+    // existing status enum's intent (an actual church staff member
+    // presumably promotes to "active" once they know who this is).
+    // Never let self-registration set role above "member".
+    status: 'provisional',
+    role: 'member'
+  });
+
+  return member;
+}
+
+/**
+ * Looks up a member by (church + mobile-or-email) and verifies their PIN,
+ * with per-account lockout after MAX_LOGIN_ATTEMPTS failures.
+ *
+ * KNOWN LIMITATION: lockout is tracked on the Member document itself, so it
+ * only kicks in once a matching record is found. An attacker hammering PINs
+ * against a phone/email that doesn't exist at all isn't rate-limited by
+ * this alone — that needs IP-based rate limiting at the edge (middleware or
+ * a proxy), which is a separate piece of infra this doesn't attempt to add.
+ */
+export async function authenticateMember({ church, identifier, pin }) {
+  const member = await Member.findOne({
+    church,
+    $or: [{ mobile: identifier }, { email: identifier.toLowerCase() }]
+  }).select('+pinHash');
+
+  if (!member) {
+    throw new MemberAuthError('NOT_FOUND', 'No member found with that phone or email.');
+  }
+
+  if (member.lockedUntil && member.lockedUntil > new Date()) {
+    const minutesLeft = Math.ceil((member.lockedUntil - new Date()) / 60000);
+    throw new MemberAuthError('LOCKED', `Too many attempts. Try again in ${minutesLeft} minute(s).`);
+  }
+
+  const isValid = member.pinHash && (await bcrypt.compare(String(pin), member.pinHash));
+
+  if (!isValid) {
+    member.loginAttempts = (member.loginAttempts ?? 0) + 1;
+    if (member.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+      member.lockedUntil = new Date(Date.now() + LOCKOUT_DURATION_MS);
+      member.loginAttempts = 0;
+    }
+    await member.save();
+    throw new MemberAuthError('INVALID_CREDENTIALS', 'Incorrect PIN.');
+  }
+
+  member.loginAttempts = 0;
+  member.lockedUntil = undefined;
+  await member.save();
+
+  return member;
+}
+
+export function generateMemberToken(member) {
+  return jwt.sign(
+    { memberId: member._id.toString(), church: member.church.toString(), type: 'member' },
+    JWT_SECRET,
+    { expiresIn: MEMBER_TOKEN_EXPIRY }
+  );
+}
+
+export function verifyMemberToken(token) {
+  const payload = jwt.verify(token, JWT_SECRET);
+  if (payload.type !== 'member') {
+    throw new Error('Invalid token type.');
+  }
+  return payload; // { memberId, church }
+}
+
 export {
+  MemberAuthError,
   aggregateMemberByRole,
   getMembers,
   removeMember,

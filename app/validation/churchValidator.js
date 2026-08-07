@@ -47,6 +47,16 @@ function pastorValidator(data) {
   return validator.validate(data, schema);
 }
 
+function notificationValidator(data) {
+  const validator = new Validator();
+  const schema = {
+    title: { type: 'string', empty: false, max: 100 },
+    message: { type: 'string', empty: false, max: 300 },
+    expiry_date: { type: 'date', convert: true },
+  };
+  return validator.validate(data, schema);
+}
+
 function updateOneValidator(data) {
   const validator = new Validator();
   const updateOneSchema = {
@@ -101,5 +111,6 @@ export  {
   churchValidator,
   churchUpdateValidator,
   pastorValidator,
-  propheticValidator
+  propheticValidator,
+  notificationValidator
 };

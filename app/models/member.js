@@ -22,10 +22,19 @@ const memberSchema = new Schema(
     },
     status: { type: String, enum: ["active", "provisional", "inactive", "under discipline"], required: true },
     email: { type: String, unique: false, lowercase: true },
-    pin: {
-      type: Number,
-      default: 0
-    },
+
+    // CHANGED: was `pin: { type: Number, default: 0 }` — a plaintext numeric
+    // PIN readable by anyone with database access. Replaced with a bcrypt
+    // hash, same treatment as a password, even though it's "just" a short
+    // PIN — it's still the only thing gating "act as this member."
+    pinHash: { type: String, required: false, select: false },
+
+    // Self-service login-attempt tracking, so member/login can lock out
+    // brute-force PIN guesses without needing separate rate-limit infra
+    // (Redis, etc.). See services/memberService.js authenticateMember().
+    loginAttempts: { type: Number, default: 0 },
+    lockedUntil: { type: Date, required: false },
+
     role: { type: String, enum: ['member', 'volunteer', 'leader', 'pastor'], required: true }
   },
   { timestamps: true }

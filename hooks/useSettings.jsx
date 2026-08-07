@@ -6,8 +6,8 @@ import { zat } from '../utils/api';
 import { bzat } from '../utils/axios';
 import { VERBS } from '../config';
 import { CHURCH, USER, SEED_DATA } from '../utils/apiUrl';
-import { churchValidator, pastorValidator, propheticValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator } from '../validator/rules';
-import { FEATURES } from '../utils/helpers';
+import { churchValidator, pastorValidator, propheticValidator, bankTransferValidator, socialMediaValidator, featuresValidator, configValidator, notificationValidator } from '../validator/rules';
+import { MOBILE_FEATURES } from '../constants/mobileFeatures';
 
 const useSettings = () => {
   const [state, setState] = useState({
@@ -262,6 +262,78 @@ const useProphetic = () => {
   };
 };
 
+const useNotification = () => {
+  const [state, setState] = useState({
+    data: {},
+    loading: false,
+    fields: notificationValidator.fields,
+    error: null,
+    success: false,
+    rules: notificationValidator.rules
+  });
+
+  const handleChange = (name, value) => {
+    setState((prevState) => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+        [name]: value
+      }
+    }));
+  };
+
+  const handleSelect = (data) => {
+    const { title, message, expiry_date } = data || {};
+    setState((prevState) => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+        title: title || '',
+        message: message || '',
+        // The date input expects a yyyy-mm-dd string.
+        expiry_date: expiry_date ? new Date(expiry_date).toISOString().split('T')[0] : ''
+      }
+    }));
+  };
+
+  const handleError = (error) => {
+    setState((pre) => {
+      return { ...pre, error: error, loading: false };
+    });
+  };
+
+  const handleReset = () => {
+    setState((pre) => {
+      return { ...pre, editData: null, error: null, success: false };
+    });
+  };
+
+  const handleUpdate = async (body) => {
+    setState((prev) => ({ ...prev, loading: true, success: false }));
+    const { success, errorMessage } = await zat(CHURCH.uploadNotification, body, VERBS.PUT);
+
+    if (success) {
+      setState((prevState) => ({
+        ...prevState,
+        success: true,
+        loading: false
+      }));
+      return true;
+    } else {
+      handleError(errorMessage || 'Failed to update the notification.');
+      return false;
+    }
+  };
+
+  return {
+    ...state,
+    handleReset,
+    handleSelect,
+    handleChange,
+    handleUpdate
+  };
+};
+
 const useBankTransfer = () => {
   const [state, setState] = useState({
     data: {},
@@ -411,7 +483,7 @@ const useSocialMedia = () => {
 
 const useFeatures = () => {
   const [state, setState] = useState({
-    data: FEATURES || [],
+    data: MOBILE_FEATURES,
     loading: false,
     fields: featuresValidator.fields,
     error: null,
@@ -446,14 +518,14 @@ const useFeatures = () => {
 
   const handleReset = () => {
     setState((pre) => {
-      return { ...pre, data: FEATURES, error: null };
+      return { ...pre, data: MOBILE_FEATURES, error: null };
     });
   };
 
   const handleSave = async (body) => {
     setState((prev) => ({ ...prev, loading: true, success: false }));
     const { success, errorMessage } = await zat(CHURCH.uploadOne, body, VERBS.PUT, {
-      action: 'bulk'
+      action: 'features'
     });
 
     if (success) {
@@ -516,7 +588,7 @@ const useConfig = () => {
 
   const handleReset = () => {
     setState((pre) => {
-      return { ...pre, data: FEATURES, error: null };
+      return { ...pre, error: null };
     });
   };
 
@@ -559,4 +631,4 @@ export const single = async (id) => {
   }
 }
 
-export { usePastor, useProphetic, useSettings,useConfig, useBankTransfer, useSocialMedia, useFeatures };
+export { usePastor, useProphetic, useSettings, useConfig, useBankTransfer, useSocialMedia, useFeatures, useNotification };

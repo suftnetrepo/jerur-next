@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
 import { validate } from '../../../../../validator/validator';
 import { usePastor } from '../../../../../hooks/useSettings';
+import ImageUploadPanel from '../../../../../src/components/reuseable/ImageUploadPanel';
 
 const Pastor = ({ data }) => {
   const { error, success, fields, rules, handleChange, handleUpdate, handleReset, handleSelect } = usePastor();
@@ -11,7 +12,6 @@ const Pastor = ({ data }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [file, setFile] = useState(null);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const fileInputRef = useRef(null);
 
   console.log('Pastor data:', data); // Debugging line to check the data prop
   console.log('Pastor success:', success); // Debugging line to check the fields state
@@ -36,23 +36,13 @@ const Pastor = ({ data }) => {
     };
   }, [previewUrl]);
 
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-
-    if (selectedFile && selectedFile.type.startsWith('image/')) {
-      // Revoke previous preview URL if exists
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setFile(selectedFile);
-      setPreviewUrl(URL.createObjectURL(selectedFile));
-      // Reset file input value to allow selecting the same file again
-      e.target.value = null;
+  const handleFileSelect = (selectedFile) => {
+    // Revoke previous preview URL if exists
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
     }
+    setFile(selectedFile);
+    setPreviewUrl(URL.createObjectURL(selectedFile));
   };
 
   const onSubmit = async () => {
@@ -177,52 +167,12 @@ const Pastor = ({ data }) => {
         </Col>
 
         <Col xs={12} md={4}>
-          <div className="d-flex flex-column justify-content-start align-items-start">
-            <div
-              style={{
-                width: 460,
-                height: 579,
-                borderRadius: '8%',
-                overflow: 'hidden',
-                backgroundColor: '#ccc',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative'
-              }}
-              className="mb-3"
-            >
-              {previewUrl ? (
-                <img
-                  src={previewUrl}
-                  alt="Avatar Preview"
-                  className="img-fluid"
-                  style={{ width: '460px', height: '579px', objectFit: 'cover', cursor: 'pointer' }}
-                  onClick={handleImageClick}
-                />
-              ) : fields?.secure_url ? (
-                <img
-                  src={fields.secure_url}
-                  alt="Avatar"
-                  className="img-fluid"
-                  style={{ width: '460px', height: '579px', objectFit: 'cover', cursor: 'pointer' }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/img/blank_insert.png';
-                  }}
-                  onClick={handleImageClick}
-                />
-              ) : (
-                <img
-                  src='/img/blank_insert.png'
-                  alt="Avatar"
-                  className="img-fluid"
-                  style={{ width: '460px', height: '579px', objectFit: 'cover', cursor: 'pointer' }}
-                  onClick={handleImageClick}
-                />
-              )}
-            </div>
-          </div>
+          <ImageUploadPanel
+            previewUrl={previewUrl}
+            imageUrl={fields?.secure_url}
+            onFileSelect={handleFileSelect}
+            alt="Pastor"
+          />
         </Col>
       </Row>
 
@@ -234,14 +184,6 @@ const Pastor = ({ data }) => {
         />
       )}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
-      <input 
-        type="file" 
-        id="file-input" 
-        ref={fileInputRef}
-        accept="image/*" 
-        onChange={handleFileChange} 
-        hidden 
-      />
     </div>
   );
 };

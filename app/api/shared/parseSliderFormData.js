@@ -1,16 +1,11 @@
-import { Buffer } from 'buffer';
-import { v2 as cloudinary } from 'cloudinary';
-
 export const config = {
   api: { bodyParser: false }
 };
 
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUD_NAME,
-  api_key: process.env.NEXT_PUBLIC_CLOUD_API_KEY,
-  api_secret: process.env.NEXT_PUBLIC_CLOUD_SECRETE
-});
-
+// Pulls the plain fields + the raw image File (if any) off the multipart
+// form. Uploading to Cloudinary is the slider service's job (only it knows
+// whether this is a new slider or an edit, and - for edits - what the
+// previous image's public_id was), so this stays a pure parser.
 export async function parseSliderFormData(req) {
   const formData = await req.formData();
 
@@ -18,42 +13,15 @@ export async function parseSliderFormData(req) {
   const status = formData.get('status') === 'true';
   const imageOnly = formData.get('imageOnly') === 'true';
   const message = formData.get('message');
-
   const file = formData.get('file');
-  let uploadedImage = null;
 
-  if (file) {
-    const fileBuffer = await file.arrayBuffer();
-    const base64Data = Buffer.from(fileBuffer).toString('base64');
-    const fileUri = `data:${file.type};base64,${base64Data}`;
-
-    const uploadToCloudinary = () => {
-      return new Promise((resolve, reject) => {
-        cloudinary.uploader
-          .upload(fileUri, {
-            folder: 'jerur_next_uploads',
-            resource_type: 'auto',
-            invalidate: true
-          })
-          .then(resolve)
-          .catch(reject);
-      });
-    };
-
-    uploadedImage = await uploadToCloudinary();
-  }
-
-  const sliderData = {
+  return {
     title,
     status,
     message,
-    imageOnly
+    imageOnly,
+    // Present only when the admin actually picked a new image; the service
+    // layer treats a missing/falsy `file` as "keep the existing image".
+    file: file || null
   };
-
-  if (uploadedImage) {
-    sliderData.secure_url = uploadedImage.secure_url;
-    sliderData.public_id = uploadedImage.public_id;
-  }
-
-  return sliderData;
 }

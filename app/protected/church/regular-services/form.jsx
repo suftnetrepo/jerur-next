@@ -22,7 +22,7 @@ const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleC
             <Form.Control
               type="text"
               placeholder="Enter title"
-              name="name"
+              name="title"
               value={fields?.title}
               onChange={(e) => handleChange('title', e.target.value)}
               className="border-dark"
@@ -70,7 +70,7 @@ const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleC
               <option value="prayer">Prayer</option>
               <option value="service">Service</option>
             </Form.Select>
-            {errorMessages.role?.message && <span className="text-danger">{errorMessages.role?.message}</span>}
+            {errorMessages.service_type?.message && <span className="text-danger">{errorMessages.service_type?.message}</span>}
           </Form.Group>
         </div>
       </div>

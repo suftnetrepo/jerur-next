@@ -20,8 +20,8 @@ export const regularServiceValidator = {
         message: 'start time is required'
       },
       {
-        pattern: /^.{0,50}$/,
-        message: 'star time must be no more than 10 characters'
+        pattern: /^.{0,10}$/,
+        message: 'start time must be no more than 10 characters'
       }
     ],
     end_time: [
@@ -30,8 +30,18 @@ export const regularServiceValidator = {
         message: 'end time is required'
       },
       {
-        pattern: /^.{0,50}$/,
+        pattern: /^.{0,10}$/,
         message: 'end time must be no more than 10 characters'
+      }
+    ],
+    service_type: [
+      {
+        pattern: /^.+$/,
+        message: 'service type is required'
+      },
+      {
+        pattern: /^.{0,50}$/,
+        message: 'service type must be no more than 50 characters'
       }
     ],
   },
@@ -42,6 +52,7 @@ export const regularServiceValidator = {
       title: '',
       start_time: '',
       end_time: '',
+      service_type: '',
       sequency_no: 0,
       description: '',
       status: false,
@@ -82,8 +93,8 @@ export const regularAgendaValidator = {
         message: 'start time is required'
       },
       {
-        pattern: /^.{0,50}$/,
-        message: 'star time must be no more than 10 characters'
+        pattern: /^.{0,10}$/,
+        message: 'start time must be no more than 10 characters'
       }
     ],
     end_time: [
@@ -92,7 +103,7 @@ export const regularAgendaValidator = {
         message: 'end time is required'
       },
       {
-        pattern: /^.{0,50}$/,
+        pattern: /^.{0,10}$/,
         message: 'end time must be no more than 10 characters'
       }
     ],
@@ -130,11 +141,11 @@ export const eventValidator = {
   rules: {
     title: [
       { pattern: /^.+$/, message: 'title is required' },
-      { pattern: /^.{0,250}$/, message: 'title must not exceed 150 characters' }
+      { pattern: /^.{0,250}$/, message: 'title must not exceed 250 characters' }
     ],
     description: [
       { pattern: /^.+$/, message: 'description is required' },
-      { pattern: /^.{0,5000}$/, message: 'description must not exceed 1000 characters' }
+      { pattern: /^.{0,5000}$/, message: 'description must not exceed 5000 characters' }
     ],
     status: [{ pattern: /^.+$/, message: 'Status is required' }],
     start_date: [
@@ -969,6 +980,64 @@ export const configValidator = {
     isSearchable: false,
     prayer_request_email: '',
     giving_url: ''
+  }
+};
+
+export const notificationValidator = {
+  rules: {
+    title: [
+      {
+        pattern: /^.+$/,
+        message: 'Title is required'
+      },
+      {
+        pattern: /^.{0,100}$/,
+        message: 'Title must not be more than 100 characters'
+      }
+    ],
+    message: [
+      {
+        pattern: /^.+$/,
+        message: 'Message is required'
+      },
+      {
+        pattern: /^[\s\S]{0,300}$/,
+        message: 'Message must not be more than 300 characters'
+      }
+    ],
+    expiry_date: [
+      {
+        pattern: /^.+$/,
+        message: 'Expiry date is required'
+      },
+      {
+        validate: (value) => {
+          const date = new Date(value);
+          if (Number.isNaN(date.getTime())) {
+            return 'Expiry date is invalid';
+          }
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          if (date < today) {
+            return 'Expiry date cannot be in the past';
+          }
+          return undefined;
+        },
+        message: 'Expiry date cannot be in the past'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      title: '',
+      message: '',
+      expiry_date: ''
+    };
+  },
+  fields: {
+    title: '',
+    message: '',
+    expiry_date: ''
   }
 };
 

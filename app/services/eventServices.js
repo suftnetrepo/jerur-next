@@ -3,8 +3,11 @@ import { identifierValidator } from '../validation/identifierValidator';
 import { eventValidator } from '../validation/eventValidator';
 import { logger } from '../../utils/logger';
 import { mongoConnect } from '../../utils/connectDb';
+import CloudinaryService from '../../lib/CloudinaryService';
 
 mongoConnect();
+
+const eventImageFolder = (suid) => `${process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER}/${suid}`;
 
 async function creatEvent(suid, body) {
   try {
@@ -22,9 +25,13 @@ async function creatEvent(suid, body) {
       throw error;
     }
 
+    const { file, ...eventFields } = body;
+    const uploaded = await CloudinaryService.uploadImage(file, { folder: eventImageFolder(suid) });
+
     const newEvent = new Event({
       suid,
-      ...body
+      ...eventFields,
+      ...(uploaded && { secure_url: uploaded.secure_url, public_id: uploaded.public_id })
     });
 
     const savedEvent = await newEvent.save();
@@ -50,7 +57,24 @@ async function editEvent(id, body) {
       error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
       throw error;
     }
-    await Event.findByIdAndUpdate(id, body, {
+
+    const { file, ...eventFields } = body;
+    const existingEvent = await Event.findById(id);
+    if (!existingEvent) {
+      throw new Error('Event not found');
+    }
+
+    // No new file -> CASE 1: leave secure_url/public_id untouched entirely.
+    // New file -> CASE 2: delete the old Cloudinary image, upload the new
+    // one, and persist its secure_url/public_id.
+    const uploaded = await CloudinaryService.replaceImage(file, existingEvent.public_id, {
+      folder: eventImageFolder(existingEvent.suid)
+    });
+
+    await Event.findByIdAndUpdate(id, {
+      ...eventFields,
+      ...(uploaded && { secure_url: uploaded.secure_url, public_id: uploaded.public_id })
+    }, {
       new: true
     });
     return true;
@@ -68,6 +92,16 @@ async function deleteEvent(id) {
       error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
       throw error;
     }
+
+    const existingEvent = await Event.findById(id);
+    if (!existingEvent) {
+      throw new Error('Event not found');
+    }
+
+    // Best-effort: a failed Cloudinary cleanup is logged but must not block
+    // the record deletion the caller asked for.
+    await CloudinaryService.deleteImage(existingEvent.public_id);
+
     await Event.findOneAndDelete({ _id: id });
     return true;
   } catch (error) {
