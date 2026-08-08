@@ -188,9 +188,31 @@ export const MOBILE_FEATURES = [
   }
 ];
 
-export const DEFAULT_ENABLED_FEATURE_IDS = MOBILE_FEATURES.filter((feature) => feature.enabledByDefault).map(
-  (feature) => feature.id
-);
+/**
+ * Feature ids a newly created Church starts with — used as
+ * Church.features' schema default (see app/models/church.js) and to
+ * backfill existing churches that have no configured selection yet (see
+ * migrations/003-default-mobile-features.js). This is a deliberately
+ * hand-picked, curated list, not derived from each feature's
+ * `enabledByDefault` flag above (that flag is presentation-only, driving
+ * nothing else) - so it's free to differ, and it intentionally does:
+ * `sermons` and `prayer-hour` are `enabledByDefault: true` above but not
+ * included here, and `notifications` is included here but has no matching
+ * entry in MOBILE_FEATURES at all (it isn't a member-facing toggleable
+ * feature - it's a baseline platform capability every church gets).
+ */
+export const DEFAULT_ENABLED_FEATURE_IDS = [
+  'service-times',
+  'upcoming-events',
+  'contact-us',
+  'giving',
+  'prayer-request',
+  'testimony',
+  'house-fellowship',
+  'attendance',
+  'register-member',
+  'notifications'
+];
 
 export const getFeatureById = (id) => MOBILE_FEATURES.find((feature) => feature.id === id);
 

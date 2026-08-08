@@ -1,6 +1,7 @@
 
 import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
+import { DEFAULT_ENABLED_FEATURE_IDS } from '../../constants/mobileFeatures'
 
 const addressSchema = new Schema({
   addressLine1: {
@@ -78,11 +79,24 @@ const ChurchSchema = new mongoose.Schema(
       max: 2000,
       default: ''
     },
+    // One denomination per church, selected from the hardcoded list in
+    // constants/denominations.js on Settings -> About Us — not an array,
+    // a church belongs to exactly one. Phase 1: admin-editable only: the
+    // mobile app receives this on every church-profile endpoint already,
+    // but doesn't filter on it yet.
+    denomination: {
+      type: String,
+      trim: true,
+      default: ''
+    },
     address: {
       type: addressSchema,
       required: false
     },
-    features: [String],
+    features: {
+      type: [String],
+      default: () => [...DEFAULT_ENABLED_FEATURE_IDS]
+    },
     sliders: [
       {
         title: {

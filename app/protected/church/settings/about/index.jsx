@@ -1,6 +1,27 @@
 import React from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import ImageUploadPanel from '../../../../../src/components/reuseable/ImageUploadPanel';
+import Select from '../../../../../src/components/reuseable/Select';
+import { DENOMINATIONS } from '../../../../../constants/denominations';
+
+// Adapts {id, label} entries from constants/denominations.js to the
+// {id, title, value} shape the shared Select component expects (same
+// pattern as the Currency dropdown on Settings -> Config) — `title` is
+// what's displayed, `value` is what gets saved, and here they
+// deliberately differ: the dropdown shows the friendly label but saves
+// the stable id, never the label, into Church.denomination. Leading
+// placeholder option matters here specifically: `denomination` defaults
+// to '' (unset), and without an option whose value is '' a native
+// <select> just silently displays the first real option instead,
+// visually implying a denomination is selected when none has been saved.
+const DENOMINATION_OPTIONS = [
+  { id: '', title: 'Select denomination', value: '' },
+  ...DENOMINATIONS.map((denomination) => ({
+    id: denomination.id,
+    title: denomination.label,
+    value: denomination.id
+  }))
+];
 
 // Layout mirrors the Pastor settings tab (others/pastor.jsx): form fields on
 // the left, image upload on the right, same container width/spacing/grid.
@@ -56,6 +77,22 @@ const About = ({ fields, errorMessages, handleChange, onSubmit, handleSeeds, pre
                   />
                   {errorMessages?.mobile?.message && (
                     <span className="text-danger fs-13">{errorMessages?.mobile?.message}</span>
+                  )}
+                </Form.Group>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-6">
+                <Form.Group controlId="formDenomination" className="mb-3">
+                  <Form.Label className="text-dark">Denomination</Form.Label>
+                  <Select
+                    options={DENOMINATION_OPTIONS}
+                    value={fields?.denomination ?? ''}
+                    onChange={(value) => handleChange('denomination', value)}
+                  />
+                  {errorMessages?.denomination?.message && (
+                    <span className="text-danger fs-13">{errorMessages?.denomination?.message}</span>
                   )}
                 </Form.Group>
               </div>

@@ -37,6 +37,7 @@ export const PUT = async (req) => {
       const email = formData.get('email');
       const mobile = formData.get('mobile');
       const description = formData.get('description');
+      const denomination = formData.get('denomination');
       const file = formData.get('file');
 
       // Uploading (and, on edit, replacing/deleting the previous logo) is
@@ -47,6 +48,7 @@ export const PUT = async (req) => {
         name,
         email,
         mobile,
+        denomination,
         file: file || null
       };
 

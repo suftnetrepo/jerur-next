@@ -12,6 +12,11 @@ export const POST = async (req) => {
     }
 
     const church = decrypt(clientId);
+
+    if (!church) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
 
     if (!body.identifier || !body.pin) {

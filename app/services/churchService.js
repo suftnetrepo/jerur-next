@@ -277,7 +277,12 @@ async function getChurch(id) {
       throw error;
     }
 
-    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description address features sliders contacts currency bank_name account_number sort_code tax_rate notification').lean();
+    // secure_url/public_id: the church's official banner image (uploaded on
+    // the admin's About Us page - see updateBulk above). Was previously
+    // missing from this whitelist, so the mobile app's "get selected
+    // church" call (GET /api/church/get) never received it even though the
+    // search endpoint did.
+    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination address features sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id').lean();
     return {
       ...data,
       notification: buildNotificationResponse(data?.notification)

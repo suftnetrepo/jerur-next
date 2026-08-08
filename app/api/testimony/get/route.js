@@ -16,6 +16,14 @@ export const GET = async (req) => {
     }
 
     const identifier = decrypt(clientId);
+
+    if (!identifier) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const data = await getTestimonies(identifier, 1, 100);
     return NextResponse.json({ data, success: true });
   } catch (error) {

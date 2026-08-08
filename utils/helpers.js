@@ -328,7 +328,7 @@ function encrypt(text) {
 }
 
 function decrypt(text) {
-  if (!text) return
+  if (!text) return null
   try {
     const textParts = text.split(':');
     const iv = Buffer.from(textParts.shift(), 'hex');
@@ -339,8 +339,16 @@ function decrypt(text) {
 
     return decrypted;
   } catch (error) {
+    // NOTE: this used to `return text` here - i.e. silently hand the
+    // caller back the original, still-encrypted (or just plain garbage)
+    // string as if it had been decrypted. Every caller treats the return
+    // value as a trusted Mongo id/church identifier with no further
+    // validation, so that garbage went on to hit a database call and fail
+    // there instead - a confusing 500 far from the real cause, instead of
+    // a clean 401 here where the actual problem is. Callers must treat a
+    // null return as "could not authenticate this request".
     console.error('Decryption error:', error);
-    return text;
+    return null;
   }
 }
 

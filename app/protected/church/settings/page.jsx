@@ -66,6 +66,7 @@ const SettingsPage = () => {
     formData.append('name', fields.name);
     formData.append('email', fields.email);
     formData.append('mobile', fields.mobile);
+    formData.append('denomination', fields.denomination || '');
 
     await handleSave(formData);
   };

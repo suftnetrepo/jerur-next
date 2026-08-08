@@ -75,10 +75,14 @@
       "Bash(grep -n \"Attempted import error\\\\|Failed to compile\\\\|Module not found\\\\|Error:\" /tmp/build_final.log | grep -v memberService *)",
       "Bash(rm -f /tmp/build_features2.log)",
       "Bash(node -e \"console.log\\('NEXT_PUBLIC_MONGODB_URL set?', !!process.env.NEXT_PUBLIC_MONGODB_URL\\); console.log\\(process.env.NEXT_PUBLIC_MONGODB_URL || '\\(unset\\)'\\)\")",
-      "Bash(NODE_ENV=production node -e ' *)"
+      "Bash(NODE_ENV=production node -e ' *)",
+      "Bash(npx tsc *)"
     ],
     "additionalDirectories": [
-      "/private/tmp"
+      "/private/tmp",
+      "/Users/appdev/dev/winners-chapel-mobile/src/components",
+      "/Users/appdev/dev/winners-chapel-mobile/src/api",
+      "/tmp"
     ]
   }
 }
