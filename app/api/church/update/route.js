@@ -77,7 +77,9 @@ export const PUT = async (req) => {
 
     if (action === 'features') {
       const body = await req.json();
-      const updated = await updateFeatures(user?.church, body);
+      // updateFeatures expects the plain features array, not the request
+      // body wrapper ({ features: [...] }) the client actually sends.
+      const updated = await updateFeatures(user?.church, body.features);
       return NextResponse.json({ success: true, data: updated });
     }
 
