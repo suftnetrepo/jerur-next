@@ -86,9 +86,11 @@ const RenderSermonOffcanvas = ({
   const handleSubmit = async () => {
     setErrorMessages({});
     const validationResult = validate(fields, sermonUiValidator.rules);
-    const mediaUrlError = fields.youtubeUrl || fields.videoUrl || fields.audioUrl
-      ? undefined
-      : 'at least one media URL is required';
+    // YouTube URL is the only media field left in this form (see the
+    // Media card below) - it's the sole way left to satisfy the backend's
+    // "at least one media URL" rule, so require it directly here instead
+    // of the old audioUrl/videoUrl OR-check.
+    const mediaUrlError = fields.youtubeUrl ? undefined : 'YouTube URL is required';
 
     if (validationResult.hasError || mediaUrlError) {
       setErrorMessages({
@@ -238,28 +240,10 @@ const RenderSermonOffcanvas = ({
               <Form.Group>
                 <Form.Label className="text-dark">YouTube URL</Form.Label>
                 <Form.Control value={fields.youtubeUrl} onChange={(event) => handleChange('youtubeUrl', event.target.value)} className="border-dark" />
+                <div className="form-text">
+                  The thumbnail shown in the mobile app is generated automatically from this link - no separate thumbnail upload needed.
+                </div>
                 {errorMessages.youtubeUrl?.message ? <span className="text-danger small">{errorMessages.youtubeUrl.message}</span> : null}
-              </Form.Group>
-            </Col>
-            <Col md={12}>
-              <Form.Group>
-                <Form.Label className="text-dark">Audio URL</Form.Label>
-                <Form.Control value={fields.audioUrl} onChange={(event) => handleChange('audioUrl', event.target.value)} className="border-dark" />
-                {errorMessages.audioUrl?.message ? <span className="text-danger small">{errorMessages.audioUrl.message}</span> : null}
-              </Form.Group>
-            </Col>
-            <Col md={12}>
-              <Form.Group>
-                <Form.Label className="text-dark">Video URL</Form.Label>
-                <Form.Control value={fields.videoUrl} onChange={(event) => handleChange('videoUrl', event.target.value)} className="border-dark" />
-                {errorMessages.videoUrl?.message ? <span className="text-danger small">{errorMessages.videoUrl.message}</span> : null}
-              </Form.Group>
-            </Col>
-            <Col md={12}>
-              <Form.Group>
-                <Form.Label className="text-dark">Thumbnail URL</Form.Label>
-                <Form.Control value={fields.thumbnail} onChange={(event) => handleChange('thumbnail', event.target.value)} className="border-dark" />
-                {errorMessages.thumbnail?.message ? <span className="text-danger small">{errorMessages.thumbnail.message}</span> : null}
               </Form.Group>
             </Col>
           </Row>

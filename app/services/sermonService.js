@@ -5,6 +5,7 @@ import { identifierValidator } from '../validation/identifierValidator';
 import { sermonValidator } from '../validation/sermonValidator';
 import { logger } from '../../utils/logger';
 import { mongoConnect } from '../../utils/connectDb';
+import { getYouTubeThumbnail } from '../../utils/youtube';
 
 mongoConnect();
 
@@ -37,11 +38,17 @@ const buildSortOptions = (sortField, sortOrder, defaultField) => {
 };
 
 const sanitizeSermonPayload = (data = {}) => {
+  // YouTube URL is the only media field the admin form still submits
+  // (see renderOffcanvas.jsx) - audioUrl/videoUrl are permanently zeroed
+  // here regardless of what a caller sends, and thumbnail is always
+  // DERIVED from youtubeUrl via utils/youtube.js, never taken from
+  // input - there is no "manually entered thumbnail" path anymore.
+  const youtubeUrl = data.media?.youtubeUrl || '';
   const media = {
-    youtubeUrl: data.media?.youtubeUrl || '',
-    audioUrl: data.media?.audioUrl || '',
-    videoUrl: data.media?.videoUrl || '',
-    thumbnail: data.media?.thumbnail || ''
+    youtubeUrl,
+    audioUrl: '',
+    videoUrl: '',
+    thumbnail: getYouTubeThumbnail(youtubeUrl)
   };
 
   const payload = {
@@ -290,6 +297,28 @@ const getLatestSermons = async ({ churchId, limit = 10 } = {}) => {
   }
 };
 
+/**
+ * The single most recent PUBLISHED sermon for a church - what the mobile
+ * app's Home screen "Latest Sermon" card shows. Deliberately a separate,
+ * narrower query rather than reusing getLatestSermons({limit: 1}): that
+ * function doesn't filter by status at all (by design - the admin list
+ * view shows drafts/archived too), so a naive limit:1 there could surface
+ * an unpublished sermon to members. This is the one place "published" is
+ * enforced for a single-sermon lookup.
+ */
+const getLatestPublishedSermon = async (churchId) => {
+  try {
+    validateIdentifier(churchId);
+
+    return populateSermonQuery(
+      Sermon.findOne({ churchId, status: 'PUBLISHED' }).sort({ preachedAt: -1, createdAt: -1 })
+    );
+  } catch (error) {
+    logger.error(error);
+    throw new Error(error.message || 'Error fetching latest published sermon');
+  }
+};
+
 const searchSermons = async ({ churchId, query, page = 1, limit = 10 } = {}) => {
   try {
     return getAllSermons({ churchId, page, limit, search: query });
@@ -333,6 +362,7 @@ export {
   getSermonById,
   getAllSermons,
   getLatestSermons,
+  getLatestPublishedSermon,
   searchSermons,
   getSermonsBySpeaker,
   publishSermon,
