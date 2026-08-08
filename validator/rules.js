@@ -461,6 +461,8 @@ export const churchValidator = {
       email: '',
       mobile: '',
       denomination: '',
+      short_message: '',
+      verse: '',
       secure_url: '',
       public_id: '',
       status: '',
@@ -476,6 +478,8 @@ export const churchValidator = {
     email: '',
     mobile: '',
     denomination: '',
+    short_message: '',
+    verse: '',
     secure_url: '',
     public_id: '',
     status: '',
@@ -1007,38 +1011,63 @@ export const notificationValidator = {
         message: 'Message must not be more than 300 characters'
       }
     ],
-    expiry_date: [
-      {
-        pattern: /^.+$/,
-        message: 'Expiry date is required'
-      },
+    // start_date/expiry_date are both optional - no "required" rule, just
+    // format/ordering checks, and only when a value is actually present.
+    start_date: [
       {
         validate: (value) => {
+          if (!value) return undefined;
+          const date = new Date(value);
+          if (Number.isNaN(date.getTime())) {
+            return 'Start date is invalid';
+          }
+          return undefined;
+        },
+        message: 'Start date is invalid'
+      }
+    ],
+    expiry_date: [
+      {
+        validate: (value, fields) => {
+          if (!value) return undefined;
           const date = new Date(value);
           if (Number.isNaN(date.getTime())) {
             return 'Expiry date is invalid';
           }
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          if (date < today) {
-            return 'Expiry date cannot be in the past';
+          if (fields?.start_date) {
+            const start = new Date(fields.start_date);
+            if (!Number.isNaN(start.getTime()) && date < start) {
+              return 'Expiry date cannot be before the start date';
+            }
           }
           return undefined;
         },
-        message: 'Expiry date cannot be in the past'
+        message: 'Expiry date cannot be before the start date'
       }
     ]
   },
   reset: () => {
     return {
+      type: 'announcement',
       title: '',
       message: '',
+      secure_url: '',
+      public_id: '',
+      priority: 'normal',
+      status: true,
+      start_date: '',
       expiry_date: ''
     };
   },
   fields: {
+    type: 'announcement',
     title: '',
     message: '',
+    secure_url: '',
+    public_id: '',
+    priority: 'normal',
+    status: true,
+    start_date: '',
     expiry_date: ''
   }
 };

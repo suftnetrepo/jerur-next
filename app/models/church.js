@@ -89,6 +89,25 @@ const ChurchSchema = new mongoose.Schema(
       trim: true,
       default: ''
     },
+    // Short welcome/tagline for the mobile app's church banner/hero area
+    // (e.g. "A place to belong, grow and encounter God."), set on
+    // Settings -> About Us alongside description/denomination.
+    short_message: {
+      type: String,
+      trim: true,
+      required: false,
+      default: '',
+      max: 160
+    },
+    // Short scripture text or reference for the same banner/hero area
+    // (e.g. "For where two or three gather in my name... — Matthew 18:20").
+    verse: {
+      type: String,
+      trim: true,
+      required: false,
+      default: '',
+      max: 300
+    },
     address: {
       type: addressSchema,
       required: false
@@ -371,6 +390,11 @@ const ChurchSchema = new mongoose.Schema(
       }
     },
     notification: {
+      type: {
+        type: String,
+        enum: ['announcement', 'event', 'promotion', 'scripture', 'welcome', 'emergency', 'sermon'],
+        default: 'announcement'
+      },
       title: {
         type: String,
         trim: true,
@@ -384,6 +408,30 @@ const ChurchSchema = new mongoose.Schema(
         required: false,
         default: '',
         max: 300
+      },
+      secure_url: {
+        type: String,
+        required: false,
+        default: ''
+      },
+      public_id: {
+        type: String,
+        required: false,
+        default: ''
+      },
+      priority: {
+        type: String,
+        enum: ['low', 'normal', 'high', 'urgent'],
+        default: 'normal'
+      },
+      status: {
+        type: Boolean,
+        default: true
+      },
+      start_date: {
+        type: Date,
+        required: false,
+        default: null
       },
       expiry_date: {
         type: Date,

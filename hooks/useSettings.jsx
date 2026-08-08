@@ -282,16 +282,32 @@ const useNotification = () => {
     }));
   };
 
+  // "type=datetime-local" inputs need a local (no timezone) "yyyy-MM-ddTHH:mm"
+  // string - toISOString() would shift the displayed time to UTC, so this
+  // builds the string from the Date object's local getters instead.
+  const toDateTimeLocal = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
   const handleSelect = (data) => {
-    const { title, message, expiry_date } = data || {};
+    const { type, title, message, secure_url, public_id, priority, status, start_date, expiry_date } = data || {};
     setState((prevState) => ({
       ...prevState,
       fields: {
         ...prevState.fields,
+        type: type || 'announcement',
         title: title || '',
         message: message || '',
-        // The date input expects a yyyy-mm-dd string.
-        expiry_date: expiry_date ? new Date(expiry_date).toISOString().split('T')[0] : ''
+        secure_url: secure_url || '',
+        public_id: public_id || '',
+        priority: priority || 'normal',
+        status: status ?? true,
+        start_date: toDateTimeLocal(start_date),
+        expiry_date: toDateTimeLocal(expiry_date)
       }
     }));
   };

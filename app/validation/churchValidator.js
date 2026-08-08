@@ -50,9 +50,17 @@ function pastorValidator(data) {
 function notificationValidator(data) {
   const validator = new Validator();
   const schema = {
+    type: {
+      type: 'string',
+      optional: true,
+      enum: ['announcement', 'event', 'promotion', 'scripture', 'welcome', 'emergency', 'sermon']
+    },
     title: { type: 'string', empty: false, max: 100 },
     message: { type: 'string', empty: false, max: 300 },
-    expiry_date: { type: 'date', convert: true },
+    priority: { type: 'string', optional: true, enum: ['low', 'normal', 'high', 'urgent'] },
+    status: { type: 'boolean', optional: true, convert: true },
+    start_date: { type: 'date', convert: true, optional: true, nullable: true },
+    expiry_date: { type: 'date', convert: true, optional: true, nullable: true },
   };
   return validator.validate(data, schema);
 }

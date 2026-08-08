@@ -30,7 +30,7 @@ const About = ({ fields, errorMessages, handleChange, onSubmit, handleSeeds, pre
     <div style={{ marginLeft: 25, width: '55%', backgroundColor: 'white' }}>
       <Row className="mb-3">
         <Col xs={12} md={8}>
-          <Form className="pt-16">
+          <Form className="pt-1">
             <div className="row">
               <div className="col-md-6">
                 <Form.Group controlId="formChurchName" className="mb-3">
@@ -93,6 +93,48 @@ const About = ({ fields, errorMessages, handleChange, onSubmit, handleSeeds, pre
                   />
                   {errorMessages?.denomination?.message && (
                     <span className="text-danger fs-13">{errorMessages?.denomination?.message}</span>
+                  )}
+                </Form.Group>
+              </div>
+            </div>
+
+            
+
+            <div className="row">
+              <div className="col-md-12">
+                <Form.Group controlId="formShortMessage" className="mb-3">
+                  <Form.Label className="text-dark">Short Message</Form.Label>
+                  <Form.Control
+                    maxLength={160}
+                    type="text"
+                
+                    placeholder="A place to belong, grow and encounter God."
+                    value={fields?.short_message ?? ''}
+                    className="border-dark"
+                    onChange={(e) => handleChange('short_message', e.target.value)}
+                  />
+                  {errorMessages?.short_message?.message && (
+                    <span className="text-danger fs-13">{errorMessages?.short_message?.message}</span>
+                  )}
+                </Form.Group>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-12">
+                <Form.Group controlId="formVerse" className="mb-3">
+                  <Form.Label className="text-dark">Verse</Form.Label>
+                  <Form.Control
+                    maxLength={300}
+                    type="text"
+                   
+                    placeholder="For where two or three gather in my name, there am I with them. — Matthew 18:20"
+                    value={fields?.verse ?? ''}
+                    className="border-dark"
+                    onChange={(e) => handleChange('verse', e.target.value)}
+                  />
+                  {errorMessages?.verse?.message && (
+                    <span className="text-danger fs-13">{errorMessages?.verse?.message}</span>
                   )}
                 </Form.Group>
               </div>

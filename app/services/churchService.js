@@ -50,13 +50,25 @@ async function updateProphetic(suid, body) {
 }
 
 const buildNotificationResponse = (notification) => {
+  const type = notification?.type || 'announcement';
   const title = notification?.title || '';
   const message = notification?.message || '';
+  const secure_url = notification?.secure_url || '';
+  const public_id = notification?.public_id || '';
+  const priority = notification?.priority || 'normal';
+  const status = notification?.status ?? true;
+  const start_date = notification?.start_date || null;
   const expiry_date = notification?.expiry_date || null;
 
   return {
+    type,
     title,
     message,
+    secure_url,
+    public_id,
+    priority,
+    status,
+    start_date,
     expiry_date,
     isExpired: expiry_date ? new Date(expiry_date) < new Date() : false
   };
@@ -88,26 +100,64 @@ async function updateNotification(suid, body) {
       throw error;
     }
 
-    const bodyErrors = notificationValidator(body);
+    const { file, removeImage, ...notificationFields } = body;
+    const bodyErrors = notificationValidator(notificationFields);
     if (bodyErrors.length) {
       const error = new Error(bodyErrors.map((it) => it.message).join(','));
       error.invalidArgs = bodyErrors.map((it) => it.field).join(',');
       throw error;
     }
 
-    const { title, message, expiry_date } = body;
+    const { type, title, message, priority, status, start_date, expiry_date } = notificationFields;
 
-    if (new Date(expiry_date) < new Date(new Date().toDateString())) {
-      const error = new Error('Expiry date must not be in the past');
+    if (start_date && expiry_date && new Date(expiry_date) < new Date(start_date)) {
+      const error = new Error('Expiry date must not be before the start date');
       error.invalidArgs = 'expiry_date';
       throw error;
     }
 
+    const existingChurch = await Church.findById(suid).select('notification');
+    const existingNotification = existingChurch?.notification || {};
+
+    // No new file, no removal requested -> CASE 1: keep the existing
+    // secure_url/public_id.
+    // New file -> CASE 2: delete the old Cloudinary image, upload the new
+    // one, and persist its secure_url/public_id.
+    // No new file, removal requested -> CASE 3: delete the old Cloudinary
+    // image and clear secure_url/public_id back to empty - a file always
+    // wins over a removal request if both are somehow sent together.
+    //
+    // notification is a single embedded (non-array) subdocument, same as
+    // pastor_section - a plain `{ notification: {...} }` update fully
+    // replaces it rather than merging, so secure_url/public_id must always
+    // be explicitly included (new, cleared, or carried-forward) or they'd
+    // be reset to their schema defaults on every save.
+    let uploaded = await CloudinaryService.replaceImage(file, existingNotification.public_id, {
+      folder: churchImageFolder(suid)
+    });
+
+    if (!uploaded && removeImage && existingNotification.public_id) {
+      await CloudinaryService.deleteImage(existingNotification.public_id);
+      uploaded = { secure_url: '', public_id: '' };
+    }
+
+    const notification = {
+      type: type || 'announcement',
+      title,
+      message,
+      priority: priority || 'normal',
+      status: status ?? true,
+      start_date: start_date || null,
+      expiry_date: expiry_date || null,
+      public_id: uploaded ? uploaded.public_id : existingNotification.public_id,
+      secure_url: uploaded ? uploaded.secure_url : existingNotification.secure_url
+    };
+
     // $set only the notification object so the existing value is overwritten in place,
     // never appended, and the rest of the Church document is left untouched.
-    await Church.findByIdAndUpdate(suid, { $set: { notification: { title, message, expiry_date } } }, { new: true });
+    await Church.findByIdAndUpdate(suid, { $set: { notification } }, { new: true });
 
-    return buildNotificationResponse({ title, message, expiry_date });
+    return buildNotificationResponse(notification);
   } catch (error) {
     logger.error(error);
     throw new Error(error.message || 'Error updating church notification');
@@ -282,7 +332,7 @@ async function getChurch(id) {
     // missing from this whitelist, so the mobile app's "get selected
     // church" call (GET /api/church/get) never received it even though the
     // search endpoint did.
-    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination address features sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id').lean();
+    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination short_message verse address features sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id').lean();
     return {
       ...data,
       notification: buildNotificationResponse(data?.notification)
