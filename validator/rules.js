@@ -718,6 +718,50 @@ export const sermonUiValidator = {
   }
 };
 
+// Strips tags to check whether Tiptap's generated HTML actually has any
+// text in it - an "empty" editor still outputs "<p></p>", not "", so a
+// plain required-pattern check on the raw HTML would never catch it.
+const isBlankHtml = (html) => !String(html || '').replace(/<[^>]*>/g, '').trim();
+
+export const articleUiValidator = {
+  rules: {
+    title: [
+      { pattern: /^.+$/, message: 'title is required' },
+      { pattern: /^.{0,150}$/, message: 'title must not be more than 150 characters' }
+    ],
+    summary: [
+      { pattern: /^.+$/, message: 'summary is required' },
+      { pattern: /^[\s\S]{0,300}$/, message: 'summary must not be more than 300 characters' }
+    ],
+    content: [
+      {
+        validate: (value) => (isBlankHtml(value) ? 'content is required' : undefined),
+        message: 'content is required'
+      }
+    ]
+  },
+  reset: () => {
+    return {
+      _id: '',
+      title: '',
+      summary: '',
+      content: '',
+      status: 'draft',
+      secure_url: '',
+      public_id: ''
+    };
+  },
+  fields: {
+    _id: '',
+    title: '',
+    summary: '',
+    content: '',
+    status: 'draft',
+    secure_url: '',
+    public_id: ''
+  }
+};
+
 export const registerValidator = {
   rules: {
     first_name: [

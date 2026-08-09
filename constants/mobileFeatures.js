@@ -185,6 +185,18 @@ export const MOBILE_FEATURES = [
     icon: 'self_improvement',
     color: '#115E59',
     enabledByDefault: true
+  },
+  {
+    id: 'articles',
+    label: 'Christian Articles',
+    description: "Read articles that help members grow in God's Word.",
+    category: 'Media',
+    icon: 'auto_stories',
+    color: '#4F46E5',
+    // New, capacity-limited feature (see constants/articles.js -
+    // MAX_ARTICLES_PER_CHURCH) - churches opt in rather than having it
+    // switched on for them, same reasoning as Hymns/Bible/Note above.
+    enabledByDefault: false
   }
 ];
 

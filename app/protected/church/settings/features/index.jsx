@@ -22,7 +22,8 @@ import {
   MdEditNote,
   MdMenuBook,
   MdOndemandVideo,
-  MdSelfImprovement
+  MdSelfImprovement,
+  MdAutoStories
 } from 'react-icons/md';
 import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
@@ -50,7 +51,8 @@ const FEATURE_ICONS = {
   edit_note: MdEditNote,
   menu_book: MdMenuBook,
   ondemand_video: MdOndemandVideo,
-  self_improvement: MdSelfImprovement
+  self_improvement: MdSelfImprovement,
+  auto_stories: MdAutoStories
 };
 
 const FeatureCard = ({ feature, checked, onToggle }) => {

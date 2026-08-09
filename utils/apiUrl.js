@@ -193,6 +193,13 @@ export const SERMON = {
   removeOne: `${HOST}sermon`
 };
 
+export const ARTICLE = {
+  createOne: `${HOST}article`,
+  updateOne: `${HOST}article`,
+  fetch: `${HOST}article`,
+  removeOne: `${HOST}article`
+};
+
 export const EVENT_REGISTER = {
   createOne: `${HOST}event/register`,
   updateOne: `${HOST}event/register`,
