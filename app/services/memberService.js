@@ -445,33 +445,66 @@ export async function registerMember({ church, first_name, last_name, mobile, em
     throw new Error('PIN must be 4 to 6 digits.');
   }
 
-  // Prevent duplicate self-registration for the same person at the same church.
-  const existing = await Member.findOne({
-    church,
-    $or: [mobile ? { mobile } : null, email ? { email: email.toLowerCase() } : null].filter(Boolean)
-  });
-  if (existing) {
-    throw new Error('A member with this phone or email already exists at this church.');
+  const normalizedEmail = email ? email.trim().toLowerCase() : undefined;
+
+  // The `members` collection has a *global* unique index on `email`
+  // (db-level, not declared unique on the Mongoose schema — see
+  // app/models/member.js — and not scoped to `church`), so this
+  // pre-check has to match that exact scope: an email already used at
+  // ANY church, not just this one, would otherwise sail past a
+  // church-scoped check and only fail as a raw E11000 duplicate-key
+  // error out of Member.create() below. Comparison is against the
+  // already-lowercased stored value, so this is effectively
+  // case-insensitive without needing a regex query.
+  if (normalizedEmail) {
+    const existingEmail = await Member.findOne({ email: normalizedEmail });
+    if (existingEmail) {
+      throw new MemberAuthError('EMAIL_EXISTS', 'An account already exists with this email address. Please log in instead.');
+    }
+  }
+
+  // Mobile carries no db-level uniqueness constraint — this is a soft,
+  // per-church business rule only (the same phone number is allowed to
+  // belong to different members at different churches), unlike email.
+  if (mobile) {
+    const existingMobile = await Member.findOne({ church, mobile });
+    if (existingMobile) {
+      throw new MemberAuthError('MOBILE_EXISTS', 'An account already exists with this phone number. Please log in instead.');
+    }
   }
 
   const pinHash = await bcrypt.hash(String(pin), PIN_SALT_ROUNDS);
 
-  const member = await Member.create({
-    church,
-    first_name,
-    last_name,
-    mobile: mobile ?? '',
-    email: email ? email.toLowerCase() : undefined,
-    pinHash,
-    // Self-registered members start as "provisional" — matches the
-    // existing status enum's intent (an actual church staff member
-    // presumably promotes to "active" once they know who this is).
-    // Never let self-registration set role above "member".
-    status: 'provisional',
-    role: 'member'
-  });
+  try {
+    const member = await Member.create({
+      church,
+      first_name,
+      last_name,
+      mobile: mobile ?? '',
+      email: normalizedEmail,
+      pinHash,
+      // Self-registered members start as "provisional" — matches the
+      // existing status enum's intent (an actual church staff member
+      // presumably promotes to "active" once they know who this is).
+      // Never let self-registration set role above "member".
+      status: 'provisional',
+      role: 'member'
+    });
 
-  return member;
+    return member;
+  } catch (error) {
+    // Final safety net for the TOCTOU race the pre-check above can't
+    // close on its own: two concurrent requests for the same email can
+    // both pass the findOne check before either has committed. The
+    // database's own unique index is the real source of truth here —
+    // this just guarantees that failure reaches the client as the same
+    // friendly EMAIL_EXISTS response, never as a raw Mongo exception
+    // ("E11000 duplicate key error collection: ... index: email_1 ...").
+    if (error?.code === 11000) {
+      throw new MemberAuthError('EMAIL_EXISTS', 'An account already exists with this email address. Please log in instead.');
+    }
+    throw error;
+  }
 }
 
 /**
