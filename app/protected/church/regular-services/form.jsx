@@ -5,6 +5,8 @@ import { Form, Button } from 'react-bootstrap';
 import DeleteConfirmation from '../../../../src/components/elements/ConfirmDialogue';
 import { normalizeTime } from '../../../../utils/helpers';
 
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleChange, fields }) => {
 
   const handlePaste = (e) => {
@@ -107,6 +109,44 @@ const RegularServiceForm = ({ errorMessages, handleDelete, handleSubmit, handleC
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="row mb-3">
+        <div className="col-md-12">
+          <Form.Group controlId="formServiceDay">
+            <Form.Label className="text-dark">Day</Form.Label>
+            <Form.Select
+              className="border-dark"
+              value={Array.isArray(fields?.days) && fields.days.length > 0 ? fields.days[0] : ''}
+              onChange={(e) => handleChange('days', e.target.value === '' ? [] : [Number(e.target.value)])}
+            >
+              <option value="">Select a day</option>
+              {WEEKDAYS.map((label, day) => <option key={label} value={day}>{label}</option>)}
+            </Form.Select>
+          </Form.Group>
+          {errorMessages?.days?.message && <span className="text-danger fs-13">{errorMessages.days.message}</span>}
+        </div>
+      </div>
+
+      <div className="row mb-3">
+        <div className="col-md-12">
+          <Form.Group controlId="formHomeNoticeMinutes">
+            <Form.Label className="text-dark">Show on Home before start</Form.Label>
+            <Form.Select
+              value={fields?.home_notice_minutes ?? 15}
+              className="border-dark"
+              onChange={(e) => handleChange('home_notice_minutes', Number(e.target.value))}
+            >
+              <option value={0}>At start time</option>
+              <option value={5}>5 minutes before</option>
+              <option value={10}>10 minutes before</option>
+              <option value={15}>15 minutes before</option>
+              <option value={30}>30 minutes before</option>
+              <option value={60}>1 hour before</option>
+            </Form.Select>
+            <Form.Text className="text-muted">The Home screen will show this session during this lead time and until it ends.</Form.Text>
+          </Form.Group>
         </div>
       </div>
 

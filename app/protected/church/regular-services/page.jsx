@@ -15,6 +15,8 @@ import RenderAgendaOffcanvas from './renderAgendaOffcanvas';
 import { getYesNoColorCode, serviceType } from '../../../../utils/helpers';
 import useDebounce from '../../../../hooks/useDebounce';
 
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 const Render = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -51,6 +53,15 @@ const Render = () => {
         )
       },
       { Header: 'Title', accessor: 'title', sortType: 'basic' },
+      {
+        Header: 'Day',
+        accessor: 'days',
+        disableSortBy: true,
+        Cell: ({ value }) => {
+          const day = Array.isArray(value) ? value[0] : value;
+          return <span>{WEEKDAYS[day] ?? 'Not set'}</span>;
+        }
+      },
       { Header: 'Start Time', accessor: 'start_time', sortType: 'basic' },
       { Header: 'End Time', accessor: 'end_time', sortType: 'basic' },
       {

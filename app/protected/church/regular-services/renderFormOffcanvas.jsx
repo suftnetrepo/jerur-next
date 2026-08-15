@@ -32,12 +32,17 @@ const RenderFormOffcanvas = ({
       setErrorMessages({ ...errorMessages, remote_link: 'Remote link is required' });
     }
 
+    if (!Array.isArray(fields?.days) || fields.days.length === 0) {
+      setErrorMessages((current) => ({ ...current, days: { message: 'Select a day' } }));
+      return;
+    }
+
     if (validationResult.hasError) {
       setErrorMessages({ ...errorMessages, ...validationResult.errors });
       return;
     }
 
-    const { description, remote, sequency_no, remote_link, start_time, status, title, end_time, service_type } = fields;
+    const { description, remote, sequency_no, remote_link, start_time, status, title, end_time, service_type, days, home_notice_minutes } = fields;
 
     const body = {
       description,
@@ -48,7 +53,9 @@ const RenderFormOffcanvas = ({
       status,
       title,
       end_time,
-      service_type
+      service_type,
+      days,
+      home_notice_minutes: Number(home_notice_minutes ?? 15)
     };
 
     if (fields?._id) {

@@ -53,6 +53,12 @@ const ServiceTimeSchema = new mongoose.Schema(
       enum: [0, 1, 2, 3, 4, 5, 6],
       required: true
     },
+    home_notice_minutes: {
+      type: Number,
+      min: 0,
+      max: 180,
+      default: 15
+    },
     agenda: [
       {
         title: {

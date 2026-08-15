@@ -58,6 +58,8 @@ export const regularServiceValidator = {
       status: false,
       remote: false,
       remote_link: '',
+      days: [],
+      home_notice_minutes: 15,
       file: null
     };
   },
@@ -71,6 +73,8 @@ export const regularServiceValidator = {
     status: false,
     remote: false,
     remote_link: '',
+    days: [],
+    home_notice_minutes: 15,
     file: null
   }
 };
