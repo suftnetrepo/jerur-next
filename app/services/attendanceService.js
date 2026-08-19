@@ -478,6 +478,24 @@ const getServiceAttendanceSummary = async (serviceId) => {
 
 // New methods for extended attendance management
 
+/**
+ * Whether the given ServiceTime actually recurs today, in the server's
+ * local time (0=Sun..6=Sat via Date.getDay(), the same convention as
+ * ServiceTime.days). Used to gate mobile self-service attendance
+ * submission to the service's own day — see
+ * app/api/attendance/create/mobile/route.js. Deliberately not enforced
+ * inside createAttendance() itself: the staff/admin attendance route
+ * (app/api/attendance/create/route.js) shares that function and may
+ * legitimately need to record or correct attendance outside that exact
+ * window.
+ */
+const isServiceRunningToday = async (serviceId) => {
+  const service = await ServiceTime.findById(serviceId);
+  if (!service) return false;
+  const todayIndex = new Date().getDay();
+  return Array.isArray(service.days) && service.days.includes(todayIndex);
+};
+
 const createAttendance = async (body) => {
   try {
     const { memberId, userId, serviceId, status, message, checkedInVia, wantsPastorContact, churchId } = body;
@@ -811,6 +829,7 @@ export {
   getMemberAttendanceStats, 
   getServiceAttendanceSummary,
   createAttendance,
+  isServiceRunningToday,
   updateAttendance,
   getAttendanceById,
   getAttendanceByService,

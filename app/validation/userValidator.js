@@ -41,7 +41,12 @@ function userValidator(data) {
 function memberValidator(data) {
   const validator = new Validator()
   const schema = {
-    email: { type: 'email', empty: false, max: 50 },
+    // Optional, same as Member.email in app/models/member.js and the
+    // "mobile or email" rule in registerMember() (memberService.js) — a
+    // member created/updated with no email must not fail here just
+    // because this validator, unlike those two, previously required it.
+    // Still format/length-checked whenever an email is actually given.
+    email: { type: 'email', optional: true, empty: true, max: 50 },
     first_name: { type: 'string', empty: false, max: 50 },
     last_name: { type: 'string', empty: false, max: 50 },
     mobile: { type: 'string', empty: false, max: 20 }
