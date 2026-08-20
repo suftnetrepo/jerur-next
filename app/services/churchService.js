@@ -332,7 +332,7 @@ async function getChurch(id) {
     // missing from this whitelist, so the mobile app's "get selected
     // church" call (GET /api/church/get) never received it even though the
     // search endpoint did.
-    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination short_message verse address features sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id conference_link support_email').lean();
+    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination short_message verse address features sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id conference_link support_email logo_url logo_id').lean();
     return {
       ...data,
       notification: buildNotificationResponse(data?.notification)
@@ -376,27 +376,58 @@ async function updateBulk(suid, body) {
       throw error;
     }
 
-    // Only the "About Us" (church logo) save passes a `file`; every other
-    // caller of this generic bulk-update (bank transfer, social media, ...)
-    // never includes one, so this block is a no-op for them.
-    const { file, ...fields } = body;
+    // Only the "About Us" save passes any of these four, and it manages
+    // two entirely independent images: `file`/`removeBanner` for the
+    // church BANNER (secure_url/public_id), `logoFile`/`removeLogo` for
+    // the church LOGO (logo_url/logo_id) - see app/models/church.js.
+    // Every other caller of this generic bulk-update (bank transfer,
+    // social media, config, ...) never includes any of them, so this
+    // whole block is a no-op for them.
+    const { file, removeBanner, logoFile, removeLogo, ...fields } = body;
 
-    if (file) {
-      const existingChurch = await Church.findById(suid).select('public_id');
+    const needsExisting = file || removeBanner || logoFile || removeLogo;
+    const existingChurch = needsExisting ? await Church.findById(suid).select('public_id logo_id') : null;
 
-      // No new file never reaches here. A new file -> CASE 2: delete the
-      // old Cloudinary logo, upload the new one, and persist its
-      // secure_url/public_id. public_id/secure_url are top-level scalar
-      // fields on Church, so simply omitting them from `fields` below (as
-      // already happened before this change) correctly leaves the existing
-      // ones untouched for CASE 1 (no file selected).
-      const uploaded = await CloudinaryService.replaceImage(file, existingChurch?.public_id, {
+    if (file || removeBanner) {
+      // Same CASE 1/2/3 lifecycle as updateNotification() above: neither a
+      // file nor a removal request reaches here at all (banner untouched,
+      // simply omitted from `fields`, below). A file -> CASE 2: delete the
+      // old banner (if any), upload the new one, and persist its
+      // secure_url/public_id. No file but removal requested -> CASE 3:
+      // delete the old banner and clear both fields. A file always wins
+      // over a removal request if somehow both are sent together (mirrors
+      // CloudinaryService.replaceImage, which only ever acts on a file).
+      let uploaded = await CloudinaryService.replaceImage(file, existingChurch?.public_id, {
         folder: churchImageFolder(suid)
       });
+
+      if (!uploaded && removeBanner && existingChurch?.public_id) {
+        await CloudinaryService.deleteImage(existingChurch.public_id);
+        uploaded = { secure_url: '', public_id: '' };
+      }
 
       if (uploaded) {
         fields.public_id = uploaded.public_id;
         fields.secure_url = uploaded.secure_url;
+      }
+    }
+
+    if (logoFile || removeLogo) {
+      // Identical lifecycle, entirely independent asset/fields - removing
+      // or replacing the logo never touches the banner's Cloudinary asset
+      // or its secure_url/public_id, and vice versa.
+      let uploadedLogo = await CloudinaryService.replaceImage(logoFile, existingChurch?.logo_id, {
+        folder: churchImageFolder(suid)
+      });
+
+      if (!uploadedLogo && removeLogo && existingChurch?.logo_id) {
+        await CloudinaryService.deleteImage(existingChurch.logo_id);
+        uploadedLogo = { secure_url: '', public_id: '' };
+      }
+
+      if (uploadedLogo) {
+        fields.logo_id = uploadedLogo.public_id;
+        fields.logo_url = uploadedLogo.secure_url;
       }
     }
 

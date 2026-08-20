@@ -25,13 +25,25 @@ import About from './about';
 const AddressForm = dynamic(() => import('./address'), { ssr: false });
 
 const SettingsPage = () => {
-  const { handleSave, handleChange, handleSeeds, rules, loading, error, data, fields, success, handleSaveChangePassword } =
+  const { handleSave, handleChange, rules, loading, error, data, fields, success, handleSaveChangePassword } =
     useSettings();
   const { handleCustomerPortalSession } = useSubscriber();
+  // Banner (Church.secure_url/public_id) - unchanged from before.
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [file, setFile] = useState(null);
+  // True once the admin clicks the banner's "Remove" - tells the next save
+  // to clear the existing Cloudinary banner rather than keep it. Selecting
+  // a new file always overrides this if both somehow happen before save
+  // (see handleBannerSelect below and updateBulk's own file-wins-over-
+  // removal rule server-side).
+  const [bannerRemoved, setBannerRemoved] = useState(false);
+  // Church logo (Church.logo_url/logo_id) - a fully independent image,
+  // same file-select/preview/remove pattern as the banner above.
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState(null);
+  const [logoRemoved, setLogoRemoved] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('profile');
   const [errorMessages, setErrorMessages] = useState({});
-  const [file, setFile] = useState(null);
   const [key, setKey] = useState('bank_transfer');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -43,10 +55,45 @@ const SettingsPage = () => {
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    return () => {
+      if (logoPreviewUrl) {
+        URL.revokeObjectURL(logoPreviewUrl);
+      }
+    };
+  }, [logoPreviewUrl]);
+
   const handleImageSelect = (selectedFile) => {
     setPreviewUrl(null);
     setFile(selectedFile);
     setPreviewUrl(URL.createObjectURL(selectedFile));
+    setBannerRemoved(false);
+  };
+
+  const handleBannerRemove = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl(null);
+    setBannerRemoved(true);
+    // Clears the saved-banner preview immediately (the form reads
+    // fields.secure_url) - the actual Cloudinary delete only happens once
+    // this is actually saved, via the removeBanner flag below.
+    handleChange('secure_url', '');
+  };
+
+  const handleLogoSelect = (selectedFile) => {
+    if (logoPreviewUrl) URL.revokeObjectURL(logoPreviewUrl);
+    setLogoFile(selectedFile);
+    setLogoPreviewUrl(URL.createObjectURL(selectedFile));
+    setLogoRemoved(false);
+  };
+
+  const handleLogoRemove = () => {
+    if (logoPreviewUrl) URL.revokeObjectURL(logoPreviewUrl);
+    setLogoFile(null);
+    setLogoPreviewUrl(null);
+    setLogoRemoved(true);
+    handleChange('logo_url', '');
   };
 
   const onSubmit = async () => {
@@ -62,6 +109,13 @@ const SettingsPage = () => {
     formData.append('description', fields.description);
     if (file) {
       formData.append('file', file);
+    } else if (bannerRemoved) {
+      formData.append('removeBanner', 'true');
+    }
+    if (logoFile) {
+      formData.append('logoFile', logoFile);
+    } else if (logoRemoved) {
+      formData.append('removeLogo', 'true');
     }
     formData.append('name', fields.name);
     formData.append('email', fields.email);
@@ -70,7 +124,32 @@ const SettingsPage = () => {
     formData.append('short_message', fields.short_message || '');
     formData.append('verse', fields.verse || '');
 
+    // Deliberately not clearing file/previewUrl/logoFile/logoPreviewUrl
+    // here on success (same as before this change): updateBulk only ever
+    // returns `true`, never the freshly-saved secure_url/logo_url, so
+    // fields.secure_url/logo_url stay stale until the next full fetch -
+    // clearing the local blob preview now would make a just-saved
+    // image/removal appear to revert instead of staying correct on screen.
     await handleSave(formData);
+  };
+
+  const handleCancelAbout = () => {
+    setErrorMessages({});
+    setFile(null);
+    setPreviewUrl(null);
+    setBannerRemoved(false);
+    setLogoFile(null);
+    setLogoPreviewUrl(null);
+    setLogoRemoved(false);
+    handleChange('name', data?.name ?? '');
+    handleChange('email', data?.email ?? '');
+    handleChange('mobile', data?.mobile ?? '');
+    handleChange('denomination', data?.denomination ?? '');
+    handleChange('short_message', data?.short_message ?? '');
+    handleChange('verse', data?.verse ?? '');
+    handleChange('description', data?.description ?? '');
+    handleChange('secure_url', data?.secure_url ?? '');
+    handleChange('logo_url', data?.logo_url ?? '');
   };
 
   const handleSubmit = (fields) => {
@@ -99,9 +178,14 @@ const SettingsPage = () => {
             errorMessages={errorMessages}
             handleChange={handleChange}
             onSubmit={onSubmit}
-            handleSeeds={handleSeeds}
+            onCancel={handleCancelAbout}
+            loading={loading}
             previewUrl={previewUrl}
             onImageSelect={handleImageSelect}
+            onBannerRemove={handleBannerRemove}
+            logoPreviewUrl={logoPreviewUrl}
+            onLogoSelect={handleLogoSelect}
+            onLogoRemove={handleLogoRemove}
           />
         );
       case 'Subscription':
@@ -354,7 +438,13 @@ const SettingsPage = () => {
         </Col>
       </Row>
       {!loading && <span className="overlay__block" />}
-      {success && <OkDialogue showSuccess={success} onClose={() => { }} />}
+      {success && (
+        <OkDialogue
+          showSuccess={success}
+          message={selectedMenu === 'profile' ? 'Church information updated.' : undefined}
+          onClose={() => { }}
+        />
+      )}
       {error && <ErrorDialogue showError={error} onClose={() => { }} />}
     </>
   );

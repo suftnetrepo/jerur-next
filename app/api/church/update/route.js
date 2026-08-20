@@ -40,9 +40,15 @@ export const PUT = async (req) => {
       const denomination = formData.get('denomination');
       const short_message = formData.get('short_message');
       const verse = formData.get('verse');
+      // `file`/`removeBanner` -> the church BANNER (secure_url/public_id).
+      // `logoFile`/`removeLogo` -> the church LOGO (logo_url/logo_id), a
+      // fully independent asset - see churchService.updateBulk.
       const file = formData.get('file');
+      const removeBanner = formData.get('removeBanner');
+      const logoFile = formData.get('logoFile');
+      const removeLogo = formData.get('removeLogo');
 
-      // Uploading (and, on edit, replacing/deleting the previous logo) is
+      // Uploading (and, on edit, replacing/deleting the previous image) is
       // handled by churchService.updateBulk via CloudinaryService - this
       // route only extracts the raw form fields.
       const body = {
@@ -53,7 +59,10 @@ export const PUT = async (req) => {
         denomination,
         short_message,
         verse,
-        file: file || null
+        file: file || null,
+        removeBanner: removeBanner === 'true',
+        logoFile: logoFile || null,
+        removeLogo: removeLogo === 'true'
       };
 
       const updated = await updateBulk(user?.church, body);
