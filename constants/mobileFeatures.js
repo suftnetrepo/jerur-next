@@ -10,6 +10,15 @@
  *
  * NOTE: the home Slider is not listed here - it is always available and is
  * not gated behind a feature flag.
+ *
+ * A feature's optional `denominations` array restricts it to churches with
+ * one of those denomination ids (Church.denomination, set on Settings ->
+ * About Us - see constants/denominations.js). Absent/empty means available
+ * to every denomination. When present, this is enforced in two places:
+ * the admin's Mobile Features grid (app/protected/church/settings/features)
+ * hides the toggle entirely for a non-matching church, and the mobile
+ * app's useFeatureFlags() re-checks it at read time, so a feature id left
+ * enabled from before a denomination change never resurfaces either.
  */
 
 export const FEATURE_CATEGORIES = ['Church', 'Community', 'Finance', 'Media', 'Communication', 'Members'];
@@ -44,7 +53,7 @@ export const MOBILE_FEATURES = [
   },
   {
     id: 'testimony',
-    label: 'Testimony',
+    label: 'Share Testimony',
     description: 'Let members share testimonies of what God has done in their lives.',
     category: 'Church',
     icon: 'record_voice_over',
@@ -121,7 +130,8 @@ export const MOBILE_FEATURES = [
     category: 'Community',
     icon: 'restaurant',
     color: '#EA580C',
-    enabledByDefault: false
+    enabledByDefault: false,
+    denominations: ['living-faith-church']
   },
   {
     id: 'free-transport',
@@ -130,7 +140,8 @@ export const MOBILE_FEATURES = [
     category: 'Community',
     icon: 'directions_bus',
     color: '#2563EB',
-    enabledByDefault: false
+    enabledByDefault: false,
+    denominations: ['living-faith-church']
   },
   {
     id: 'believers-foundation-class',
@@ -139,7 +150,8 @@ export const MOBILE_FEATURES = [
     category: 'Church',
     icon: 'school',
     color: '#9333EA',
-    enabledByDefault: false
+    enabledByDefault: false,
+    denominations: ['living-faith-church']
   },
   {
     id: 'wofbi-basic-certificate',
@@ -148,7 +160,8 @@ export const MOBILE_FEATURES = [
     category: 'Church',
     icon: 'workspace_premium',
     color: '#B91C1C',
-    enabledByDefault: false
+    enabledByDefault: false,
+    denominations: ['living-faith-church']
   },
   {
     id: 'note',
@@ -185,6 +198,19 @@ export const MOBILE_FEATURES = [
     icon: 'self_improvement',
     color: '#115E59',
     enabledByDefault: true
+  },
+  {
+    id: 'prophetic-theme',
+    label: 'Prophetic Theme of the Month',
+    description: "Share this month's prophetic theme and scripture with members on the home screen.",
+    category: 'Church',
+    icon: 'auto_awesome',
+    color: '#6D28D9',
+    // Content-driven, same as prayer-hour/sermons above - a church only
+    // wants this on once they're actually keeping Settings -> Prophetic
+    // Focus (month/verse/description) up to date each month.
+    enabledByDefault: false,
+    denominations: ['living-faith-church']
   },
   {
     id: 'articles',

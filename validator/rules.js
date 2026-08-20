@@ -1025,15 +1025,17 @@ export const configValidator = {
     return {
       currency: '',
       isSearchable: false,
-      prayer_request_email: '',
-      giving_url: ''
+      support_email: '',
+      giving_url: '',
+      conference_link: ''
     };
   },
   fields: {
     currency: '',
     isSearchable: false,
-    prayer_request_email: '',
-    giving_url: ''
+    support_email: '',
+    giving_url: '',
+    conference_link: ''
   }
 };
 

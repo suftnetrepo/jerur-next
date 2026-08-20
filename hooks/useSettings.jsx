@@ -586,12 +586,12 @@ const useConfig = () => {
   };
 
   const handleSelect = (data) => {
-    const { currency,prayer_request_email, giving_url,isSearchable}= data
+    const { currency,support_email, giving_url,isSearchable, conference_link}= data
     setState((prevState) => ({
       ...prevState,
       fields: {
         ...prevState.fields,
-        currency,prayer_request_email, giving_url,isSearchable
+        currency,support_email, giving_url,isSearchable, conference_link
       }
     }));
   };

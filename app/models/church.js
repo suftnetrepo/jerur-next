@@ -300,12 +300,25 @@ const ChurchSchema = new mongoose.Schema(
       required: false,
       default: ''
     },
-    prayer_request_email: {
+    // Renamed from prayer_request_email (see migrations/009-rename-
+    // prayer-request-email-to-support-email.js) - now the general support
+    // address the mobile app sends Testimony, Contact Us, and Wofbi course
+    // enquiry email drafts to (see getChurch()'s select whitelist below,
+    // which now exposes this to GET /church/get).
+    support_email: {
       type: String,
       required: false,
       default: ''
     },
     giving_url: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    // Zoom/Teams/etc. link for remote services - a church-wide fallback,
+    // distinct from a single ServiceTime's own remote_link (see
+    // app/models/serviceTime.js).
+    conference_link: {
       type: String,
       required: false,
       default: ''

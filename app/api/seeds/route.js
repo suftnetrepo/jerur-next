@@ -167,7 +167,7 @@ const generateRandomChurch = () => {
     account_number: faker.finance.accountNumber(),
     bank_name: faker.company.name(),
     reference: faker.string.uuid(),
-    prayer_request_email: faker.internet.email(),
+    support_email: faker.internet.email(),
     giving_url: faker.internet.url(),
     enable_url_giving: true,
     enable_bank_transfer: true,

@@ -332,7 +332,7 @@ async function getChurch(id) {
     // missing from this whitelist, so the mobile app's "get selected
     // church" call (GET /api/church/get) never received it even though the
     // search endpoint did.
-    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination short_message verse address features sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id').lean();
+    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination short_message verse address features sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id conference_link support_email').lean();
     return {
       ...data,
       notification: buildNotificationResponse(data?.notification)

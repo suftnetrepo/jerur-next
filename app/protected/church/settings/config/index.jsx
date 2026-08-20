@@ -46,19 +46,19 @@ const ConfigPage = ({ data }) => {
 
         <div className="row">
           <div className="col-md-12">
-            <Form.Group controlId="formPrayer_request_email" className="mb-3">
-              <Form.Label className="text-dark">Prayer Request Email</Form.Label>
+            <Form.Group controlId="formSupport_email" className="mb-3">
+              <Form.Label className="text-dark">Support Email</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter prayer request email"
-                name="prayer_request_email"
-                value={fields.prayer_request_email}
-                onChange={(e) => handleChange('prayer_request_email', e.target.value)}
+                placeholder="Enter support email"
+                name="support_email"
+                value={fields.support_email}
+                onChange={(e) => handleChange('support_email', e.target.value)}
                 className="border-dark"
                 maxLength={50}
               />
-              {errorMessages.prayer_request_email?.message && (
-                <span className="text-danger">{errorMessages.prayer_request_email?.message}</span>
+              {errorMessages.support_email?.message && (
+                <span className="text-danger">{errorMessages.support_email?.message}</span>
               )}
             </Form.Group>
           </div>
@@ -79,6 +79,26 @@ const ConfigPage = ({ data }) => {
               />
               {errorMessages.giving_url?.message && (
                 <span className="text-danger alert-danger">{errorMessages.giving_url?.message}</span>
+              )}
+            </Form.Group>
+          </div>
+          <div className="col-md-6"></div>
+        </div>
+
+        <div className="row">
+          <div className="col-md-12">
+            <Form.Group controlId="formConferenceLink" className="mb-3">
+              <Form.Label className="text-dark">Conference Link</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Zoom, Teams or other conference link for remote services"
+                name="conference_link"
+                value={fields.conference_link}
+                onChange={(e) => handleChange('conference_link', e.target.value)}
+                className="border-dark"
+              />
+              {errorMessages.conference_link?.message && (
+                <span className="text-danger alert-danger">{errorMessages.conference_link?.message}</span>
               )}
             </Form.Group>
           </div>

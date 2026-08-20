@@ -28,7 +28,7 @@ import {
 import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
 import { useFeatures } from '../../../../../hooks/useSettings';
-import { groupFeaturesByCategory } from '../../../../../constants/mobileFeatures';
+import { MOBILE_FEATURES, groupFeaturesByCategory } from '../../../../../constants/mobileFeatures';
 
 // Maps the string icon identifiers stored in constants/mobileFeatures.js to
 // their react-icons/md component.
@@ -103,7 +103,17 @@ const FeatureCard = ({ feature, checked, onToggle }) => {
 const Features = ({ data }) => {
   const { error, success, fields, loading, handleSave, handleChange, handleSelect, handleReset } = useFeatures();
   const enabledFeatures = fields?.features || [];
-  const categories = groupFeaturesByCategory();
+
+  // Denomination-restricted features (see the `denominations` field in
+  // constants/mobileFeatures.js) only show up here at all once this
+  // church's own denomination (Settings -> About Us) matches one they're
+  // restricted to - a church that hasn't set one, or has a different one,
+  // never sees the toggle and so can never enable it.
+  const denomination = data?.denomination;
+  const visibleFeatures = MOBILE_FEATURES.filter(
+    (feature) => !feature.denominations?.length || (denomination && feature.denominations.includes(denomination))
+  );
+  const categories = groupFeaturesByCategory(visibleFeatures);
 
   useEffect(() => {
     handleSelect(data?.features || []);
