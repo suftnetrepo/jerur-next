@@ -249,7 +249,9 @@ export const DEFAULT_ENABLED_FEATURE_IDS = [
   'house-fellowship',
   'attendance',
   'register-member',
-  'notifications'
+  'notifications',
+  'bible',
+  'hymns'
 ];
 
 export const getFeatureById = (id) => MOBILE_FEATURES.find((feature) => feature.id === id);
