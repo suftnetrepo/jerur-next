@@ -5,6 +5,7 @@
   "scripts": {
     "create-admin": "tsx scripts/create-admin.ts",
     "migrate": "tsx scripts/run-migrations.js",
+    "migrate-church-to-live": "tsx scripts/migrate-church-to-live.ts",
     "dev": "next dev",
     "lint": "next lint",
     "build": "next build",
