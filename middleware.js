@@ -33,6 +33,30 @@ export async function middleware(req) {
       return NextResponse.next();
     }
 
+    // Checked before the staff bearer-token path below: a mobile/public
+    // request always carries this (see winners-chapel-mobile's apiClient.ts
+    // interceptor), and a staff dashboard request never does. Once a
+    // member is logged in, the mobile app's requests also carry an
+    // Authorization: Bearer <memberToken> header (same interceptor,
+    // unconditional once a member session exists) — that token is signed
+    // with MEMBER_JWT_SECRET via jsonwebtoken, not the ACCESS_TOKEN_SECRET
+    // AuthService.verifyAccessToken() (jose) expects, so checking the
+    // bearer path first for these requests only ever produced a doomed
+    // ERR_JWS_SIGNATURE_VERIFICATION_FAILED before falling through to this
+    // same nj-api-key success anyway. Checking nj-api-key first skips that
+    // wasted, noisy verification attempt entirely.
+    const key = req.headers.get('nj-api-key');
+    if (key) {
+      const requestHeaders = new Headers(req.headers);
+      requestHeaders.set('x-nj-client-id', key);
+
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    }
+
     const authHeader = req.headers.get('authorization');
     if (authHeader?.startsWith('Bearer ')) {
       const bearerToken = authHeader.split(' ')[1];
@@ -42,18 +66,6 @@ export async function middleware(req) {
       } catch (e) {
         console.warn('Invalid bearer token');
       }
-    }
-
-    const key = req.headers.get('nj-api-key');
-    if (key) {
-      const requestHeaders = new Headers(req.headers);
-      requestHeaders.set('x-nj-client-id', key);
-      
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
     }
 
     const returnUrl = encodeURIComponent(req.nextUrl.pathname);
