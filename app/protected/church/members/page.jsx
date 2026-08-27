@@ -45,7 +45,8 @@ const MembersPageContent = () => {
     handleSave,
     handleReset,
     handleChange,
-    handleSelect
+    handleSelect,
+    handleResetPin
   } = useMember(debouncedSearchQuery, selectedStatus);
 
   const handleClose = useCallback(() => {
@@ -210,6 +211,7 @@ const MembersPageContent = () => {
         handleReset={handleReset}
         handleEdit={handleEdit}
         handleSave={handleSave}
+        handleResetPin={handleResetPin}
       />
     </>
   );

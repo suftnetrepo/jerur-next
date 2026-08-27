@@ -1,8 +1,13 @@
 import { decrypt } from '../../../../utils/helpers';
-import { authenticateMember, generateMemberToken, MemberAuthError } from '../../../services/memberService';
+import { forgotPin, MemberAuthError } from '../../../services/memberService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
 
+// Mobile self-service "forgot PIN" — same auth shape as member/login (a
+// valid nj-api-key is all that's required, no staff session), but instead
+// of verifying a PIN it replaces one outright. See forgotPin()'s comment in
+// memberService.js for why this is deliberately less restrictive than the
+// admin recovery path (member/reset-pin, staff-session gated).
 export const POST = async (req) => {
   try {
     const clientId = req.headers.get('x-nj-client-id');
@@ -20,30 +25,17 @@ export const POST = async (req) => {
     const body = await req.json();
 
     if (!body.identifier || !body.pin) {
-      return NextResponse.json({ success: false, error: 'Phone/email and PIN are required.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Phone/email and new PIN are required.' }, { status: 400 });
     }
 
-    const member = await authenticateMember({ church, identifier: body.identifier, pin: body.pin });
-    const token = generateMemberToken(member);
+    await forgotPin({ church, identifier: body.identifier, pin: body.pin });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        token,
-        member: {
-          _id: member._id,
-          first_name: member.first_name,
-          last_name: member.last_name,
-          status: member.status,
-          role: member.role
-        }
-      }
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
     logger.error(error);
 
     if (error instanceof MemberAuthError) {
-      const status = error.code === 'LOCKED' ? 429 : error.code === 'INACTIVE' ? 403 : 401;
+      const status = error.code === 'INACTIVE' ? 403 : 400;
       return NextResponse.json({ success: false, error: error.message, code: error.code }, { status });
     }
 

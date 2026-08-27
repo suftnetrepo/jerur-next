@@ -294,6 +294,57 @@ async function updateMember(id, body) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Admin "forgot PIN" recovery — church dashboard Members page look up the
+// member, then set a new PIN on their behalf. Deliberately a separate
+// function from updateMember() above: that one forwards `body` straight to
+// Member.findByIdAndUpdate(), which can't write a hashed PIN (the schema
+// only has `pinHash`, not `pin` — see app/models/member.js — so a plaintext
+// `pin` in the body would just be silently dropped by Mongoose's strict
+// schema, same trap documented on verificationPin() above). This hashes
+// with the same bcrypt/PIN_SALT_ROUNDS treatment as self-service
+// registration, and also clears any lockout so a member who was locked out
+// right before asking an admin for help isn't still locked out after.
+async function resetMemberPin(id, pin) {
+  try {
+    const identifierValidateResult = identifierValidator(id);
+    if (identifierValidateResult.length) {
+      const error = new Error(identifierValidateResult.map((it) => it.message).join(','));
+      error.invalidArgs = identifierValidateResult.map((it) => it.field).join(',');
+      throw error;
+    }
+
+    if (!/^\d{4,6}$/.test(String(pin ?? ''))) {
+      const error = new Error('PIN must be 4 to 6 digits.');
+      error.invalidArgs = 'pin';
+      throw error;
+    }
+
+    const pinHash = await bcrypt.hash(String(pin), PIN_SALT_ROUNDS);
+
+    // Mixing plain fields with a $unset at the top level of an update
+    // document isn't valid MongoDB syntax once any $ operator is present —
+    // pinHash/loginAttempts have to go under their own $set alongside it.
+    const updatedMember = await Member.findByIdAndUpdate(
+      id,
+      {
+        $set: { pinHash, loginAttempts: 0 },
+        $unset: { lockedUntil: 1 }
+      },
+      { new: true }
+    );
+
+    if (!updatedMember) {
+      throw new Error('Member not found or update failed');
+    }
+
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error(error.message || 'An unexpected error occurred. Please try again.');
+  }
+}
+
 async function removeMember(suid, id) {
   try {
     const identifierValidateResult = identifierValidator(id);
@@ -527,6 +578,14 @@ export async function authenticateMember({ church, identifier, pin }) {
     throw new MemberAuthError('NOT_FOUND', 'No member found with that phone or email.');
   }
 
+  // Blocked regardless of PIN correctness — an inactive member (see
+  // Member.status in app/models/member.js) shouldn't be able to log in at
+  // all until church staff reactivates them, so this short-circuits before
+  // the lockout/PIN checks below rather than after a failed PIN attempt.
+  if (member.status === 'inactive') {
+    throw new MemberAuthError('INACTIVE', 'Your account is inactive. Please contact your church for help.');
+  }
+
   if (member.lockedUntil && member.lockedUntil > new Date()) {
     const minutesLeft = Math.ceil((member.lockedUntil - new Date()) / 60000);
     throw new MemberAuthError('LOCKED', `Too many attempts. Try again in ${minutesLeft} minute(s).`);
@@ -544,6 +603,49 @@ export async function authenticateMember({ church, identifier, pin }) {
     throw new MemberAuthError('INVALID_CREDENTIALS', 'Incorrect PIN.');
   }
 
+  member.loginAttempts = 0;
+  member.lockedUntil = undefined;
+  await member.save();
+
+  return member;
+}
+
+/**
+ * Self-service "forgot PIN" — the mobile counterpart to admin's
+ * resetMemberPin() above, deliberately less restrictive: no old PIN, no
+ * admin, no OTP step. Proving you own the phone/email on file is the only
+ * gate, same trust level the rest of this member auth already runs on (see
+ * authenticateMember() above — anyone who knows the identifier + PIN gets
+ * in; this just lets them replace a forgotten PIN with the identifier
+ * alone). Deliberately does NOT touch loginAttempts on a wrong identifier —
+ * unlike a failed PIN guess, there's no PIN attempt happening here to
+ * penalize.
+ */
+export async function forgotPin({ church, identifier, pin }) {
+  if (!identifier) {
+    throw new MemberAuthError('INVALID_CREDENTIALS', 'Enter your phone or email.');
+  }
+  if (!/^\d{4,6}$/.test(String(pin ?? ''))) {
+    throw new MemberAuthError('INVALID_CREDENTIALS', 'PIN must be 4 to 6 digits.');
+  }
+
+  const member = await Member.findOne({
+    church,
+    $or: [{ mobile: identifier }, { email: identifier.toLowerCase() }]
+  });
+
+  if (!member) {
+    throw new MemberAuthError('NOT_FOUND', 'No member found with that phone or email.');
+  }
+
+  // An inactive member is blocked from logging in at all (see
+  // authenticateMember() above) — letting them reset their PIN here would
+  // just hand them a back door around that block, so it applies here too.
+  if (member.status === 'inactive') {
+    throw new MemberAuthError('INACTIVE', 'Your account is inactive. Please contact your church for help.');
+  }
+
+  member.pinHash = await bcrypt.hash(String(pin), PIN_SALT_ROUNDS);
   member.loginAttempts = 0;
   member.lockedUntil = undefined;
   await member.save();
@@ -573,6 +675,7 @@ export {
   getMembers,
   removeMember,
   updateMember,
+  resetMemberPin,
   getMember,
   verificationPin,
   addMember,
