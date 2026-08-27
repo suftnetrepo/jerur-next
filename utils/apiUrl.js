@@ -169,7 +169,8 @@ export const MEMBER = {
   createOne: `${HOST}member/create`,
   updateOne: `${HOST}member/update`,
   fetch: `${HOST}member/`,
-  removeOne: `${HOST}member/delete`
+  removeOne: `${HOST}member/delete`,
+  resetPin: `${HOST}member/reset-pin`
 };
 
 export const DONATION = {

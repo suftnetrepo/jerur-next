@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Offcanvas, Button, Form } from 'react-bootstrap';
 import { validate } from '../../../../validator/validator';
 import { ConfirmationDialogue, OkDialogue } from '../../../../src/components/elements/ConfirmDialogue';
@@ -13,11 +13,52 @@ const RenderUserOffcanvas = ({
   handleReset,
   handleSave,
   handleEdit,
+  handleResetPin,
   fields
 }) => {
   const [errorMessages, setErrorMessages] = useState({});
+  const [newPin, setNewPin] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [pinSuccess, setPinSuccess] = useState(false);
+  const [resettingPin, setResettingPin] = useState(false);
 
   const resetFields = () => {};
+
+  // "Forgot PIN" recovery — a member locked out of the mobile app can't
+  // reset their own PIN (there's no email/SMS flow for that yet), so this
+  // is staff setting a new one on their behalf after verifying who they
+  // are. Same 4-6 digit rule as self-service registration/login on the
+  // mobile side (see registerMember() in jerur-next's memberService.js).
+  const handlePinSubmit = async () => {
+    setPinError('');
+    setPinSuccess(false);
+
+    if (!/^\d{4,6}$/.test(newPin)) {
+      setPinError('PIN must be 4 to 6 digits.');
+      return;
+    }
+
+    setResettingPin(true);
+    const result = await handleResetPin(fields._id, newPin);
+    setResettingPin(false);
+
+    if (result) {
+      setPinSuccess(true);
+      setNewPin('');
+    } else {
+      setPinError('Failed to reset the PIN. Please try again.');
+    }
+  };
+
+  // Clears leftover PIN-reset state (a stale "PIN reset" confirmation, an
+  // in-progress digit) whenever the offcanvas switches to a different
+  // member or closes — this panel would otherwise still show the previous
+  // member's success message.
+  useEffect(() => {
+    setNewPin('');
+    setPinError('');
+    setPinSuccess(false);
+  }, [fields?._id, show]);
 
   const handleSubmit = async () => {
     setErrorMessages({});
@@ -153,7 +194,45 @@ const RenderUserOffcanvas = ({
             </div>
           </div>
 
-          <div className="d-flex justify-content-start">
+          {/* Forgot-PIN recovery — only once a member is actually selected
+              (fields._id), never on the "Add Member" form where there's no
+              member yet to reset. */}
+          {fields?._id && (
+            <div className="row">
+              <div className="col-12">
+                <hr />
+                <Form.Label className="text-dark fw-semibold">Reset PIN</Form.Label>
+                <div className="text-muted small mb-2">
+                  Member forgot their PIN? Set a new 4-6 digit PIN for them here.
+                </div>
+                <div className="d-flex align-items-start gap-2">
+                  <Form.Group controlId="formNewPin" className="mb-0" style={{ maxWidth: 160 }}>
+                    <Form.Control
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="New PIN"
+                      maxLength={6}
+                      value={newPin}
+                      onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
+                      className="border-dark"
+                    />
+                  </Form.Group>
+                  <Button
+                    type="button"
+                    variant="outline-primary"
+                    disabled={resettingPin}
+                    onClick={() => handlePinSubmit()}
+                  >
+                    {resettingPin ? 'Resetting…' : 'Reset PIN'}
+                  </Button>
+                </div>
+                {pinError && <span className="text-danger d-block mt-1">{pinError}</span>}
+                {pinSuccess && <span className="text-success d-block mt-1">PIN reset successfully.</span>}
+              </div>
+            </div>
+          )}
+
+          <div className="d-flex justify-content-start mt-3">
             <Button variant="secondary" className="me-2" onClick={handleClose}>
               Cancel
             </Button>

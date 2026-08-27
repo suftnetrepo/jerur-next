@@ -179,6 +179,25 @@ const useMember = (searchQuery, selectedStatus = 'ALL') => {
     }
   }
 
+  // Admin "forgot PIN" recovery — separate from handleEdit above since it
+  // hits its own reset-pin endpoint (the generic member/update route can't
+  // write a hashed PIN — see resetMemberPin()'s comment in
+  // app/services/memberService.js). Deliberately does not refetch the
+  // member list afterward (unlike handleDelete/handleSave/handleEdit) since
+  // a PIN reset changes nothing the table displays.
+  async function handleResetPin(id, pin) {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    const { success, errorMessage } = await zat(MEMBER.resetPin, { pin }, VERBS.PUT, { id: id });
+
+    if (success) {
+      setState((prevState) => ({ ...prevState, success: true, loading: false }));
+      return true;
+    } else {
+      handleError(errorMessage || 'Failed to reset the PIN.');
+      return false;
+    }
+  }
+
   return {
     ...state,
     handleFetch,
@@ -188,7 +207,8 @@ const useMember = (searchQuery, selectedStatus = 'ALL') => {
     handleEdit,
     handleSave,
     handleReset,
-    handleChange
+    handleChange,
+    handleResetPin
   };
 };
 
