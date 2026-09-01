@@ -47,9 +47,14 @@ const SettingsPage = () => {
   const [key, setKey] = useState('config');
 
   useEffect(() => {
-    const requestedSection = new URLSearchParams(window.location.search).get('section');
-    if (requestedSection === 'address') {
-      setSelectedMenu('address');
+    const requestedSection = new URLSearchParams(window.location.search).get('section')?.toLowerCase();
+    const settingsSections = {
+      address: 'address',
+      subscription: 'Subscription'
+    };
+
+    if (settingsSections[requestedSection]) {
+      setSelectedMenu(settingsSections[requestedSection]);
     }
   }, []);
 

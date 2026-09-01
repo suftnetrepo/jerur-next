@@ -19,8 +19,11 @@ export async function POST(req) {
         }
 
         const stripe = getStripeClient();
-        const returnUrl = process.env.NEXT_FRONTEND_URL
-            || `${new URL(req.url).origin}/protected/church/settings`;
+        const frontendOrigin = process.env.NEXT_FRONTEND_URL || new URL(req.url).origin;
+        const returnUrl = new URL(
+            '/protected/church/settings?section=subscription',
+            frontendOrigin
+        ).toString();
 
         // Create a Stripe Billing Portal session
         const session = await stripe.billingPortal.sessions.create({
