@@ -43,7 +43,9 @@ const transformData = (records) => {
     });
   }
 
-  records.forEach((item) => {
+  const safeRecords = Array.isArray(records) ? records : [];
+
+  safeRecords.forEach((item) => {
     const recordDate = new Date(item.checkInTime)
       .toISOString()
       .split("T")[0];
@@ -91,14 +93,6 @@ export default function AttendanceChart({ data = [], loading = false }) {
     },
   };
 
-  if (!data || data.length === 0) {
-        return (
-           <div className="d-flex justify-content-center align-items-center h-100">
-                <span> No attendance data available</span>
-            </div>
-        );
-    }
-
   return (
     <Card className="shadow-sm border-0 h-100">
       <Card.Header className="bg-white border-0">
@@ -135,10 +129,6 @@ export default function AttendanceChart({ data = [], loading = false }) {
         {loading ? (
           <div className="d-flex justify-content-center align-items-center h-100">
             <Spinner animation="border" />
-          </div>
-        ) : data?.length === 0 ? (
-          <div className="text-center text-muted mt-5">
-            No attendance data available
           </div>
         ) : chartType === "bar" ? (
           <Bar data={chartData} options={options} />

@@ -8,6 +8,7 @@ import {
   MdInfoOutline,
   MdCalendarToday,
   MdAccessTime,
+  MdLink,
   MdCampaign,
   MdEvent,
   MdSell,
@@ -198,6 +199,18 @@ const NotificationPreview = ({ fields, previewUrl }) => {
                   </div>
                 )}
               </div>
+            )}
+
+            {fields?.conference_link && (
+              <a
+                href={fields.conference_link}
+                target="_blank"
+                rel="noreferrer"
+                className="d-flex align-items-center justify-content-center text-decoration-none mt-3"
+                style={{ gap: 7, minHeight: 40, borderRadius: 9, color: '#fff', backgroundColor: type.color, fontSize: 12.5, fontWeight: 700 }}
+              >
+                <MdLink size={17} /> Join conference
+              </a>
             )}
           </div>
 

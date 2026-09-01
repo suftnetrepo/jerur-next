@@ -1,6 +1,6 @@
-import Stripe from 'stripe';
 // import { logger } from '../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getStripeClient, getStripeWebhookSecret } from '../../../lib/stripe';
 
 import {
   invoicePaymentSuccess,
@@ -11,22 +11,6 @@ import {
   createSubscription,
   cancelSubscription,
 } from '../../services/webHooksService';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-async function getRawBody(req) {
-  const chunks = [];
-  for await (const chunk of req.body) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
-}
 
 export async function POST(req) {
   let event = null;
@@ -40,8 +24,7 @@ export async function POST(req) {
     });
 
     try {
-      // Try to get raw body using the stream method
-      rawBody = await getRawBody(req);
+      rawBody = Buffer.from(await req.arrayBuffer());
       console.log('Raw body length:', rawBody.length);
     } catch (bodyError) {
       console.error('Body parsing error:', bodyError);
@@ -53,10 +36,10 @@ export async function POST(req) {
 
     // Verify webhook signature
     try {
-      event = stripe.webhooks.constructEvent(
+      event = getStripeClient().webhooks.constructEvent(
         rawBody,
         req.headers.get('stripe-signature'),
-        process.env.STRIPE_WEBHOOK_SECRET_LOCAL
+        getStripeWebhookSecret()
       );
       console.log('Webhook event constructed successfully:', { type: event.type });
     } catch (signatureError) {
@@ -73,8 +56,8 @@ export async function POST(req) {
       'customer.subscription.updated': updateSubscription,
       'customer.subscription.deleted': cancelSubscription,
       'invoice.payment_succeeded': async (event) => {
-        await invoicePaymentSuccess(event);
         await setDefaultPaymentMethod(event);
+        await invoicePaymentSuccess(event);
       },
       'invoice.payment_failed': invoicePaymentFailed,
       'customer.subscription.trial_will_end': trialWillEnd,

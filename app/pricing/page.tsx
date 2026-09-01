@@ -30,10 +30,10 @@ const PricePlans: NextPage = () => {
           <div className="container pt-10  pt-md-14 pb-md-14 text-center">
             <div className="row">
               <div className="col-sm-12 col-md-12 col-lg-9 mx-auto">
-                <h1 className="display-1 mb-3">Our Pricing</h1>
+                <h1 className="display-1 mb-3">Simple, transparent pricing</h1>
                 <p className="lead mb-0 px-xl-10 px-xxl-13">
-                  No matter which plan you choose, you’ll enjoy cost savings, exceptional features, and trusted
-                  support—all designed for your success.
+                  Every billing option includes the complete Jerur platform. Pay monthly for flexibility, or save by
+                  choosing six-month or annual billing.
                 </p>
               </div>
             </div>

@@ -113,6 +113,7 @@ const NotificationSettings = ({ data }) => {
     formData.append('type', fields.type);
     formData.append('title', fields.title);
     formData.append('message', fields.message);
+    formData.append('conference_link', fields.conference_link || '');
     formData.append('priority', fields.priority);
     formData.append('status', String(statusOverride ?? fields.status));
     formData.append('start_date', fields.start_date || '');
@@ -206,6 +207,24 @@ const NotificationSettings = ({ data }) => {
                 />
                 {errorMessages.message?.message && (
                   <span className="text-danger">{errorMessages.message?.message}</span>
+                )}
+              </Form.Group>
+
+              <Form.Group controlId="formNotificationConferenceLink" className="mb-4">
+                <Form.Label className="text-dark">Conference Link (Optional)</Form.Label>
+                <Form.Control
+                  type="url"
+                  placeholder="https://zoom.us/j/..."
+                  value={fields?.conference_link ?? ''}
+                  onChange={(e) => handleChange('conference_link', e.target.value)}
+                  className="border-dark"
+                  maxLength={2048}
+                />
+                <Form.Text className="text-muted">
+                  Add a Zoom, Teams, Google Meet or other conference URL.
+                </Form.Text>
+                {errorMessages.conference_link?.message && (
+                  <div className="text-danger">{errorMessages.conference_link.message}</div>
                 )}
               </Form.Group>
 

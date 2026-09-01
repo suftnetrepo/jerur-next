@@ -53,6 +53,7 @@ const buildNotificationResponse = (notification) => {
   const type = notification?.type || 'announcement';
   const title = notification?.title || '';
   const message = notification?.message || '';
+  const conference_link = notification?.conference_link || '';
   const secure_url = notification?.secure_url || '';
   const public_id = notification?.public_id || '';
   const priority = notification?.priority || 'normal';
@@ -64,6 +65,7 @@ const buildNotificationResponse = (notification) => {
     type,
     title,
     message,
+    conference_link,
     secure_url,
     public_id,
     priority,
@@ -108,7 +110,7 @@ async function updateNotification(suid, body) {
       throw error;
     }
 
-    const { type, title, message, priority, status, start_date, expiry_date } = notificationFields;
+    const { type, title, message, conference_link, priority, status, start_date, expiry_date } = notificationFields;
 
     if (start_date && expiry_date && new Date(expiry_date) < new Date(start_date)) {
       const error = new Error('Expiry date must not be before the start date');
@@ -145,6 +147,7 @@ async function updateNotification(suid, body) {
       type: type || 'announcement',
       title,
       message,
+      conference_link: conference_link || '',
       priority: priority || 'normal',
       status: status ?? true,
       start_date: start_date || null,
@@ -443,6 +446,47 @@ async function updateBulk(suid, body) {
     throw new Error('Error updating church settings');
   }
 }
+
+async function updateOnboarding(suid, body) {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      throw new Error(identifierValidateResult.map((item) => item.message).join(','));
+    }
+
+    const allowedFields = [
+      'welcomeModalDismissed',
+      'setupChecklistDismissed',
+      'onboardingCompleted'
+    ];
+    const updates = {};
+
+    allowedFields.forEach((field) => {
+      if (typeof body?.[field] === 'boolean') {
+        updates[`onboarding.${field}`] = body[field];
+      }
+    });
+
+    if (!Object.keys(updates).length) {
+      throw new Error('No valid onboarding fields supplied');
+    }
+
+    const church = await Church.findByIdAndUpdate(
+      suid,
+      { $set: updates },
+      { new: true }
+    ).select('onboarding').lean();
+
+    if (!church) {
+      throw new Error('Church not found');
+    }
+
+    return church.onboarding;
+  } catch (error) {
+    logger.error(error);
+    throw new Error(error.message || 'Error updating church onboarding');
+  }
+}
 async function updateOneChurch(suid, name, value) {
   try {
     const validateResult = updateOneValidator({ name, value });
@@ -641,7 +685,7 @@ async function updateChurchStatus(stripeCustomerId, body) {
 
     if (!updated) {
       logger.warn({ stripeCustomerId, body }, 'Church not found for status update');
-      return null;
+      throw new Error(`Church not found for Stripe customer ${stripeCustomerId}`);
     }
 
     return updated;
@@ -652,12 +696,14 @@ async function updateChurchStatus(stripeCustomerId, body) {
 }
 async function getVerifySubscriptionStatus(id) {
   try {
-    const result = await Church.findOne({ stripeCustomerId: id });
+    if (!id || typeof id !== 'string' || !id.startsWith('cus_')) {
+      return { active: false };
+    }
 
-    console.log(`Subscription status for customer ${id}:`, result);
+    const result = await Church.findOne({ stripeCustomerId: id }).select('status').lean();
     
     return {
-      active: result?.status === 'active'
+      active: ['active', 'trialing'].includes(result?.status)
     };
   } catch (error) {
     logger.error(`Failed to verify subscription for customer ${id}:`, error);
@@ -678,6 +724,7 @@ export {
   getChurch,
   getChurchesByName,
   updateBulk,
+  updateOnboarding,
   updateOneChurch,
   getChurchesByCountryCode,
   searchChurches,

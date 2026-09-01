@@ -16,7 +16,18 @@ const Form = dynamic(() => import('../form'), { ssr: false });
 const CreateForm = () => {
   const router = useRouter();
   const [errorMessages, setErrorMessages] = useState({});
-  const { handleSave, fields, handleChange, success, handleReset, error, handleSelectedAddress } = useEventEdit();
+  const {
+    handleSave,
+    fields,
+    handleChange,
+    success,
+    handleReset,
+    error,
+    handleSelectedAddress,
+    churchAddress,
+    churchAddressLoading,
+    handleAddressSourceChange
+  } = useEventEdit();
 
   const handleSubmit = async () => {
     setErrorMessages({});
@@ -34,6 +45,7 @@ const CreateForm = () => {
     formData.append('description', fields.description || '');
     formData.append('start_date', fields.start_date);
     formData.append('end_date', fields.end_date);
+    formData.append('use_church_address', String(Boolean(fields.use_church_address)));
     formData.append('addressLine1', fields.addressLine1);
     formData.append('county', fields.county);
     formData.append('town', fields.town);
@@ -66,6 +78,9 @@ const CreateForm = () => {
             handleSubmit={handleSubmit}
             errorMessages={errorMessages}
             handleSelectedAddress={handleSelectedAddress}
+            churchAddress={churchAddress}
+            churchAddressLoading={churchAddressLoading}
+            handleAddressSourceChange={handleAddressSourceChange}
           />
         </div>
       </div>

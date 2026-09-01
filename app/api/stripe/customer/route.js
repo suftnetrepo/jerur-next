@@ -1,13 +1,17 @@
-import Stripe from 'stripe';
 import { logger } from '../../../../utils/logger';
+import { getStripeClient } from '../../../../lib/stripe';
+import { getUserSession } from '../../../../utils/generateToken';
 const { NextResponse } = require('next/server');
 
 // POST handler
 export async function POST(req) {
     try {
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-            apiVersion: '2020-08-27',
-        });
+        const user = await getUserSession(req, { requireActiveSubscription: false });
+        if (!user?.church) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const stripe = getStripeClient();
 
         // Parse the request body
         const body = await req.json();

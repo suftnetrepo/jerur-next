@@ -3,7 +3,6 @@
 import { FC, Fragment, ReactElement, useRef } from 'react';
 import useSticky from '../../../hooks/useSticky';
 import NextLink from '../../reuseable/links/NextLink';
-import SocialLinks from '../../reuseable/SocialLinks';
 import Social from './partials/Social';
 
 type NavbarProps = {
@@ -37,7 +36,7 @@ const Navbar: FC<NavbarProps> = (props) => {
 
       <div id="offcanvas-nav" data-bs-scroll="true" className="navbar-collapse offcanvas offcanvas-nav offcanvas-start">
         <div className="offcanvas-header d-lg-none">
-          <h3 className="text-white fs-30 mb-0">Snatchi</h3>
+          <h3 className="text-white fs-30 mb-0">Jerur</h3>
           <button type="button" aria-label="Close" data-bs-dismiss="offcanvas" className="btn-close btn-close-white" />
         </div>
 
@@ -66,11 +65,7 @@ const Navbar: FC<NavbarProps> = (props) => {
 
           <div className="offcanvas-footer d-lg-none">
             <div>
-              <NextLink title="info@snatchi.com" className="link-inverse" href="mailto:info@snatchi.com" />
-              <br />
-              <NextLink href="tel:+449404522280" title="+44 9404 522 280" />
-              <br />
-              <SocialLinks />
+              <NextLink title="Contact Jerur" className="link-inverse" href="/contact" />
             </div>
           </div>
         </div>

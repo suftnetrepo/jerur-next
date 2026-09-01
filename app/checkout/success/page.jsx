@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faHome,
@@ -22,8 +22,6 @@ function CheckoutSuccess() {
     const [csrfToken, setCsrfToken] = useState('');
     const stripeCustomerId = searchParams.get('stripeCustomerId');
     const email = searchParams.get('email');
-    const plan = searchParams.get('plan') || 'Basic Plan';
-    const amount = searchParams.get('amount') || '£50';
 
     const [status, setStatus] = useState('processing');
     // processing | active | failed
@@ -66,14 +64,24 @@ function CheckoutSuccess() {
                 retryCount++;
                 if (retryCount > 15) {
                     setStatus('failed');
+                    return false;
                 }
 
             } catch (err) {
-                setStatus('failed');
+                retryCount++;
+                if (retryCount > 15) {
+                    setStatus('failed');
+                    return false;
+                }
             }
+            return true;
         };
 
-        const interval = setInterval(checkStatus, 2000);
+        checkStatus();
+        const interval = setInterval(async () => {
+            const shouldContinue = await checkStatus();
+            if (shouldContinue === false) clearInterval(interval);
+        }, 2000);
         return () => clearInterval(interval);
 
     }, [csrfToken, email, handleVerifySubscriptionStatus, stripeCustomerId]);
@@ -136,32 +144,12 @@ function CheckoutSuccess() {
                                         'Something went wrong. Please contact support.'}
                                 </p>
 
-                                {/* Details */}
+                                {/* Activation state */}
                                 <Card className="border-0 bg-light mb-4" style={{ borderRadius: 12 }}>
                                     <Card.Body>
-                                        <Row>
-                                            <Col md={4}>
-                                                <small className="text-muted d-block">Plan</small>
-                                                <span className="fw-semibold">
-                                                    <FontAwesomeIcon icon={faProjectDiagram} className="me-2 text-primary" />
-                                                    {plan}
-                                                </span>
-                                            </Col>
-
-                                            <Col md={4}>
-                                                <small className="text-muted d-block">Amount</small>
-                                                <span className="fw-semibold">
-                                                    {amount}
-                                                </span>
-                                            </Col>
-
-                                            <Col md={4}>
-                                                <small className="text-muted d-block">Customer ID</small>
-                                                <Badge bg="secondary">
-                                                    {stripeCustomerId}
-                                                </Badge>
-                                            </Col>
-                                        </Row>
+                                        <p className="mb-0 text-muted">
+                                            Your payment was received. We are securely preparing your church workspace.
+                                        </p>
                                     </Card.Body>
                                 </Card>
 

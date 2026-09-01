@@ -33,15 +33,20 @@ export const zat = async (url, body, method, queryParams = null) => {
     // Perform the fetch
     const response = await fetch(url, requestOptions);
 
-    // Handle error statuses
-    if ([400, 401, 403].includes(response.status)) {
-      const errorData = await response.json();
-      return { success: false, status: response.status,  errorMessage: errorData.error || errorData };
-    }
-
     // Handle non-OK responses
     if (!response.ok) {
-      return { success: false, errorMessage: `Network response was not ok: ${response.statusText}` };
+      let errorData = null;
+      try {
+        errorData = await response.json();
+      } catch {
+        // Some upstream failures return an empty or non-JSON response.
+      }
+
+      return {
+        success: false,
+        status: response.status,
+        errorMessage: errorData?.error || errorData?.message || response.statusText || `Request failed (${response.status})`
+      };
     }
 
     // Parse the response JSON

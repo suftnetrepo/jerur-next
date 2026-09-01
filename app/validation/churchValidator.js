@@ -57,6 +57,12 @@ function notificationValidator(data) {
     },
     title: { type: 'string', empty: false, max: 100 },
     message: { type: 'string', empty: false, max: 300 },
+    conference_link: {
+      type: 'string',
+      optional: true,
+      max: 2048,
+      pattern: /^(|https?:\/\/\S+)$/i
+    },
     priority: { type: 'string', optional: true, enum: ['low', 'normal', 'high', 'urgent'] },
     status: { type: 'boolean', optional: true, convert: true },
     start_date: { type: 'date', convert: true, optional: true, nullable: true },

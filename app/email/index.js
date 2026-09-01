@@ -57,7 +57,7 @@ const emailTemplates = {
               padding-right="25px" 
               padding-bottom="20px" 
               padding-top="50px">
-              Welcome to Snatchi
+              Welcome to Jerur
             </mj-text>
           </mj-column>
         </mj-section>
@@ -85,7 +85,7 @@ const emailTemplates = {
               <p>Plan : ${plan}<br />Amount : ${price}<br />Billing Cycle : ${billingCycle}</p>
               <p>
                 <strong>Getting Started</strong><br>
-                Your subscription plan gives you access to <strong>Snatchi</strong> for the next ${duration}.
+                Your subscription plan gives you access to <strong>Jerur</strong> for the next ${duration}.
               </p>
               In case you have any questions, feel free to reach out to us at ${contactEmail}. <br>
               You can log in to your account with your username ${userName} and a temp password : ${password}
@@ -167,7 +167,7 @@ const emailTemplates = {
             <mj-divider border-color="#06adef" width="100px"></mj-divider>
             <mj-text font-size="18px" align="left" color="#555" line-height="30px">
               Dear ${contact},
-              <p>Thank you for your Snatchi subscription payment, registered to ${email}</p>
+              <p>Thank you for your Jerur subscription payment, registered to ${email}</p>
               <p><b>Total Amount Paid</b>: ${amount_paid}</p>
               <p>
                 To view and download your invoice, copy the following link and paste it in your browser: 
@@ -179,7 +179,7 @@ const emailTemplates = {
               </p>
               <p>
                 We hope you enjoy our services.<br>
-                Thank you again for subscribing to <strong>Snatchi</strong>! We look forward to working with you!
+                Thank you again for subscribing to <strong>Jerur</strong>! We look forward to working with you!
               </p>
               <p>Sincerely,<br />${team}</p>
             </mj-text>
@@ -380,7 +380,7 @@ welcomeEmailTrial : ({ name, Plan, amount, billingCycle, duration, contactEmail,
           <p>Plan: ${Plan}<br />Amount: ${amount}<br />Billing Cycle: ${billingCycle}</p>
           <p>
             <strong>Getting Started</strong><br>
-            Your subscription plan gives you access to <strong>Snatchi</strong> for the next ${duration}.
+            Your subscription plan gives you access to <strong>Jerur</strong> for the next ${duration}.
           </p>
           In case you have any questions, feel free to reach out to us at ${contactEmail}. You can log in to your account with your username ${userName}.
         </mj-text>

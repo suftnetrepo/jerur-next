@@ -49,7 +49,7 @@ const streams = isServerless
 
 // Create a Bunyan logger instance
 const logger = bunyan.createLogger({
-  name: 'jsl-snatchi',
+  name: 'jerur',
   streams,
 });
 

@@ -1,4 +1,5 @@
 import Event from '../models/event';
+import Church from '../models/church';
 import { identifierValidator } from '../validation/identifierValidator';
 import { eventValidator } from '../validation/eventValidator';
 import { logger } from '../../utils/logger';
@@ -8,6 +9,31 @@ import CloudinaryService from '../../lib/CloudinaryService';
 mongoConnect();
 
 const eventImageFolder = (suid) => `${process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER}/${suid}`;
+
+const EVENT_ADDRESS_FIELDS = [
+  'addressLine1',
+  'completeAddress',
+  'county',
+  'town',
+  'country',
+  'postcode',
+  'location'
+];
+
+async function resolveEventAddress(suid, eventFields) {
+  if (!eventFields.use_church_address) return eventFields;
+
+  const church = await Church.findById(suid).select('address').lean();
+  if (!church?.address?.completeAddress) {
+    throw new Error('Add the church address in Settings before using it for an event');
+  }
+
+  const resolvedFields = { ...eventFields, use_church_address: true };
+  EVENT_ADDRESS_FIELDS.forEach((field) => {
+    resolvedFields[field] = church.address[field] ?? (field === 'location' ? { type: 'Point', coordinates: [] } : '');
+  });
+  return resolvedFields;
+}
 
 async function creatEvent(suid, body) {
   try {
@@ -25,7 +51,8 @@ async function creatEvent(suid, body) {
       throw error;
     }
 
-    const { file, ...eventFields } = body;
+    const { file, ...submittedEventFields } = body;
+    const eventFields = await resolveEventAddress(suid, submittedEventFields);
     const uploaded = await CloudinaryService.uploadImage(file, { folder: eventImageFolder(suid) });
 
     const newEvent = new Event({
@@ -38,11 +65,11 @@ async function creatEvent(suid, body) {
     return savedEvent;
   } catch (error) {
     logger.error(error);
-    throw new Error('Error adding event');
+    throw new Error(error.message || 'Error adding event');
   }
 }
 
-async function editEvent(id, body) {
+async function editEvent(id, body, suid) {
   try {
     const identifierValidateResult = identifierValidator(id);
     if (identifierValidateResult.length) {
@@ -58,11 +85,12 @@ async function editEvent(id, body) {
       throw error;
     }
 
-    const { file, ...eventFields } = body;
-    const existingEvent = await Event.findById(id);
+    const { file, ...submittedEventFields } = body;
+    const existingEvent = await Event.findOne({ _id: id, suid });
     if (!existingEvent) {
       throw new Error('Event not found');
     }
+    const eventFields = await resolveEventAddress(suid, submittedEventFields);
 
     // No new file -> CASE 1: leave secure_url/public_id untouched entirely.
     // New file -> CASE 2: delete the old Cloudinary image, upload the new
@@ -80,7 +108,7 @@ async function editEvent(id, body) {
     return true;
   } catch (error) {
     logger.error(error);
-    throw new Error('Error editing events');
+    throw new Error(error.message || 'Error editing events');
   }
 }
 

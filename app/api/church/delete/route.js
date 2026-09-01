@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 export const DELETE = async (req) => {
   try {
 
-    const user = await getUserSession(req);
+    const user = await getUserSession(req, { requireActiveSubscription: false });
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -14,7 +14,17 @@ export const DELETE = async (req) => {
 
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
-    const deleted = await deleteChurch(id);
+    const targetChurchId = user.church || id;
+
+    if (!targetChurchId) {
+      return NextResponse.json({ success: false, error: 'Church id is required' }, { status: 400 });
+    }
+
+    if (user.church && id && id !== String(user.church)) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
+
+    const deleted = await deleteChurch(targetChurchId);
     return NextResponse.json({ success: true, data: deleted });
   } catch (error) {
     logger.error(error);

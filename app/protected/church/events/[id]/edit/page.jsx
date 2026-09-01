@@ -17,7 +17,18 @@ const EditForm = () => {
   const { id } = useParams();
   const router = useRouter();
   const [errorMessages, setErrorMessages] = useState({});
-  const { handleEdit, fields, handleChange, success, error, handleReset, handleSelectedAddress } = useEventEdit(id);
+  const {
+    handleEdit,
+    fields,
+    handleChange,
+    success,
+    error,
+    handleReset,
+    handleSelectedAddress,
+    churchAddress,
+    churchAddressLoading,
+    handleAddressSourceChange
+  } = useEventEdit(id);
 
   const resetFields = () => {
     handleReset();
@@ -40,6 +51,7 @@ const EditForm = () => {
     formData.append('description', fields.description || '');
     formData.append('start_date', fields.start_date);
     formData.append('end_date', fields.end_date);
+    formData.append('use_church_address', String(Boolean(fields.use_church_address)));
     formData.append('addressLine1', fields.addressLine1);
     formData.append('county', fields.county);
     formData.append('town', fields.town);
@@ -73,6 +85,9 @@ const EditForm = () => {
             handleSubmit={handleSubmit}
             errorMessages={errorMessages}
             handleSelectedAddress={handleSelectedAddress}
+            churchAddress={churchAddress}
+            churchAddressLoading={churchAddressLoading}
+            handleAddressSourceChange={handleAddressSourceChange}
           />
         </div>
       </div>

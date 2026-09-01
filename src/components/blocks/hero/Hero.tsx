@@ -8,11 +8,11 @@ const Hero: FC = () => {
     loop: true,
     autoStart: true,
     strings: [
-      'grow your church',
-      'inspire your members',
-      'reach new hearts',
-      'nurture discipleship',
-      'lead with confidence'
+      'members and attendance',
+      'services and events',
+      'giving and campaigns',
+      'sermons and articles',
+      'your mobile ministry'
     ]
   };
 
@@ -22,30 +22,30 @@ const Hero: FC = () => {
         <div className="row gx-lg-8 gx-xl-12 gy-10 align-items-center">
           <div className="col-md-10 offset-md-1 offset-lg-0 col-lg-5 mt-lg-n2 text-center text-lg-start order-2 order-lg-0">
             <h1 className="display-1 mb-5 mx-md-10 mx-lg-0" style={slideInDownAnimate('600ms')}>
-              Bring Your Church Together—Online and In Person. <br />
+              One place to manage your church and connect your members. <br />
               <span className="typer text-primary text-nowrap">
                 <Typewriter options={OPTIONS} />
               </span>
             </h1>
 
             <p className="lead fs-lg mb-7" style={slideInDownAnimate('900ms')}>
-              Connect members, manage events, and keep your church thriving—anytime, anywhere, on any device.
+              Run your church administration from the web and publish the right experiences directly to your members' mobile app.
             </p>
 
             <div className="d-flex flex-wrap gap-3 mb-5" style={slideInDownAnimate('1000ms')}>
-              <NextLink title="Get Started" href="/pricing" className="btn btn-primary btn-lg px-5 rounded-pill" />
+              <NextLink title="View Plans" href="/pricing" className="btn btn-primary btn-lg px-5 rounded-pill" />
 
-              <NextLink title="Watch Demo" href="#" className="btn btn-outline-dark btn-lg px-5 rounded-pill" />
+              <NextLink title="Explore Features" href="/features" className="btn btn-outline-dark btn-lg px-5 rounded-pill" />
             </div>
             <div className="d-flex align-items-left" style={slideInDownAnimate('1200ms')}>
              
 
               <div className="ms-0">
                 <div className="fw-bold">
-                  Trusted by <span className="text-primary">500+</span> Churches
+                  Built for <span className="text-primary">church ministry</span>, not generic business workflows
                 </div>
 
-                <small className="text-muted">Growing ministry communities worldwide</small>
+                <small className="text-muted">Web administration and a configurable member mobile experience</small>
               </div>
             </div>
           </div>
@@ -57,7 +57,7 @@ const Hero: FC = () => {
               className="position-absolute"
               style={{
                 top: -40,
-                right: -20,
+                right: 0,
                 width: '70%',
                 zIndex: 1
               }}

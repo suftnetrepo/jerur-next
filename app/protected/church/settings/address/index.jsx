@@ -1,18 +1,30 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Alert, Form, Button } from 'react-bootstrap';
 import FindAddress from '../../../../share/findAddress';
 import { validate } from '../../../../../validator/validator';
 import { useAddress } from '../../../../../hooks/useAddress';
 
 const AddressForm = ({ address }) => {
     const [errorMessages, setErrorMessages] = useState({});
-    const { handleChange, handleEdit, handleSelectedAddress, handleSave, handleSelect, fields, rules } = useAddress()
+    const {
+        handleChange,
+        handleEdit,
+        handleSelectedAddress,
+        handleSave,
+        handleSelect,
+        handleStatusReset,
+        fields,
+        rules,
+        loading,
+        error,
+        success
+    } = useAddress()
 
     useEffect(() => {
         address && handleSelect(address)
-    }, [address])
+    }, [address, handleSelect])
 
     const handleSubmit = async () => {
         setErrorMessages({});
@@ -37,7 +49,7 @@ const AddressForm = ({ address }) => {
         };
 
         if (fields?._id) {
-            await handleEdit(body, fields._id);
+            await handleEdit(body);
         } else {
             await handleSave(body);
         }
@@ -147,13 +159,22 @@ const AddressForm = ({ address }) => {
             {
                 (fields?.completeAddress || address) && (
                     <div className="d-flex justify-content-start">
-                        <Button type="button" variant="primary" onClick={() => handleSubmit()}>
-                            Save Changes
+                        <Button type="button" variant="primary" disabled={loading} onClick={() => handleSubmit()}>
+                            {loading ? 'Saving…' : 'Save Changes'}
                         </Button>
                     </div>
                 )
             }
-
+            {success && (
+                <Alert variant="success" dismissible className="mt-3 mb-0" onClose={handleStatusReset}>
+                    Address saved successfully.
+                </Alert>
+            )}
+            {error && (
+                <Alert variant="danger" dismissible className="mt-3 mb-0" onClose={handleStatusReset}>
+                    {typeof error === 'string' ? error : 'Unable to save the address.'}
+                </Alert>
+            )}
         </Form>
     );
 };

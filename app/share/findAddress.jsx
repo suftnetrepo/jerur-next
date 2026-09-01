@@ -5,14 +5,14 @@ import { FaSearch } from 'react-icons/fa';
 import { Form, Button } from 'react-bootstrap';
 import { searchAddress, formatAddressParts } from '../../utils/helpers';
 
-const FindAddress = ({ handleSelectedAddress, addressStatus = false }) => {
+const FindAddress = ({ handleSelectedAddress, addressStatus = false, showToggle = true }) => {
   const [fields, setFields] = useState({
     status: addressStatus,
     query: '',
     place_id: 0
   });
   const [searchResults, setSearchResults] = useState([]);
-  const [findAddressStatus, setFindAddressStatus] = useState(addressStatus);
+  const [findAddressStatus, setFindAddressStatus] = useState(showToggle ? addressStatus : true);
 
   const handleFind = async (e) => {
     e.preventDefault();
@@ -29,20 +29,22 @@ const FindAddress = ({ handleSelectedAddress, addressStatus = false }) => {
 
   return (
     <>
-      <Form.Group>
-        <div className="d-flex align-items-center justify-content-start">
-          <Form.Check
-            type="switch"
-            id="custom-switch"
-            value={fields.status}
-            onChange={(e) => {
-              setFindAddressStatus(e.target.checked);
-              setFields({ ...fields, status: e.target.checked });
-            }}
-          />
-          <span className="text-dark ms-1">Find Address</span>
-        </div>
-      </Form.Group>
+      {showToggle && (
+        <Form.Group>
+          <div className="d-flex align-items-center justify-content-start">
+            <Form.Check
+              type="switch"
+              id="custom-switch"
+              value={fields.status}
+              onChange={(e) => {
+                setFindAddressStatus(e.target.checked);
+                setFields({ ...fields, status: e.target.checked });
+              }}
+            />
+            <span className="text-dark ms-1">Find Address</span>
+          </div>
+        </Form.Group>
+      )}
       {findAddressStatus && (
         <>
           <div className="d-flex align-items-center justify-content-start mt-2 mb-3">

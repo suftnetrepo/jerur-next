@@ -5,7 +5,6 @@ import PageProgress from '../../src/components/common/PageProgress';
 import Link from 'next/link';
 import { Footer } from '../../src/components/blocks/footer';
 import Features from '../../src/components/blocks/service';
-import Testimonial from '../../src/components/blocks/testimonial';
 
 const Feature: NextPage = () => {
   return (
@@ -32,8 +31,8 @@ const Feature: NextPage = () => {
               <div className="col-sm-12 col-md-12 col-lg-12 mx-auto">
                 <h1 className="display-1 mb-3">Features</h1>
                 <p className="lead mb-0 px-xl-10 px-xxl-13">
-                  We exist to strengthen churches through technology that understands ministry. With features like
-                  automated follow-ups and giving analytics, we help turn your God-given vision into measurable impact.
+                  Manage members, services, events, giving and content from the church dashboard, then choose what your
+                  members can access through the mobile app.
                 </p>
               </div>
             </div>
@@ -44,12 +43,6 @@ const Feature: NextPage = () => {
           <div className="container pb-14 pb-md-16">
             <Features show={false} />
           </div>
-          <div className='bg-gray'>
-          <div className=" container  pt-15 pt-md-17 pb-13 pb-md-15 mb-n14">
-            <Testimonial />
-          </div>
-          </div>
-         
         </section>
       </main>
       <Footer />

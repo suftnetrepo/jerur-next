@@ -4,9 +4,9 @@ import data from '../../../data/demo-27';
 const Steps: FC = () => {
   return (
     <div className="container pt-13 pb-15 pb-md-17 py-lg-16 ps-lg-15 pe-xxl-16">
-      <h2 className="fs-15 text-uppercase text-muted mb-3 text-center">How It Works?</h2>
+      <h2 className="fs-15 text-uppercase text-muted mb-3 text-center">How Jerur Works</h2>
       <h3 className="display-4 mb-10 px-lg-12 px-xl-15 text-center">
-        Here are the 4 Steps from buying a plan to onboarding.
+        From choosing a billing cycle to publishing your church experience in four clear steps.
       </h3>
       <div className="row gx-lg-8 gx-xl-12 gy-10 align-items-center">
         <div className="col-md-6 col-lg-6 mt-lg-n2 text-center text-lg-start order-2 order-lg-0">

@@ -67,6 +67,14 @@ try {
     project: 'snatchi',
     silent: !process.env.CI,
     widenClientFileUpload: true,
+    sourcemaps: {
+      // Useful for offline/local release verification. Production keeps
+      // source-map uploads enabled unless this flag is explicitly set.
+      disable: process.env.SENTRY_SKIP_UPLOAD === '1'
+    },
+    unstable_sentryWebpackPluginOptions: {
+      disable: process.env.SENTRY_SKIP_UPLOAD === '1'
+    },
     disableLogger: true,
     automaticVercelMonitors: true
   });

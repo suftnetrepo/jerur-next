@@ -1,23 +1,31 @@
-import Stripe from 'stripe';
 import { logger } from '../../../../utils/logger';
+import Church from '../../../models/church';
+import { getUserSession } from '../../../../utils/generateToken';
+import { getStripeClient } from '../../../../lib/stripe';
 const { NextResponse } = require('next/server');
 
 // POST handler to create a customer portal session
 export async function POST(req) {
     try {
-        // Initialize Stripe
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-            apiVersion: '2020-08-27',
-        });
+        const user = await getUserSession(req, { requireActiveSubscription: false });
 
-        // Parse the request body
-        const body = await req.json();
-        const { stripeCustomerId } = body;
+        if (!user?.church) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const church = await Church.findById(user.church).select('stripeCustomerId').lean();
+        if (!church?.stripeCustomerId) {
+            return NextResponse.json({ error: 'No Stripe customer is linked to this church.' }, { status: 400 });
+        }
+
+        const stripe = getStripeClient();
+        const returnUrl = process.env.NEXT_FRONTEND_URL
+            || `${new URL(req.url).origin}/protected/church/settings`;
 
         // Create a Stripe Billing Portal session
         const session = await stripe.billingPortal.sessions.create({
-            customer: stripeCustomerId,
-            return_url: process.env.NEXT_FRONTEND_URL,
+            customer: church.stripeCustomerId,
+            return_url: returnUrl,
         });
 
         // Return the session URL

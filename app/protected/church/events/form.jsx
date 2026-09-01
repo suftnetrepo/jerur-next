@@ -2,11 +2,19 @@
 
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
-import 'react-datetime/css/react-datetime.css';
 import FindAddress from '../../../share/findAddress';
 import { ImageUploader } from '../../../../src/components/elements/image';
 
-const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSelectedAddress }) => {
+const EventForm = ({
+  errorMessages,
+  handleSubmit,
+  handleChange,
+  fields,
+  handleSelectedAddress,
+  churchAddress,
+  churchAddressLoading,
+  handleAddressSourceChange
+}) => {
 
   const handleImageChange = (file) => {
     handleChange('file', file);
@@ -76,13 +84,82 @@ const EventForm = ({ errorMessages, handleSubmit, handleChange, fields, handleSe
         <div className="col-md-12">
           <div className="row">
             <div className="col-md-6">
-              <FindAddress handleSelectedAddress={handleSelectedAddress} />
-              {fields?.completeAddress && <span>{fields.completeAddress}</span>}
+              <Form.Label className="text-dark mb-2">Event location</Form.Label>
+              <div className="d-flex flex-column flex-sm-row gap-2 mb-3">
+                <label
+                  htmlFor="event-address-church"
+                  className="d-flex align-items-start gap-2 p-3 rounded-3 flex-fill"
+                  style={{
+                    border: fields?.use_church_address ? '1px solid #55b3c9' : '1px solid #dee2e6',
+                    background: fields?.use_church_address ? '#f5fbfa' : '#fff',
+                    cursor: churchAddressLoading || !churchAddress?.completeAddress ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  <Form.Check
+                    type="radio"
+                    id="event-address-church"
+                    name="event-address-source"
+                    checked={Boolean(fields?.use_church_address)}
+                    disabled={churchAddressLoading || !churchAddress?.completeAddress}
+                    onChange={() => handleAddressSourceChange(true)}
+                  />
+                  <span>
+                    <span className="d-block text-dark fw-medium">Church address</span>
+                    <span className="d-block text-muted mt-1" style={{ fontSize: 12 }}>
+                      {churchAddressLoading
+                        ? 'Loading church address…'
+                        : churchAddress?.completeAddress || 'No church address configured in Settings.'}
+                    </span>
+                  </span>
+                </label>
+
+                <label
+                  htmlFor="event-address-external"
+                  className="d-flex align-items-start gap-2 p-3 rounded-3 flex-fill"
+                  style={{
+                    border: !fields?.use_church_address ? '1px solid #55b3c9' : '1px solid #dee2e6',
+                    background: !fields?.use_church_address ? '#f5fbfa' : '#fff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Form.Check
+                    type="radio"
+                    id="event-address-external"
+                    name="event-address-source"
+                    checked={!fields?.use_church_address}
+                    onChange={() => handleAddressSourceChange(false)}
+                  />
+                  <span>
+                    <span className="d-block text-dark fw-medium">External address</span>
+                    <span className="d-block text-muted mt-1" style={{ fontSize: 12 }}>
+                      Search for a different event location.
+                    </span>
+                  </span>
+                </label>
+              </div>
+
+              {!churchAddressLoading && !churchAddress?.completeAddress && (
+                <div className="alert alert-info py-2 px-3 mb-3" role="status">
+                  <span>Add the church address before using it for an event. </span>
+                  <a href="/protected/church/settings?section=address" className="alert-link">
+                    Set church address
+                  </a>
+                </div>
+              )}
+
+              {!fields?.use_church_address && (
+                <FindAddress handleSelectedAddress={handleSelectedAddress} showToggle={false} />
+              )}
+              {fields?.completeAddress && (
+                <div className="mt-2 p-2 rounded-2 text-dark" style={{ background: '#f8f9fa', fontSize: 13 }}>
+                  {fields.completeAddress}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {fields?.completeAddress && (
+        {fields?.completeAddress && !fields?.use_church_address && (
           <>
             <div className="col-md-12">
               <div className="col-md-6">

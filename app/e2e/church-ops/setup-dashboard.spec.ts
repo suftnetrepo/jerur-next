@@ -156,7 +156,13 @@ async function completeRequiredSetupTasks(churchId: string) {
 
 async function getOnboardingState(churchId: string) {
   await mongoConnect();
-  const church = await Church.findById(churchId).lean() as { onboarding?: { onboardingCompleted?: boolean } } | null;
+  const church = await Church.findById(churchId).lean() as {
+    onboarding?: {
+      welcomeModalDismissed?: boolean;
+      setupChecklistDismissed?: boolean;
+      onboardingCompleted?: boolean;
+    };
+  } | null;
   return church?.onboarding || null;
 }
 
@@ -193,7 +199,7 @@ function attachDashboardObservers(page: any): DashboardObservations {
 }
 
 async function expectSetupDashboard(page: any) {
-  await expect(page.getByText('Complete Your Church Setup')).toBeVisible({ timeout: 30000 });
+  await expect(page.getByText('Get your church workspace ready')).toBeVisible({ timeout: 30000 });
   await expect(page.getByText('Quick Actions')).toBeVisible();
   await expect(page.getByText('Setup Progress')).toBeVisible();
   await expect(page.getByText('Recent Members')).toBeVisible();
@@ -210,7 +216,7 @@ async function dismissFirstRunOverlays(page: any) {
 
   const welcomeDialog = page.getByRole('dialog', { name: 'Welcome to Jerur' });
   if (await welcomeDialog.isVisible().catch(() => false)) {
-    await welcomeDialog.getByRole('button', { name: "I'll Do This Later" }).click();
+    await welcomeDialog.getByRole('button', { name: 'Get Started' }).click();
     const closed = await welcomeDialog.waitFor({ state: 'hidden', timeout: 15000 }).then(() => true).catch(() => false);
     if (!closed) {
       result.welcomeDismissed = false;
@@ -273,18 +279,22 @@ test.describe.serial('Church setup dashboard e2e validation', () => {
     await expect(page.getByRole('dialog', { name: 'Welcome to Jerur' })).toBeVisible();
     const firstRunOverlayState = await dismissFirstRunOverlays(page);
     if (!firstRunOverlayState.welcomeDismissed) {
-      scenarioFailures.push({ severity: 'Major', area: 'Welcome Overlay', detail: 'The "I\'ll Do This Later" action did not dismiss the welcome overlay within 15 seconds.' });
+      scenarioFailures.push({ severity: 'Major', area: 'Welcome Overlay', detail: 'The "Get Started" action did not persist onboarding state and dismiss the welcome overlay within 15 seconds.' });
     }
     if (!firstRunOverlayState.tourDismissed) {
       scenarioFailures.push({ severity: 'Minor', area: 'Product Tour', detail: 'The dashboard product tour remained visible after its local dismissal key was set and the page reloaded.' });
     }
 
-    await expect(page.getByText('Follow these simple steps to get the most out of Jerur.')).toBeVisible();
-    await expect(page.getByText('0 of 3 Complete')).toBeVisible();
+    const startedOnboardingState = await getOnboardingState(setupFixture.churchId);
+    expect(startedOnboardingState?.welcomeModalDismissed).toBe(true);
+    expect(startedOnboardingState?.setupChecklistDismissed).toBe(false);
+
+    await expect(page.getByText('Next: Create your first service')).toBeVisible();
+    await expect(page.getByText('0 of 3 essential steps')).toBeVisible();
     await expect(page.getByText('0%')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Create Your First Service' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add Members' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add Event' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /Create service/ }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /Add members/ }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /Add event/ }).first()).toBeVisible();
 
     await page.getByRole('button', { name: 'View Setup Guide' }).click();
     const drawer = page.getByRole('dialog');
@@ -333,32 +343,19 @@ test.describe.serial('Church setup dashboard e2e validation', () => {
     }
 
     await page.goto(`${baseUrl}/protected/church/dashboard`);
-    if (!(await verifyNavigation(page, async () => {
-      await page.getByRole('button', { name: 'Record Attendance' }).last().click();
-    }, /\/protected\/church\/attendance/))) {
-      scenarioFailures.push({ severity: 'Major', area: 'Empty State Attendance', detail: 'Record Attendance CTA did not open the attendance page.' });
-    }
-
-    await page.goto(`${baseUrl}/protected/church/dashboard`);
-    if (!(await verifyNavigation(page, async () => {
-      await page.getByRole('button', { name: 'Add Fellowship Group' }).click();
-    }, /\/protected\/church\/fellowships/))) {
-      scenarioFailures.push({ severity: 'Major', area: 'Empty State Fellowship', detail: 'Add Fellowship Group CTA did not open the fellowships page.' });
-    }
-
-    await page.goto(`${baseUrl}/protected/church/dashboard`);
-    if (!(await verifyNavigation(page, async () => {
-      await page.getByRole('button', { name: 'Add Member' }).last().click();
-    }, /\/protected\/church\/members/))) {
-      scenarioFailures.push({ severity: 'Major', area: 'Empty State Members', detail: 'Add Member CTA did not open the members page.' });
-    }
+    const attendanceCard = page.locator('.card').filter({ has: page.getByRole('heading', { name: 'Attendance' }) });
+    const fellowshipCard = page.locator('.card').filter({ has: page.getByRole('heading', { name: 'Fellowship' }) });
+    const recentMembersCard = page.locator('.card').filter({ has: page.getByRole('heading', { name: 'Recent Members' }) });
+    await expect(attendanceCard.getByRole('button', { name: 'Record Attendance' })).toHaveCount(0);
+    await expect(fellowshipCard.getByRole('button', { name: 'Add Fellowship Group' })).toHaveCount(0);
+    await expect(recentMembersCard.getByRole('button', { name: 'Add Member' })).toHaveCount(0);
 
     await page.goto(`${baseUrl}/protected/church/dashboard`);
     const completionSeed = await completeRequiredSetupTasks(setupFixture.churchId);
     await page.reload();
 
     await expect(page.getByText('Recent Members')).toBeVisible({ timeout: 30000 });
-    await expect(page.locator('body')).not.toContainText('Complete Your Church Setup');
+    await expect(page.locator('body')).not.toContainText('Get your church workspace ready');
     await expect(page.locator('body')).toContainText('Total Members');
     await expect(page.locator('body')).toContainText('Upcoming Events');
     await expect(page.locator('body')).toContainText('Fellowship Groups');

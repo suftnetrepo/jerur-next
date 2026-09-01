@@ -2,6 +2,9 @@
 import Home from '../icons/lineal/Home';
 import BriefcaseTwo from '../icons/lineal/BriefcaseTwo';
 import ShoppingBasket from '../icons/lineal/ShoppingBasket';
+import { SUBSCRIPTION_PLANS, findSubscriptionPlanByPriceId } from '../../constants/subscriptionPlans';
+
+const planDetails = SUBSCRIPTION_PLANS;
 
 export const pricingList = [
   {
@@ -10,21 +13,23 @@ export const pricingList = [
     Icon: ShoppingBasket,
     price: '£25',
     raw_price: 25,
-    duration: '30 days',
+    duration: 'month',
     billingCycle: 'Monthly',
+    displayName: 'Monthly',
+    description: 'Flexible month-to-month access to the complete Jerur platform.',
+    badge: '',
     index: 1,
     currency: '£',
-    live_priceId: 'price_1TvzmRJ9QQF7JMlNn5Ik7tAG',
-    priceId: 'price_1HDVRhJ9QQF7JMlNSdnkB7l4',
+    live_priceId: planDetails[0].livePriceId,
+    priceId: planDetails[0].testPriceId,
     planName: 'Basic Plan',
     features: [
-     'Service Time Management',
-      'Fundraising Campaigns',
-      'Online Giving ',
-      'Multi-Platform Access',
-      'Event Management',
-      'Dedicated Customer Support',
-      'Data Security and Privacy',    
+      'Church profile and service times',
+      'Members and attendance',
+      'Events, sermons and articles',
+      'Giving and fundraising campaigns',
+      'Announcements and prayer requests',
+      'Configurable member mobile features'
     ]
   },
   {
@@ -35,19 +40,21 @@ export const pricingList = [
     raw_price: 140,
     duration: '6 months',
     billingCycle: 'Every 6 months',
+    displayName: 'Six Months',
+    description: 'The complete Jerur platform with a saving for six-month billing.',
+    badge: 'Save £10',
     planName: 'Premium',
     currency: '£',
     index: 2,
-    live_priceId: 'price_1Tvzo4J9QQF7JMlNnpzMdacv',
-    priceId: 'price_1HDVRhJ9QQF7JMlNxp77CsjK',
+    live_priceId: planDetails[1].livePriceId,
+    priceId: planDetails[1].testPriceId,
     features: [
-      'Service Time Management',
-      'Fundraising Campaigns',
-      'Online Giving ',
-      'Multi-Platform Access',
-      'Event Management',
-      'Dedicated Customer Support',
-      'Data Security and Privacy',     
+      'Everything in the monthly option',
+      'Church profile and service times',
+      'Members and attendance',
+      'Events, sermons and articles',
+      'Giving and fundraising campaigns',
+      'Configurable member mobile features'
     ]
   },
   {
@@ -56,31 +63,33 @@ export const pricingList = [
     Icon: BriefcaseTwo,
     price: '£280',
     raw_price: 280,
-    duration: '1 Year',
+    duration: 'year',
     billingCycle: 'Yearly',
+    displayName: 'Annual',
+    description: 'The best-value way to use the complete Jerur platform all year.',
+    badge: 'Best value · Save £20',
     planName: 'Premium Plus',
     currency: '£',
     index: 3,
-    live_priceId: 'price_1TvzpLJ9QQF7JMlNBXe8Yscy',
-    priceId: 'price_1HHWPsJ9QQF7JMlN2X4BTJC3',
+    live_priceId: planDetails[2].livePriceId,
+    priceId: planDetails[2].testPriceId,
     features: [
-      'Service Time Management',
-      'Fundraising Campaigns',
-      'Online Giving ',
-      'Multi-Platform Access',
-      'Event Management',
-      'Dedicated Customer Support',
-      'Data Security and Privacy',
+      'Everything in the monthly option',
+      'Church profile and service times',
+      'Members and attendance',
+      'Events, sermons and articles',
+      'Giving and fundraising campaigns',
+      'Configurable member mobile features'
     ]
   }
 ];
 
-const findPrice = (priceId : string, live : boolean) => {
-  if (live) {
-    return pricingList.find((x) => x.live_priceId === priceId) || {};
-  }
-  return pricingList.find((x) => x.priceId === priceId) || {};
+const findPrice = (priceId : string, _live? : boolean) => {
+  const plan = findSubscriptionPlanByPriceId(priceId);
+  if (!plan) return {};
+
+  const index = SUBSCRIPTION_PLANS.findIndex((item) => item.id === plan.id);
+  return pricingList[index] || {};
 };
 
 export { findPrice };
-
