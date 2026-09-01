@@ -3,19 +3,10 @@
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import ThemeProvider from '../src/theme/ThemeProvider';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
 // Bootstrap and custom scss
 import '../src/assets/scss/style.scss';
 // animate css
 import 'animate.css';
-// import swiper css
-import 'swiper/css';
-import 'swiper/css/free-mode';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/thumbs';
-// video player css
-import 'plyr-react/plyr.css';
 // glightbox css
 import 'glightbox/dist/css/glightbox.css';
 // custom scrollcue css

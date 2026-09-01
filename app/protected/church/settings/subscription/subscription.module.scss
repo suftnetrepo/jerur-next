@@ -1,0 +1,231 @@
+.wrapper {
+  width: 100%;
+  max-width: 960px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: #078f95;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.25px;
+  text-transform: uppercase;
+}
+
+.pageHeader h4 {
+  margin: 0;
+  color: #18283a;
+  font-size: 25px;
+  font-weight: 750;
+}
+
+.pageHeader p {
+  margin: 7px 0 0;
+  color: #748194;
+  font-size: 13px;
+}
+
+.secureLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid #dce8e3;
+  border-radius: 999px;
+  color: #28705e;
+  background: #f2faf7;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.planCard {
+  overflow: hidden;
+  border: 1px solid #e1e6ed !important;
+  border-radius: 18px !important;
+  box-shadow: none !important;
+}
+
+.planHero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  min-height: 176px;
+  padding: 30px;
+  overflow: hidden;
+  color: #203145;
+  border-bottom: 1px solid #e7ecef;
+  background: #fff;
+}
+
+.planIcon {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #c9e9e8;
+  border-radius: 15px;
+  color: #078f95;
+  background: #eaf8f7;
+  font-size: 24px;
+}
+
+.planIdentity {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.planIdentity > span {
+  color: #718091;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.planIdentity h5 {
+  margin: 4px 0 5px;
+  color: #192b3d;
+  font-size: 26px;
+  font-weight: 750;
+}
+
+.planIdentity p {
+  max-width: 530px;
+  margin: 0;
+  color: #748194;
+  font-size: 12px;
+}
+
+.statusBadge {
+  position: relative;
+  z-index: 1;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 8px 12px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+.planBody {
+  padding: 26px 30px 30px;
+  background: #fff;
+}
+
+.dateCard {
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid #e7ebf1;
+  border-radius: 12px;
+  background: #fafbfc;
+}
+
+.dateIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  color: #078f95;
+  background: #eaf8f7;
+  font-size: 16px;
+}
+
+.dateLabel {
+  display: block;
+  margin-bottom: 3px;
+  color: #7a8797;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+
+.dateCard strong {
+  color: #26374a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.portalPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 22px;
+  padding: 19px 20px;
+  border: 1px solid #d5eae9;
+  border-radius: 13px;
+  background: #f4fbfa;
+}
+
+.portalPanel strong {
+  color: #24344a;
+  font-size: 13px;
+}
+
+.portalPanel p {
+  margin: 4px 0 0;
+  color: #748194;
+  font-size: 11px;
+}
+
+.portalButton {
+  display: inline-flex !important;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 17px !important;
+  border-color: #078f95 !important;
+  border-radius: 9px !important;
+  background: #078f95 !important;
+  box-shadow: none;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  white-space: nowrap;
+}
+
+.portalButton:hover {
+  border-color: #06777c !important;
+  background: #06777c !important;
+}
+
+.supportNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 0 4px;
+  color: #8390a0;
+  font-size: 10px;
+}
+
+@media (max-width: 767px) {
+  .pageHeader { flex-direction: column; gap: 12px; }
+  .planHero { align-items: flex-start; padding: 24px 20px; flex-wrap: wrap; }
+  .planIdentity { width: calc(100% - 72px); }
+  .statusBadge { margin: 4px 0 0 71px; }
+  .planBody { padding: 20px; }
+  .portalPanel { align-items: stretch; flex-direction: column; }
+  .portalButton { width: 100%; }
+  .supportNote { align-items: flex-start; }
+}

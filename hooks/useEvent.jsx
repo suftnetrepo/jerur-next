@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import moment from 'moment';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
-import { EVENT } from '../utils/apiUrl';
+import { CHURCH, EVENT } from '../utils/apiUrl';
 import { eventValidator } from '../validator/rules';
 
 const useEvent = (searchQuery) => {
@@ -134,6 +134,8 @@ const useEventEdit = (id) => {
   const [state, setState] = useState({
     data: {},
     fields: eventValidator.fields,
+    churchAddress: null,
+    churchAddressLoading: true,
     loading: false,
     error: null,
     success: false
@@ -161,7 +163,8 @@ const useEventEdit = (id) => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 7);
 
-    setState({
+    setState((prev) => ({
+      ...prev,
       data: null,
       fields: {
         ...eventValidator.fields,
@@ -171,7 +174,7 @@ const useEventEdit = (id) => {
       error: null,
       loading: false,
       success: false
-    });
+    }));
   };
 
   const handleSelectedAddress = (selectedAddress) => {
@@ -196,6 +199,39 @@ const useEventEdit = (id) => {
       }
     }));
   };
+
+  const handleAddressSourceChange = (useChurchAddress) => {
+    setState((prev) => {
+      const address = prev.churchAddress;
+      const emptyAddress = {
+        addressLine1: '',
+        town: '',
+        county: '',
+        postcode: '',
+        country: '',
+        completeAddress: '',
+        location: { type: 'Point', coordinates: [] }
+      };
+
+      return {
+        ...prev,
+        fields: {
+          ...prev.fields,
+          ...(useChurchAddress && address ? address : emptyAddress),
+          use_church_address: useChurchAddress
+        }
+      };
+    });
+  };
+
+  const handleFetchChurchAddress = useCallback(async () => {
+    const { success, data } = await zat(CHURCH.fetchOne, null, VERBS.GET);
+    setState((prev) => ({
+      ...prev,
+      churchAddress: success ? data?.address || null : null,
+      churchAddressLoading: false
+    }));
+  }, []);
 
   async function handleSelect(id) {
     setState((prev) => ({ ...prev, loading: true }));
@@ -251,6 +287,10 @@ const useEventEdit = (id) => {
   }
 
   useEffect(() => {
+    handleFetchChurchAddress();
+  }, [handleFetchChurchAddress]);
+
+  useEffect(() => {
     if (id) {
       handleSelect(id);
     }
@@ -263,7 +303,8 @@ const useEventEdit = (id) => {
     handleEdit,
     handleChange,
     handleSave,
-    handleSelectedAddress
+    handleSelectedAddress,
+    handleAddressSourceChange
   };
 };
 

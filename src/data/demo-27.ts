@@ -22,43 +22,43 @@ const serviceList = [
 	  id: 1,
 	  Icon: Telephone,
 	  color: color.blue,
-	  title: "Attendance Tracking",
-	  description: "Automatically record and analyze attendance for services and events to better understand member engagement.",
+	  title: "Members & Attendance",
+	  description: "Keep member records organised, register new members and record attendance for services and church activities.",
 	},
 	{
 	  id: 2,
 	  Icon: Shield,
 	  color: color.yellow,
-	  title: "Service Times",
-	  description: "Display and update worship schedules, special services, and holiday events in real time.",
+	  title: "Services & Events",
+	  description: "Publish service times and upcoming events so members always know what is happening and when.",
 	},
 	{
 	  id: 3,
 	  Icon: CloudComputingTwo,
 	  color: color.orange,
-	  title: "Fundraising",
-	  description: "Launch and manage campaigns for missions, renovations, or outreach with secure donation options.",
+	  title: "Giving & Campaigns",
+	  description: "Receive online giving and run fundraising campaigns for ministry, missions and community projects.",
 	},
 	{
 	  id: 4,
 	  Icon: Analytics,
 	  color: color.pink,
-	  title: "Event Management",
-	  description: "Plan, promote, and track events—from volunteer drives to benefit concerts—with ease.",
+	  title: "Sermons & Articles",
+	  description: "Share sermons and Christian articles that help members stay connected and grow in God's Word.",
 	},
 	{
 	  id: 5,
 	  Icon: ChatTwo,
 	  color: color.green,
-	  title: "Church Communication",
-	  description: "Keep members informed with announcements, updates, and prayer requests in one central hub.",
+	  title: "Announcements & Prayer",
+	  description: "Keep your church informed with rich announcements and give members a simple way to submit prayer requests.",
 	},
 	{
 	  id: 6,
 	  Icon: SmartphoneTwo,
 	  color: color.purple,
-	  title: "Online Giving",
-	  description: "Offer a simple, secure way to give via credit cards, bank transfers, or mobile payments.",
+	  title: "Your Church Mobile Experience",
+	  description: "Choose which mobile features your church needs, from Bible and hymns to testimonies and house fellowship.",
 	},
   ];
 
@@ -66,30 +66,30 @@ const processList = [
 	{
 		id: 1,
 		Icon: Browser,
-		title: " Choose a Plan",
+		title: "Choose Your Billing Cycle",
 		description:
-			"Select a pricing plan that fits your team size, project needs, and budget.",
+			"Choose monthly, six-month or annual billing. Every option includes the same Jerur church platform.",
 	},
 	{
 		id: 2,
 		Icon: IdCard,
-		title: "Sign Up and Payment",
+		title: "Create Your Church Account",
 		description:
-			"Register your account with basic details and complete the secure payment process.",
+			"Enter your church and administrator details, then complete payment securely through Stripe.",
 	},
 	{
 		id: 3,
 		Icon: ChatTwo,
-		title: "Account Activation",
+		title: "Sign In to Jerur",
 		description:
-			"Receive a confirmation email with login details for immediate access.",
+			"After checkout, sign in to your church dashboard and continue from the guided setup checklist.",
 	},
 	{
 		id: 4,
 		Icon: Settings,
-		title: "Setup Your Workspace",
+		title: "Publish to Your Members",
 		description:
-			"Log in, personalize your workspace, invite team members, and configure tools.",
+			"Add your church profile, service times, members and events, then enable the mobile features you want to share.",
 	},
 ];
 

@@ -13,7 +13,7 @@ const Pricing: FC<PricingProps> = ({ show = true }) => {
             <div className="row">
               <div className="col-lg-10 mx-auto">
                 <h3 className="display-4 mb-15 mb-md-6 px-lg-10">
-                Big or small, each plan gives good value and real support.
+                One complete platform. Choose the billing cycle that works best for your church.
                 </h3>
               </div>
             </div>

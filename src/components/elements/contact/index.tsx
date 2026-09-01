@@ -10,9 +10,9 @@ const Contact: FC = () => {
             <div className="row gx-md-8 gx-xl-12 gy-10">
               <div className="col-lg-6">
                 <Email />
-                <h2 className="display-4 mb-3 pe-lg-10">Need help choosing a plan?.</h2>
+                <h2 className="display-4 mb-3 pe-lg-10">Need help choosing a billing cycle?</h2>
                 <p className="lead pe-lg-12 mb-0">
-                Have a question we didn’t cover? Use the contact form to talk to us.
+                  Every option includes the complete Jerur platform. Send us your question and we will help you choose.
                 </p>
               </div>
 

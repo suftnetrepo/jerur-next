@@ -422,6 +422,13 @@ const ChurchSchema = new mongoose.Schema(
         default: '',
         max: 300
       },
+      conference_link: {
+        type: String,
+        trim: true,
+        required: false,
+        default: '',
+        max: 2048
+      },
       secure_url: {
         type: String,
         required: false,

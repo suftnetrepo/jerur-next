@@ -37,6 +37,7 @@ export const PUT = async (req) => {
         const type = formData.get('type');
         const title = formData.get('title');
         const message = formData.get('message');
+        const conference_link = formData.get('conference_link');
         const priority = formData.get('priority');
         const status = formData.get('status');
         const start_date = formData.get('start_date');
@@ -51,6 +52,7 @@ export const PUT = async (req) => {
             type: type || 'announcement',
             title,
             message,
+            conference_link: conference_link || '',
             priority: priority || 'normal',
             status: status === 'true',
             start_date: start_date || null,

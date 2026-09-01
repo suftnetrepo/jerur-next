@@ -1,23 +1,37 @@
-import Stripe from 'stripe';
 import { logger } from '../../../../utils/logger';
+import { findSubscriptionPlanByPriceId, isCurrentPriceForEnvironment } from '../../../../constants/subscriptionPlans';
+import { getStripeClient } from '../../../../lib/stripe';
 const { NextResponse } = require('next/server');
 
 // POST handler for creating a subscription
 export async function POST(req) {
     try {
-        // Initialize Stripe
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-            apiVersion: '2020-08-27',
-        });
-
         // Parse the request body
         const body = await req.json();
-        const { priceId, contact, email } = body;
+        const { priceId, contact, email, idempotencyKey } = body;
+        const plan = findSubscriptionPlanByPriceId(priceId);
+
+        if (!plan || !isCurrentPriceForEnvironment(priceId)) {
+            return NextResponse.json(
+                { error: 'The selected subscription plan is not available. Please return to pricing and try again.' },
+                { status: 400 }
+            );
+        }
+
+        if (!email || typeof email !== 'string') {
+            return NextResponse.json({ error: 'A valid email address is required.' }, { status: 400 });
+        }
+
+        const stripe = getStripeClient();
+        const requestKey = typeof idempotencyKey === 'string' && idempotencyKey.length >= 16
+            ? idempotencyKey
+            : null;
 
          // Create a new Stripe customer
-        const customer = await stripe.customers.create({
-            email,
-        });
+        const customer = await stripe.customers.create(
+            { email },
+            requestKey ? { idempotencyKey: `${requestKey}:customer` } : undefined
+        );
 
         // Create a subscription
         const subscription = await stripe.subscriptions.create({
@@ -28,9 +42,10 @@ export async function POST(req) {
                 stripeCustomerId: customer.id,
                 contact: contact,
                 email: email,
+                planId: plan.id,
             },
             expand: ['latest_invoice.payment_intent'],
-        });
+        }, requestKey ? { idempotencyKey: `${requestKey}:subscription` } : undefined);
 
         // Return subscription details
         return NextResponse.json(

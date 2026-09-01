@@ -182,6 +182,7 @@ export const eventValidator = {
       description: null,
       start_date: '',
       end_date: '',
+      use_church_address: false,
       addressLine1: '',
       county: '',
       town: '',
@@ -200,6 +201,7 @@ export const eventValidator = {
     description: null,
     start_date: '',
     end_date: '',
+    use_church_address: false,
     addressLine1: '',
     county: '',
     town: '',
@@ -1065,6 +1067,24 @@ export const notificationValidator = {
         message: 'Message must not be more than 300 characters'
       }
     ],
+    conference_link: [
+      {
+        validate: (value) => {
+          if (!value) return undefined;
+          try {
+            const url = new URL(value);
+            return ['http:', 'https:'].includes(url.protocol) ? undefined : 'Conference link must use http or https';
+          } catch {
+            return 'Conference link must be a valid URL';
+          }
+        },
+        message: 'Conference link must be a valid URL'
+      },
+      {
+        pattern: /^[\s\S]{0,2048}$/,
+        message: 'Conference link must not be more than 2048 characters'
+      }
+    ],
     // start_date/expiry_date are both optional - no "required" rule, just
     // format/ordering checks, and only when a value is actually present.
     start_date: [
@@ -1105,6 +1125,7 @@ export const notificationValidator = {
       type: 'announcement',
       title: '',
       message: '',
+      conference_link: '',
       secure_url: '',
       public_id: '',
       priority: 'normal',
@@ -1117,6 +1138,7 @@ export const notificationValidator = {
     type: 'announcement',
     title: '',
     message: '',
+    conference_link: '',
     secure_url: '',
     public_id: '',
     priority: 'normal',

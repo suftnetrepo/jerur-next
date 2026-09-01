@@ -35,6 +35,10 @@ const EventSchema = new mongoose.Schema(
       required: false,
       max: 250
     },
+    use_church_address: {
+      type: Boolean,
+      default: false
+    },
     addressLine1: {
       type: String,
       required: false,

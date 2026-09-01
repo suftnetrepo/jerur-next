@@ -13,7 +13,6 @@ import Features from '../src/components/blocks/service';
 import Steps from '../src/components/blocks/steps';
 import Pricing from '../src/components/blocks/pricing';
 import Contact from '../src/components/elements/contact';
-import Testimonial from '../src/components/blocks/testimonial';
 
 const Page: NextPage = () => {
   useLightBox();
@@ -45,9 +44,6 @@ const Page: NextPage = () => {
           <Steps />
           <div className="pt-15 pt-md-17 bg-light">
             <Pricing />          
-          </div>
-          <div className="container pt-15 pt-md-17 pb-13 pb-md-15 mb-n14">
-          <Testimonial />
           </div>
           <FAQ />
           <Contact />

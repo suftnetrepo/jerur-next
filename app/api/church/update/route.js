@@ -4,7 +4,8 @@ import {
   updateChurchStatus,
   updateChurchAddress,
   updateChurchContact,
-  updateFeatures
+  updateFeatures,
+  updateOnboarding
 } from '../../../services/churchService';
 import { NextResponse } from 'next/server';
 import { getUserSession } from '../../../../utils/generateToken';
@@ -28,6 +29,12 @@ export const PUT = async (req) => {
       const body = await req.json();
       const updated = await updateBulk(user?.church, body);
       return NextResponse.json({ success: true, data:updated });
+    }
+
+    if (action === 'onboarding') {
+      const body = await req.json();
+      const updated = await updateOnboarding(user?.church, body);
+      return NextResponse.json({ success: true, data: updated });
     }
 
     if (action === 'one') {
@@ -70,9 +77,32 @@ export const PUT = async (req) => {
     }
 
     if (action === 'status') {
+      // Subscription state is normally written by verified Stripe webhooks.
+      // Retain this legacy action for platform administration only; church
+      // users must never be able to update another church by customer ID.
+      if (user.church) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+
       const body = await req.json();
       const stripeCustomerId = url.searchParams.get('stripeCustomerId');
-      const updated = await updateChurchStatus(stripeCustomerId, body);
+      if (!stripeCustomerId) {
+        return NextResponse.json({ error: 'stripeCustomerId is required' }, { status: 400 });
+      }
+
+      const allowedFields = [
+        'status', 'plan', 'priceId', 'subscriptionId',
+        'startDate', 'endDate', 'trial_start', 'trial_end'
+      ];
+      const statusUpdate = Object.fromEntries(
+        Object.entries(body).filter(([key]) => allowedFields.includes(key))
+      );
+
+      if (!Object.keys(statusUpdate).length) {
+        return NextResponse.json({ error: 'No valid subscription fields supplied' }, { status: 400 });
+      }
+
+      const updated = await updateChurchStatus(stripeCustomerId, statusUpdate);
       return NextResponse.json({ success: true, data: updated });
     }
 

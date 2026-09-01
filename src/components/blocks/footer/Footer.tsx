@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import SocialLinks from '../../reuseable/SocialLinks';
 
 const Footer8: FC = () => {
   return (
@@ -8,9 +7,9 @@ const Footer8: FC = () => {
       <div className="row gx-lg-0 gy-6">
         <div className="col-lg-4">
           <div className="widget">
-            <img className="mb-4" src="/img/logo_1.png" srcSet="/img/logo_1.png" alt="" />
+            <img className="mb-4" src="/img/logo.png" srcSet="/img/logo.png" alt="Jerur" />
             <p className="lead mb-0">
-            IT professionals, we specialize in creating scalable, user-friendly platforms that support churches of all sizes.
+              Jerur helps churches manage ministry from one web dashboard and connect members through a configurable mobile experience.
             </p>
           </div>
         </div>
@@ -27,8 +26,7 @@ const Footer8: FC = () => {
               <div>
                 <h5 className="mb-1">Phone</h5>
                 <p className="mb-0">
-                (+44)-020 8144 3161 <br />
-                  00 (987) 654 32 10
+                  (+44)-020 8144 3161
                 </p>
               </div>
             </div>
@@ -55,8 +53,12 @@ const Footer8: FC = () => {
 
       <hr className="mt-11 mt-md-12 mb-7" />
       <div className="d-md-flex align-items-center justify-content-between">
-        <p className="mb-2 mb-lg-0">© 2025 Suftnet. All rights reserved.</p>
-        <SocialLinks className="nav social social-muted mb-0 text-md-end" />
+        <p className="mb-2 mb-lg-0">© {new Date().getFullYear()} Suftnet. All rights reserved.</p>
+        <div className="d-flex gap-4">
+          <a href="/privacyPolicy" className="link-body">Privacy Policy</a>
+          <a href="/termsAndCondition" className="link-body">Terms &amp; Conditions</a>
+          <a href="/contact" className="link-body">Contact</a>
+        </div>
       </div>
     </div>
   </footer>

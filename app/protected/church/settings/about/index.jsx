@@ -245,7 +245,7 @@ const About = ({
             <Form.Group controlId="formShortMessage" className="mb-4">
               <Form.Label className="text-dark">Short Message</Form.Label>
               <Form.Control
-                maxLength={160}
+                maxLength={55}
                 type="text"
                 placeholder="A place to belong, grow and encounter God."
                 value={fields?.short_message ?? ''}
@@ -257,7 +257,7 @@ const About = ({
                   A short welcome shown over your church banner.
                 </span>
                 <span className="text-muted" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
-                  {(fields?.short_message ?? '').length}/160
+                  {(fields?.short_message ?? '').length}/55
                 </span>
               </div>
               {errorMessages?.short_message?.message && (
@@ -268,14 +268,20 @@ const About = ({
             <Form.Group controlId="formVerse" className="mb-4">
               <Form.Label className="text-dark">Verse</Form.Label>
               <Form.Control
-                maxLength={300}
+                maxLength={30}
                 type="text"
-                placeholder="For where two or three gather in my name, there am I with them. — Matthew 18:20"
+                placeholder="Matthew 18:20"
                 value={fields?.verse ?? ''}
                 className="border-dark"
                 onChange={(e) => handleChange('verse', e.target.value)}
               />
-              <CharCount value={fields?.verse} max={300} />
+               <div className="d-flex justify-content-between align-items-start mt-1">
+                <span className="text-muted" style={{ fontSize: 12 }}>
+                 The verse that represents your church's mission and values in the short message. i.e Matthew 18:20
+                </span>
+                 <CharCount value={fields?.verse} max={30} />
+              </div>
+
               {errorMessages?.verse?.message && (
                 <span className="text-danger fs-13">{errorMessages?.verse?.message}</span>
               )}

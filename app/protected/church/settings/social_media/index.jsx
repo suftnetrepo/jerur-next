@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
+import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
 import { useSocialMedia } from '../../../../../hooks/useSettings';
 
 const SocialMedia = ({data}) => {

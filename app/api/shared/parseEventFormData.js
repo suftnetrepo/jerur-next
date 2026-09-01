@@ -15,6 +15,7 @@ export async function parseEventFormData(req) {
   const description = formData.get('description');
   const start_date = formData.get('start_date');
   const end_date = formData.get('end_date');
+  const use_church_address = formData.get('use_church_address') === 'true';
   const addressLine1 = formData.get('addressLine1');
   const county = formData.get('county');
   const town = formData.get('town');
@@ -37,6 +38,7 @@ export async function parseEventFormData(req) {
     description,
     start_date,
     end_date,
+    use_church_address,
     addressLine1,
     county,
     town,

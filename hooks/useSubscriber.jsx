@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { VERBS } from '../config';
 import { STRIPE, SUBSCRIBER } from '../utils/apiUrl';
 import { zat } from '../utils/api';
@@ -16,7 +16,8 @@ const useSubscriber = (priceId) => {
   });
 
   const handlePricing = (priceId) => {
-    const plan = findPrice(priceId, process.env.NEXT_PUBLIC_ENV === 'development' ? false : true);
+    const isLive = process.env.NEXT_PUBLIC_ENV === 'production' || process.env.NODE_ENV === 'production';
+    const plan = findPrice(priceId, isLive);
     setState((pre) => {
       return { ...pre, pricing: plan };
     });
@@ -109,7 +110,7 @@ const useSubscriber = (priceId) => {
     }
   }
 
-   async function handleVerifySubscriptionStatus(stripeCustomerId) {   
+  const handleVerifySubscriptionStatus = useCallback(async (stripeCustomerId) => {
     const { success, errorMessage, data } = await zat(STRIPE.verifySubscriptionStatus, null, VERBS.GET , {
       stripeCustomerId: stripeCustomerId
     });
@@ -117,10 +118,14 @@ const useSubscriber = (priceId) => {
     if (success) {
       return data;
     } else {
-      handleError(errorMessage || 'Failed to verify subscription status.');
+      setState((previous) => ({
+        ...previous,
+        error: errorMessage || 'Failed to verify subscription status.',
+        loading: false
+      }));
       return false;
     }
-  }
+  }, []);
 
   useEffect(() => {
     handlePricing(priceId);

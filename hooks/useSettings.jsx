@@ -294,7 +294,7 @@ const useNotification = () => {
   };
 
   const handleSelect = (data) => {
-    const { type, title, message, secure_url, public_id, priority, status, start_date, expiry_date } = data || {};
+    const { type, title, message, conference_link, secure_url, public_id, priority, status, start_date, expiry_date } = data || {};
     setState((prevState) => ({
       ...prevState,
       fields: {
@@ -302,6 +302,7 @@ const useNotification = () => {
         type: type || 'announcement',
         title: title || '',
         message: message || '',
+        conference_link: conference_link || '',
         secure_url: secure_url || '',
         public_id: public_id || '',
         priority: priority || 'normal',

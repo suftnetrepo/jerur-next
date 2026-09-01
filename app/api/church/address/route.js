@@ -13,7 +13,7 @@ export const POST = async (req) => {
         }
 
         const body = await req.json();
-        const { data } = await add(user.church, body);
+        const data = await add(user.church, body);
         return NextResponse.json({ data, success: true });
     } catch (error) {
         logger.error(error);
@@ -23,19 +23,16 @@ export const POST = async (req) => {
 
 export const PUT = async (req) => {
     try {
-        const url = new URL(req.url);
         const user = await getUserSession(req);
 
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
         const body = await req.json();
-        const id = url.searchParams.get('id');
-        const data = await update(id, body);
+        const data = await update(user.church, body);
         return NextResponse.json({ data, success: true });
     } catch (error) {
         logger.error(error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 };
-

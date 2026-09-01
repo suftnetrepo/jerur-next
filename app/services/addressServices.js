@@ -23,18 +23,21 @@ const add = async (suid, body) => {
       throw error;
     }
 
-    await Church.findOneAndUpdate(
+    const church = await Church.findOneAndUpdate(
       {
-        _id: suid,
-        address: { $exists: false }
+        _id: suid
       },
       {
         $set: { address : body}
       },
       { new: true }
-    ).lean();
+    ).select('address').lean();
 
-    return true;
+    if (!church) {
+      throw new Error('Church not found');
+    }
+
+    return church.address;
   } catch (error) {
     console.error(error);
     throw new Error('Error adding church address');
@@ -62,13 +65,17 @@ const update = async (suid, body) => {
       setPayload[`address.${key}`] = body[key];
     });
 
-    await Church.findByIdAndUpdate(
+    const church = await Church.findByIdAndUpdate(
       suid,
       { $set: setPayload },
       { new: true }
-    ).lean();
+    ).select('address').lean();
 
-    return true;
+    if (!church) {
+      throw new Error('Church not found');
+    }
+
+    return church.address;
   } catch (error) {
     logger.error(error);
     throw new Error('Error updating church address');

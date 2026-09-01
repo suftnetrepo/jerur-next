@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { ADDRESS } from '../utils/apiUrl';
@@ -24,6 +24,8 @@ const useAddress = () => {
   const handleChange = (name, value) => {
     setState((prevState) => ({
       ...prevState,
+      error: null,
+      success: false,
       fields: {
         ...prevState.fields,
         [name]: value
@@ -31,25 +33,31 @@ const useAddress = () => {
     }));
   };
 
-  async function handleSelect(body) {
+  const handleSelect = useCallback((body) => {
     setState((prevState) => ({
       ...prevState,
       fields: {
         ...prevState.fields,
-        ...body,
-        error: null,
-        success: false,
-        loading: false
-      }
+        ...body
+      },
+      error: null,
+      success: false,
+      loading: false
     }));
-  }
+  }, []);
 
   async function handleSave(body) {
-    console.log(".............................body", body)
-    setState((prev) => ({ ...prev, loading: true }));
-    const { success, errorMessage } = await zat(ADDRESS.url, body, VERBS.POST);
+    setState((prev) => ({ ...prev, loading: true, error: null, success: false }));
+    const { success, errorMessage, data } = await zat(ADDRESS.url, body, VERBS.POST);
 
     if (success) {
+      setState((prev) => ({
+        ...prev,
+        fields: { ...prev.fields, ...(data || {}) },
+        loading: false,
+        error: null,
+        success: true
+      }));
       return true;
     } else {
       handleError(errorMessage || 'Failed to update the address.');
@@ -57,14 +65,18 @@ const useAddress = () => {
     }
   }
 
-  async function handleEdit(body, id) {
-    setState((prev) => ({ ...prev, loading: true }));
-    const { success, errorMessage } = await zat(ADDRESS.url, body, VERBS.PUT, {
-      id: id
-    });
+  async function handleEdit(body) {
+    setState((prev) => ({ ...prev, loading: true, error: null, success: false }));
+    const { success, errorMessage, data } = await zat(ADDRESS.url, body, VERBS.PUT);
 
     if (success) {
-
+      setState((prev) => ({
+        ...prev,
+        fields: { ...prev.fields, ...(data || {}) },
+        loading: false,
+        error: null,
+        success: true
+      }));
       return true;
     } else {
       handleError(errorMessage || 'Failed to update the address.');
@@ -84,9 +96,19 @@ const useAddress = () => {
     }));
   };
 
+  const handleStatusReset = () => {
+    setState((prevState) => ({
+      ...prevState,
+      error: null,
+      success: false
+    }));
+  };
+
   const handleSelectedAddress = (selectedAddress) => {
     setState((prev) => ({
       ...prev,
+      error: null,
+      success: false,
       fields: {
         ...prev.fields,
         addressLine1:
@@ -114,6 +136,7 @@ const useAddress = () => {
     handleSave,
     handleEdit,
     handleReset,
+    handleStatusReset,
     handleSelectedAddress
   };
 };

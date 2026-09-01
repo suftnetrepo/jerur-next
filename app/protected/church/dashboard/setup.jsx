@@ -7,7 +7,9 @@ import {
   BsCalendarEvent,
   BsCheck2Circle,
   BsCheckCircle,
+  BsChevronDown,
   BsChevronRight,
+  BsChevronUp,
   BsPeople,
   BsPersonPlus,
   BsQuestionCircle,
@@ -21,6 +23,7 @@ import { VERBS } from '../../../../config';
 import { TotalInvested, NumberofInvested, Portfoliovalue, Returnsrate } from '../../../share/chart';
 import RecentMembers from '../recentMembers';
 import AttendanceChart from '../../../share/aChart';
+import onboardingStyles from './onboardingChecklist.module.scss';
 
 /* ─────────────────────────────────────────────────────────── config ─── */
 
@@ -101,9 +104,9 @@ const QUICK_ACTIONS = [
  ];
 
 const FLAT_SETUP_TASKS = [
-  { key: 'firstService',  label: 'Create Your First Service',  href: '/protected/church/regular-services' },
-  { key: 'members',       label: 'Add Members',                href: '/protected/church/members' },
-  { key: 'events',        label: 'Add Event',                  href: '/protected/church/events/create' }
+  { key: 'firstService', label: 'Create your first service', description: 'Set up Sunday service, Bible study or prayer meeting.', action: 'Create service', href: '/protected/church/regular-services', icon: BsSpeaker },
+  { key: 'members', label: 'Add your first members', description: 'Register the people who belong to your church community.', action: 'Add members', href: '/protected/church/members', icon: BsPersonPlus },
+  { key: 'events', label: 'Publish your first event', description: 'Schedule an event that members can discover in the mobile app.', action: 'Add event', href: '/protected/church/events/create', icon: BsCalendarEvent }
 ];
 
 const SETUP_GUIDE_SECTIONS = [
@@ -308,202 +311,87 @@ const KpiCard = ({ label, sub, value, iconClass, avatarTone, Sparkline }) => (
   </div>
 );
 
+const SetupChecklistCard = ({ onboarding, onNavigate, onDismiss, onOpenGuide, checklistRef }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const nextStep = FLAT_SETUP_TASKS.find((task) => !onboarding.tasks?.[task.key]);
+
+  return (
+    <section
+      ref={checklistRef}
+      className={onboardingStyles.onboarding}
+      aria-labelledby="church-onboarding-title"
+    >
+      <div className={onboardingStyles.header}>
+        <div className={onboardingStyles.heading}>
+          <span className={onboardingStyles.eyebrow}>Getting started</span>
+          <h2 id="church-onboarding-title">Get your church workspace ready</h2>
+          <p>{nextStep ? `Next: ${nextStep.label}` : 'Your essential church setup is complete.'}</p>
+        </div>
+        <div className={onboardingStyles.headerActions}>
+          <button type="button" className={onboardingStyles.laterButton} onClick={onOpenGuide}>View setup guide</button>
+          <button type="button" className={onboardingStyles.laterButton} onClick={onDismiss}>Do this later</button>
+          <div className={onboardingStyles.progressText}>
+            <strong>{onboarding.percentage}%</strong>
+            <span>{onboarding.completedCount} of {onboarding.totalCount} essential steps</span>
+          </div>
+          <button
+            type="button"
+            className={onboardingStyles.collapseButton}
+            onClick={() => setCollapsed((value) => !value)}
+            aria-expanded={!collapsed}
+            aria-label={collapsed ? 'Expand setup guide' : 'Collapse setup guide'}
+          >
+            {collapsed ? <BsChevronDown /> : <BsChevronUp />}
+          </button>
+        </div>
+      </div>
+      <div className={onboardingStyles.progressTrack} aria-hidden="true">
+        <span style={{ width: `${onboarding.percentage}%` }} />
+      </div>
+
+      {!collapsed && (
+        <div className={onboardingStyles.stepList}>
+          {FLAT_SETUP_TASKS.map((task) => {
+            const completed = Boolean(onboarding.tasks?.[task.key]);
+            const Icon = task.icon;
+            return (
+              <article key={task.key} className={`${onboardingStyles.step} ${completed ? onboardingStyles.completed : ''}`}>
+                <div className={onboardingStyles.stepIcon}>{completed ? <BsCheck2Circle /> : <Icon />}</div>
+                <div className={onboardingStyles.stepCopy}>
+                  <h3>{task.label}</h3>
+                  <p>{completed ? 'Complete' : task.description}</p>
+                </div>
+                {completed ? (
+                  <span className={onboardingStyles.doneLabel}><BsCheck2Circle /> Done</span>
+                ) : (
+                  <button type="button" className={onboardingStyles.actionButton} onClick={() => onNavigate(task.href)}>
+                    {task.action} <BsChevronRight />
+                  </button>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+};
+
 const ChecklistRow = ({ task, onboarding, onNavigate }) => {
   const completed = Boolean(onboarding.tasks?.[task.key]);
   return (
     <button
       type="button"
       onClick={() => onNavigate(task.href)}
-      aria-label={task.label}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        textAlign: 'left',
-        gap: 8,
-        width: '100%',
-        whiteSpace: 'nowrap',
-        background: 'transparent',
-        border: 'none',
-        padding: 0,
-        marginBottom: 12,
-        cursor: 'pointer'
-      }}
+      className="d-flex align-items-center gap-2 border-0 bg-transparent p-0 mb-2 text-start"
     >
-      <span
-        style={{
-          flexShrink: 0,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 18,
-          height: 18,
-          borderRadius: '50%',
-          color: completed ? '#16A34A' : '#9CA3AF'
-        }}
-        aria-hidden="true"
-      >
-        {completed ? <BsCheck2Circle style={{ fontSize: 18 }} /> : <span style={{ width: 14, height: 14, borderRadius: '50%', border: '1.5px solid #C7CCDC' }} />}
+      <span style={{ color: completed ? '#16A34A' : '#9CA3AF', lineHeight: 0 }}>
+        {completed ? <BsCheck2Circle size={18} /> : <span className="d-inline-block rounded-circle border" style={{ width: 16, height: 16 }} />}
       </span>
-      <span style={{ fontSize: 13.5, fontWeight: completed ? 600 : 400, color: completed ? '#16213E' : '#6B7280' }}>
+      <span style={{ fontSize: 13, fontWeight: completed ? 600 : 400, color: completed ? '#16213E' : '#6B7280' }}>
         {task.label}
       </span>
     </button>
-  );
-};
-
-const SetupChecklistCard = ({ onboarding, onNavigate, onDismiss, onOpenGuide, checklistRef }) => {
-  const leftCol  = FLAT_SETUP_TASKS.slice(0, 2);
-  const rightCol = FLAT_SETUP_TASKS.slice(2);
-
-  return (
-    <div
-      ref={checklistRef}
-      className="mt-3 mt-xl-4"
-      style={{
-        ...CARD_STYLE,
-        background: '#EEF2FF',
-        border: '1px solid #C7D2FE',
-        padding: 24,
-        position: 'relative'
-      }}
-    >
-      {/* Scoped CSS: 2-column checklist by default, true 3-column CSS Grid
-          from 1200px up. Plain media query + own classnames on purpose —
-          not relying on Bootstrap's d-xl-* display utilities, which have
-          been unreliable in this app (see PurgeCSS note from earlier). */}
-      <style>{`
-        .jerur-checklist-2col { display: flex; gap: 40px; }
-        .jerur-checklist-3col { display: none; }
-        @media (min-width: 1200px) {
-          .jerur-checklist-2col { display: none; }
-          .jerur-checklist-3col {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(150px, auto));
-            column-gap: 36px;
-            row-gap: 4px;
-          }
-        }
-        .jerur-setup-half2 {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 32px;
-          flex: 1 1 50%;
-          min-width: 0;
-          flex-wrap: wrap;
-        }
-        @media (max-width: 767px) {
-          .jerur-setup-half2 {
-            flex-direction: column;
-            align-items: stretch;
-          }
-          .jerur-setup-half2 > * { width: 100%; }
-        }
-      `}</style>
-
-      {/* Dismiss button — pinned to the card corner, independent of content flow */}
-      <button
-        type="button"
-        onClick={onDismiss}
-        aria-label="Dismiss setup checklist"
-        style={{
-          position: 'absolute',
-          top: 16,
-          right: 18,
-          border: 'none',
-          background: 'transparent',
-          color: '#6B7280',
-          width: 28,
-          height: 28,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <BsX style={{ fontSize: 18 }} />
-      </button>
-
-      {/* Single flex row: illustration | [progress column 50%] | [checklist + button, evenly spaced, 50%] */}
-      <div className="d-flex flex-column flex-xl-row align-items-xl-center" style={{ gap: 28 }}>
-
-        {/* Illustration */}
-        <div className="d-none d-lg-block" style={{ flexShrink: 0, width: 150 }}>
-          <ChurchIllustration width={150} />
-        </div>
-
-        {/* Everything else splits the remaining row width 50/50 */}
-        <div className="d-flex flex-column flex-xl-row align-items-xl-center" style={{ flex: '1 1 0%', gap: 28, minWidth: 0 }}>
-
-          {/* Title + progress bar — exactly half the remaining width */}
-          <div style={{ flex: '1 1 50%', minWidth: 260 }}>
-            <h5 className="mb-1 fw-bold">Complete Your Church Setup 👋</h5>
-            <p className="text-muted small mb-3">Follow these simple steps to get the most out of Jerur.</p>
-
-            <div style={{ height: 8, borderRadius: 999, background: '#DCE1F0', overflow: 'hidden', marginBottom: 6 }}>
-              <div
-                style={{
-                  height: '100%',
-                  width: `${onboarding.percentage}%`,
-                  background: '#2F5AF0',
-                  borderRadius: 999,
-                  transition: 'width 0.3s ease'
-                }}
-                role="progressbar"
-                aria-valuenow={onboarding.percentage}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label="Church setup completion progress"
-              />
-            </div>
-            <div className="d-flex justify-content-between" style={{ fontSize: 12.5, color: '#6B7280' }}>
-              <span>{onboarding.completedCount} of {onboarding.totalCount} Complete</span>
-              <span>{onboarding.percentage}%</span>
-            </div>
-          </div>
-
-          {/* Checklist panel + button — evenly spaced/centered in the second half on desktop, stacked full-width on mobile */}
-          <div className="jerur-setup-half2">
-            <div style={{ background: '#fff', borderRadius: 14, padding: '18px 28px', maxWidth: '100%', overflowX: 'auto' }}>
-              {/* 2-column version (default / below 1200px) */}
-              <div className="jerur-checklist-2col">
-                <div>
-                  {leftCol.map((task) => <ChecklistRow key={task.key} task={task} onboarding={onboarding} onNavigate={onNavigate} />)}
-                </div>
-                <div>
-                  {rightCol.map((task) => <ChecklistRow key={task.key} task={task} onboarding={onboarding} onNavigate={onNavigate} />)}
-                </div>
-              </div>
-
-              {/* 3-column version (1200px and up) */}
-              <div className="jerur-checklist-3col">
-                {FLAT_SETUP_TASKS.map((task) => (
-                  <ChecklistRow key={task.key} task={task} onboarding={onboarding} onNavigate={onNavigate} />
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={onOpenGuide}
-              style={{
-                whiteSpace: 'nowrap',
-                borderRadius: 8,
-                border: '1.5px solid #2F5AF0',
-                background: '#fff',
-                color: '#2F5AF0',
-                fontWeight: 600,
-                fontSize: 13.5,
-                padding: '10px 20px',
-                flexShrink: 0
-              }}
-            >
-              View Setup Guide
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 };
 
@@ -713,7 +601,7 @@ const SetupGuideDrawer = ({ show, onClose, onNavigate }) => (
   </Offcanvas>
 );
 
-const PanelEmptyState = ({ icon, title, message, actionLabel, onAction, tone, buttonTone = 'primary' }) => {
+const PanelEmptyState = ({ icon, title, message, tone }) => {
   const { bg, fg } = TONE_TINT[tone] || TONE_TINT.primary;
   return (
     <div className="d-flex flex-column align-items-center justify-content-center text-center py-4">
@@ -724,8 +612,7 @@ const PanelEmptyState = ({ icon, title, message, actionLabel, onAction, tone, bu
         {React.createElement(icon)}
       </span>
       <h6 className="mb-1" style={{ fontSize: 14 }}>{title}</h6>
-      <p className="text-muted mb-3" style={{ fontSize: 12, maxWidth: 180 }}>{message}</p>
-      <JerurFeatureButton title={actionLabel} onClick={onAction} tone={buttonTone} />
+      <p className="text-muted mb-0" style={{ fontSize: 12, maxWidth: 180 }}>{message}</p>
     </div>
   );
 };
@@ -824,17 +711,14 @@ const FellowshipCard = ({ count = 0, onNavigate }) => (
           icon={BsPeople}
           title="No fellowship groups yet"
           message="Create your first fellowship group to bring members together."
-          actionLabel="Add Fellowship Group"
           tone="warning"
-          buttonTone="warning"
-          onAction={() => onNavigate('/protected/church/fellowships')}
         />
       )}
     </Card.Body>
   </Card>
 );
 
-const WelcomeOverlay = ({ show, onGetStarted, onDismiss }) => {
+const WelcomeOverlay = ({ show, onGetStarted, onDismiss, busy = false }) => {
   if (!show) return null;
   return (
     <div
@@ -908,14 +792,16 @@ const WelcomeOverlay = ({ show, onGetStarted, onDismiss }) => {
         <button
           type="button"
           className="flex-fill"
+          disabled={busy}
           style={{ background: '#2F5AF0', border: 'none', color: '#fff', fontWeight: 600, fontSize: 14, borderRadius: 10, padding: '11px 0' }}
           onClick={onGetStarted}
         >
-          Get Started
+          {busy ? 'Saving…' : 'Get Started'}
         </button>
         <button
           type="button"
           className="flex-fill"
+          disabled={busy}
           style={{ background: '#fff', border: '1.5px solid #2F5AF0', color: '#2F5AF0', fontWeight: 600, fontSize: 14, borderRadius: 10, padding: '11px 0' }}
           onClick={onDismiss}
         >
@@ -1005,16 +891,24 @@ const Dashboard = ({ dashboard }) => {
   const [welcomeVisible,    setWelcomeVisible]    = useState(false);
   const [checklistDismissed, setChecklistDismissed] = useState(false);
   const [persistingState,   setPersistingState]   = useState(false);
+  const [onboardingError,   setOnboardingError]   = useState('');
+  const persistingStateRef = useRef(false);
 
   // Bottom-right product tour (separate from onboarding checklist).
   const [tourVisible, setTourVisible] = useState(false);
   const [tourStep,    setTourStep]    = useState(1);
 
   const onboarding     = data?.onboarding || DEFAULT_ONBOARDING;
+  // Do not render onboarding UI from defaults while the persisted dashboard
+  // payload is still in flight. Otherwise a dismissed checklist briefly
+  // appears before the server state is applied.
+  const onboardingHydrated = data?.onboarding != null;
   const membersEmpty   = (data?.members  || 0) === 0;
   const attendanceEmpty = (data?.attendance || 0) === 0;
 
   useEffect(() => {
+    if (!onboardingHydrated) return;
+
     if (onboarding.completed) {
       setWelcomeVisible(false);
       setChecklistDismissed(false);
@@ -1022,7 +916,7 @@ const Dashboard = ({ dashboard }) => {
     }
     setChecklistDismissed(Boolean(onboarding.setupChecklistDismissed));
     setWelcomeVisible(!onboarding.dismissed);
-  }, [onboarding.completed, onboarding.dismissed, onboarding.setupChecklistDismissed]);
+  }, [onboarding.completed, onboarding.dismissed, onboarding.setupChecklistDismissed, onboardingHydrated]);
 
   // Show the tour once per browser, independent of the server-persisted
   // onboarding state. Reopen anytime via the help FAB.
@@ -1033,6 +927,10 @@ const Dashboard = ({ dashboard }) => {
   }, []);
 
   const persistOnboardingState = useCallback(async (partialOnboardingState) => {
+    if (persistingStateRef.current) return false;
+
+    persistingStateRef.current = true;
+    setOnboardingError('');
     setPersistingState(true);
     try {
       const nextOnboardingState = {
@@ -1043,14 +941,15 @@ const Dashboard = ({ dashboard }) => {
         } : {}),
         ...partialOnboardingState
       };
-      const response = await zat(`${CHURCH.uploadOne}?action=bulk`, { onboarding: nextOnboardingState }, VERBS.PUT);
+      const response = await zat(`${CHURCH.uploadOne}?action=onboarding`, nextOnboardingState, VERBS.PUT);
       if (!response.success) throw new Error(response.errorMessage || 'Unable to update onboarding state.');
       await fetchAll();
       return true;
     } catch (persistError) {
-      window.alert(persistError.message || 'Unable to update onboarding state.');
+      setOnboardingError(persistError.message || 'Unable to update onboarding state.');
       return false;
     } finally {
+      persistingStateRef.current = false;
       setPersistingState(false);
     }
   }, [data?.onboarding, fetchAll, onboarding.completed, onboarding.dismissed, onboarding.setupChecklistDismissed]);
@@ -1125,12 +1024,23 @@ const Dashboard = ({ dashboard }) => {
       <SetupGuideDrawer show={setupGuideVisible} onClose={handleCloseSetupGuide} onNavigate={handleNavigate} />
 
       {/* ── Fixed bottom-left welcome overlay ── */}
-      <WelcomeOverlay show={welcomeVisible} onGetStarted={handleGetStarted} onDismiss={handleDismissWelcome} />
+      <WelcomeOverlay
+        show={onboardingHydrated && welcomeVisible}
+        onGetStarted={handleGetStarted}
+        onDismiss={handleDismissWelcome}
+        busy={persistingState}
+      />
 
       {/* ── Saving indicator ── */}
       {persistingState ? (
         <div className="mb-2 d-flex align-items-center text-muted small">
           <Spinner size="sm" className="me-2" />Saving…
+        </div>
+      ) : null}
+
+      {onboardingError ? (
+        <div className="alert alert-danger py-2 small mb-3" role="alert">
+          {onboardingError}
         </div>
       ) : null}
 
@@ -1143,7 +1053,7 @@ const Dashboard = ({ dashboard }) => {
       </div>
 
       {/* ── Row 2: Setup checklist (dismissible) ── */}
-      {!checklistDismissed ? (
+      {onboardingHydrated && !checklistDismissed ? (
         <SetupChecklistCard
           onboarding={onboarding}
           onNavigate={handleNavigate}
@@ -1167,10 +1077,7 @@ const Dashboard = ({ dashboard }) => {
                   icon={BsCalendarEvent}
                   title="No attendance recorded yet"
                   message="Record your first attendance to start seeing attendance trends."
-                  actionLabel="Record Attendance"
                   tone="primary"
-                  buttonTone="success"
-                  onAction={() => handleNavigate('/protected/church/attendance')}
                 />
               ) : (
                 <AttendanceChart data={trentData} loading={loading} />
@@ -1217,11 +1124,6 @@ const Dashboard = ({ dashboard }) => {
                     <TintIcon icon={BsPeople} tone="primary" size={48} iconSize={20} />
                   </div>
                   <p className="text-muted small mb-2">No members added yet.</p>
-                  <JerurFeatureButton
-                    title="Add Member"
-                    tone="primary"
-                    onClick={() => handleNavigate('/protected/church/members')}
-                  />
                 </div>
               ) : (
                 <RecentMembers data={recentData} />

@@ -1,9 +1,8 @@
 /* eslint-disable jsx-a11y/alt-text */
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Form, Button, InputGroup, Tabs, Tab } from 'react-bootstrap';
+import { Row, Col, Tabs, Tab } from 'react-bootstrap';
 import dynamic from 'next/dynamic';
-import { dateFormatted, encrypt, decrypt } from '../../../../utils/helpers';
 import { useSettings } from '../../../../hooks/useSettings';
 import { validate } from '../../../../validator/validator';
 import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
@@ -21,6 +20,7 @@ import Pastor from './others/pastor';
 import Prophetic from './others/prophetic';
 import NotificationSettings from './others/notification';
 import About from './about';
+import SubscriptionSettings from './subscription';
 
 const AddressForm = dynamic(() => import('./address'), { ssr: false });
 
@@ -44,9 +44,15 @@ const SettingsPage = () => {
   const [logoRemoved, setLogoRemoved] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('profile');
   const [errorMessages, setErrorMessages] = useState({});
-  const [key, setKey] = useState('bank_transfer');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [key, setKey] = useState('config');
+
+  useEffect(() => {
+    const requestedSection = new URLSearchParams(window.location.search).get('section');
+    if (requestedSection === 'address') {
+      setSelectedMenu('address');
+    }
+  }, []);
+
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -152,21 +158,12 @@ const SettingsPage = () => {
     handleChange('logo_url', data?.logo_url ?? '');
   };
 
-  const handleSubmit = (fields) => {
+  const handleSubmit = async (fields) => {
     const body = {
       stripeCustomerId: fields.stripeCustomerId
     };
-    handleCustomerPortalSession(body).then((result) => {
-      if (result?.url) {
-        if (result?.url) {
-          window.location.href = result.url;
-        }
-      }
-    });
-  };
-
-  const handleSavePassword = async (fields) => {
-    await handleSaveChangePassword({ password: fields.password });
+    const result = await handleCustomerPortalSession(body);
+    if (result?.url) window.location.href = result.url;
   };
 
   const renderContent = (data) => {
@@ -189,150 +186,7 @@ const SettingsPage = () => {
           />
         );
       case 'Subscription':
-        return (
-          <Form>
-            <Row className="mb-4">
-              <h4>Subscription </h4>
-            </Row>
-            <Row className="mb-1">
-              <Col md={6}>
-                <Row className="mb-1">
-                  <Col md={6}>
-                    <Form.Group>
-                      <Form.Label className="text-dark">Plan</Form.Label>
-                      <Form.Control type="text" readOnly value={fields?.plan} />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group>
-                      <Form.Label className="text-dark">Status</Form.Label>
-                      <Form.Control type="text" readOnly value={fields?.status} />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-
-            {fields?.status !== 'trialing' && (
-              <Row>
-                <Col md={6}>
-                  <Row className="mb-3">
-                    <Col>
-                      <Form.Group>
-                        <Form.Label className="text-dark">Start Date</Form.Label>
-                        <Form.Control type="text" readOnly value={dateFormatted(fields?.startDate)} />
-                      </Form.Group>
-                    </Col>
-                    <Col>
-                      <Form.Group>
-                        <Form.Label className="text-dark">End Date</Form.Label>
-                        <Form.Control type="text" readOnly value={dateFormatted(fields?.endDate)} />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-            )}
-
-            {fields?.status === 'trialing' && (
-              <Row>
-                <Col md={6}>
-                  <Row className="mb-1">
-                    <Col>
-                      <Form.Group>
-                        <Form.Label className="text-dark">Trial Start</Form.Label>
-                        <Form.Control
-                          type="text"
-                          readOnly
-                          value={dateFormatted(fields?.trial_start)}
-                          className="border-dark"
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col>
-                      <Form.Group>
-                        <Form.Label className="text-dark">Trial End</Form.Label>
-                        <Form.Control type="text" readOnly value={dateFormatted(fields?.trial_end)} />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-            )}
-
-            <div className="d-flex justify-content-start">
-              <Button type="button" variant="primary" onClick={() => handleSubmit(fields)}>
-                Go to Stripe Portal
-              </Button>
-            </div>
-          </Form>
-        );
-      case 'ChangePassword':
-        return (
-          <Form>
-            <Row className="mb-4">
-              <h4>Change Password </h4>
-            </Row>
-            <Row className="mb-1">
-              <Col md={6}>
-                <Row className="mb-1">
-                  <Col md={6}>
-                    <Form.Group>
-                      <Form.Label className="text-dark">New Password</Form.Label>
-                      <InputGroup>
-                        <Form.Control
-                          type={showPassword ? 'text' : 'password'}
-                          value={fields.password}
-                          onChange={(e) => handleChange('password', e.target.value)}
-                          placeholder="Enter your password"
-                          maxLength={20}
-                        />
-                        <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
-                          {showPassword ? 'Hide' : 'Show'}
-                        </Button>
-                      </InputGroup>{' '}
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group>
-                      <Form.Label className="text-dark">Confirm Password</Form.Label>
-                      <InputGroup>
-                        <Form.Control
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          value={fields.confirm_password}
-                          maxLength={20}
-                          onChange={(e) => handleChange('confirm_password', e.target.value)}
-                          placeholder="Confirm your password"
-                        />
-                        <Button
-                          variant="outline-secondary"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                          {showConfirmPassword ? 'Hide' : 'Show'}
-                        </Button>
-                      </InputGroup>
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-
-            <div className="d-flex justify-content-start">
-              <Button
-                type="button"
-                variant="primary"
-                disabled={
-                  fields.password !== fields.confirm_password ||
-                  fields.password.length === 0 ||
-                  fields.confirm_password.length === 0
-                }
-                onClick={() => handleSavePassword(fields)}
-              >
-                Save Changes
-              </Button>
-            </div>
-          </Form>
-        );
+        return <SubscriptionSettings fields={fields} onManage={handleSubmit} />;
       case 'slider':
         return <Slider />;
       case 'contact':
@@ -344,6 +198,9 @@ const SettingsPage = () => {
       case 'general':
         return (
           <Tabs id="controlled-tab-example" activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
+              <Tab eventKey="config" title="General Config">
+              <ConfigPage data={data} />
+            </Tab>
             <Tab eventKey="bank_transfer" title="Bank Transfer">
               <BankTransfer data={data} />
             </Tab>
@@ -359,9 +216,7 @@ const SettingsPage = () => {
             <Tab eventKey="notification" title="Notification">
               <NotificationSettings data={data?.notification} />
             </Tab>
-            <Tab eventKey="config" title="Other Configurations">
-              <ConfigPage data={data} />
-            </Tab>
+
             <Tab eventKey="feature" title="Mobile Features">
               <Features data={data} />
             </Tab>

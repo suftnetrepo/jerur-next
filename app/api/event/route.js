@@ -93,7 +93,7 @@ export const PUT = async (req) => {
     const id = url.searchParams.get('id');
 
     const eventData = await parseEventFormData(req);
-    const updated = await editEvent(id, eventData);
+    const updated = await editEvent(id, eventData, user.church);
 
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {

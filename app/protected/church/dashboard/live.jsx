@@ -1,19 +1,14 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card, Spinner } from 'react-bootstrap';
 import { getDashboardAggregateValue } from '../../../../utils/helpers';
-import { useChurchDashboard } from '../../../../hooks/useChurchDashboard';
 import { TotalInvested, NumberofInvested, Portfoliovalue, Returnsrate, UserAggregates } from '../../../share/chart';
 import RecentMembers from '../recentMembers';
 import AttendanceChart from '../../../share/aChart';
 
-const Dashboard = () => {
-  const { recentData, chartData, trentData, data, loading, handleDashboardAggregates } = useChurchDashboard();
-
-  useEffect(() => {
-    handleDashboardAggregates();
-  }, []);
+const Dashboard = ({ dashboard }) => {
+  const { recentData, chartData, trentData, data, loading } = dashboard;
 
   return (
     <>

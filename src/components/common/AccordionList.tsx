@@ -5,26 +5,26 @@ const accordions = [
   {
     no: '1',
     expand: true,
-    heading: 'All-in-One Platform',
-    body: 'Manage everything from service planning to media content, member engagement, and online giving—seamlessly in one place.'
+    heading: 'One Connected Platform',
+    body: 'Manage church information, members, services, events, giving and ministry content from one dashboard.'
   },
   {
     no: '2',
     expand: false,
-    heading: 'Member-Centric Tools',
-    body: 'Designed to support pastors, AV teams, admin staff, and volunteers—collaborate and communicate with ease.'
+    heading: 'A Configurable Mobile Experience',
+    body: 'Choose the mobile features that fit your ministry and publish current church information directly to members.'
   },
   {
     no: '3',
     expand: false,
     heading: 'Intuitive and Accessible',
-    body: 'No steep learning curve. Jerur is easy to navigate for everyone, from tech teams to first-time users.'
+    body: 'Guided onboarding helps church administrators add the essentials and start publishing without a complicated setup process.'
   },
   {
     no: '4',
     expand: false,
-    heading: 'Responsive Support',
-    body: 'We walk with you every step of the way—from onboarding to ongoing support—so your church never feels alone.'
+    heading: 'Secure Subscription Management',
+    body: 'Payments and subscription management are handled securely through Stripe, with clear access to your current billing status.'
   }
 ];
 

@@ -1,5 +1,12 @@
 import Validator from 'fastest-validator';
-import { ObjectID } from 'mongodb';
+import mongoose from 'mongoose';
+
+// Fastest Validator expects an ObjectID-compatible constructor exposing the
+// static `isValid` method. The modern MongoDB driver no longer exports the
+// legacy `ObjectID` name, so importing it produced `undefined` at runtime.
+// Reuse Mongoose's ObjectId implementation, which is already the canonical
+// ID type throughout the application.
+const ObjectID = mongoose.Types.ObjectId;
 
 function identifierValidator(id) {
   const validator = new Validator();

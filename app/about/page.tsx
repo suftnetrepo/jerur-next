@@ -40,7 +40,7 @@ const About: NextPage = () => {
                 <figure>
                   <img
                     alt=""
-                    className="w-auto"
+                    className="img-fluid"
                     src="/img/illustrations/i2.png"
                     srcSet="/img/illustrations/i2@2x.png 2x"
                   />

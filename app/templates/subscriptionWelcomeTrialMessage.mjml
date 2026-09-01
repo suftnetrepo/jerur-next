@@ -19,7 +19,7 @@
     <p>Plan : {{Plan}}<br />Amount : {{amount}}<br />Billing Cycle : {{billingCycle}}</p>
     <p>
         <strong>Getting Started</strong><br>
-        Your subscription plan gives you access <strong>Snatchi</strong> for the next {{duration}}
+        Your subscription plan gives you access to <strong>Jerur</strong> for the next {{duration}}
     </p>
           In case you have any questions, feel free to reach out to us at {{contactEmail}}. You can login to your account with your username {{userName}}</mj-text>
         <mj-button align="left" font-size="22px" font-weight="bold" background-color="#ffffff" border-radius="10px" color="#1AA0E1" font-family="open Sans Helvetica, Arial, sans-serif">Login</mj-button>

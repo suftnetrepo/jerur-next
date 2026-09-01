@@ -116,7 +116,7 @@ const ConfigPage = ({ data }) => {
                 value={fields?.isSearchable}
                 onChange={(e) => handleChange('isSearchable', e.target.checked)}
               />
-              <Form.Label className="text-dark ms-1"> is Searchable</Form.Label>
+              <Form.Label className="text-dark ms-2"> is Searchable</Form.Label>
               {errorMessages?.isSearchable?.message && (
                 <span className="text-danger fs-13">{errorMessages?.isSearchable?.message}</span>
               )}
