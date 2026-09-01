@@ -5,7 +5,7 @@ import { memberValidator, pinValidator, loginValidator } from '../validation/use
 import { identifierValidator } from '../validation/identifierValidator';
 import Member from '../models/member';
 import { logger } from '../../utils/logger';
-import { sendEmail } from '../../lib/mail';
+import { sendBrevoEmail } from '../../lib/mail';
 import { emailTemplates } from '../email';
 import { compileEmailTemplate } from '../templates/compile-email-template';
 import { mongoConnect } from '../../utils/connectDb';
@@ -466,14 +466,14 @@ async function sendVerificationCode(member) {
     );
 
     const mailOptions = {
-      from: process.env.USER_NAME,
-      to: `${email}`,
+      sender: { email: process.env.USER_NAME, name: process.env.TEAM || 'Jerur' },
+      to: [{ email }],
       subject: 'Your code verification',
-      text: 'Your code verification',
-      html: template
+      textContent: template,
+      htmlContent: template
     };
 
-    sendEmail(mailOptions);
+    await sendBrevoEmail(mailOptions);
     return true;
   } catch (error) {
     logger.error(error);

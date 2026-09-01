@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { findSubscriptionPlanByPriceId } from '../../constants/subscriptionPlans';
 import { updateChurchStatus } from './churchService';
-import { sendEmail } from '../../lib/mail';
+import { sendBrevoEmail } from '../../lib/mail';
 import { compileEmailTemplate } from '../templates/compile-email-template';
 import { logger } from '../../utils/logger';
 import { emailTemplates } from '../email';
@@ -29,14 +29,22 @@ const invoiceMetadata = (invoice) => ({
   ...(invoice?.lines?.data?.[0]?.metadata || {})
 });
 
+const brevoMailOptions = (email, subject, html) => ({
+  sender: { email: process.env.USER_NAME, name: process.env.TEAM || 'Jerur' },
+  to: email ? [{ email }] : [],
+  subject,
+  textContent: html,
+  htmlContent: html
+});
+
 const sendEmailSafely = async (mailOptions, context) => {
-  if (!mailOptions.to) {
+  if (!mailOptions.to?.[0]?.email) {
     logger.warn({ context }, 'Skipping subscription email because no recipient was supplied');
     return;
   }
 
   try {
-    await sendEmail(mailOptions);
+    await sendBrevoEmail(mailOptions);
   } catch (error) {
     // Billing state has already been persisted. Email delivery must not cause
     // Stripe to retry an otherwise successfully processed webhook.
@@ -70,13 +78,7 @@ const invoicePaymentSuccess = async (event) => {
       })
     );
 
-    const mailOptions = {
-      from: process.env.USER_NAME,
-      to: email,
-      subject: 'Invoice paid Successfully',
-      text: 'Invoice paid Successfully',
-      html
-    };
+    const mailOptions = brevoMailOptions(email, 'Invoice paid Successfully', html);
 
     await sendEmailSafely(mailOptions, 'invoice payment success');
   } catch (error) {
@@ -124,13 +126,7 @@ const invoicePaymentFailed = async (event) => {
       })
     );
 
-    const mailOptions = {
-      from: process.env.USER_NAME,
-      to: `${email}`,
-      subject: 'Invoice Payment Failed',
-      text: 'Invoice Payment Failed',
-      html
-    };
+    const mailOptions = brevoMailOptions(email, 'Invoice Payment Failed', html);
 
     await sendEmailSafely(mailOptions, 'invoice payment failure');
   } catch (error) {
@@ -152,13 +148,7 @@ const trialWillEnd = async (event) => {
       })
     );
 
-    const mailOptions = {
-      from: process.env.USER_NAME,
-      to: `${email}`,
-      subject: 'Trial Will Soon End',
-      text: 'Trial Will Soon End',
-      html
-    };
+    const mailOptions = brevoMailOptions(email, 'Trial Will Soon End', html);
 
     await sendEmailSafely(mailOptions, 'trial ending');
   } catch (error) {
@@ -202,13 +192,7 @@ const updateSubscription = async (event) => {
       })
     );
 
-    const mailOptions = {
-      from: process.env.USER_NAME,
-      to: `${email}`,
-      subject: 'Subscription Update',
-      text: 'Subscription Update',
-      html
-    };
+    const mailOptions = brevoMailOptions(email, 'Subscription Update', html);
 
     if (status === 'active') {
       await sendEmailSafely(mailOptions, 'subscription update');
@@ -243,13 +227,7 @@ const createSubscription = async (event) => {
       })
     );
 
-    const mailOptions = {
-      from: process.env.USER_NAME,
-      to: `${email}`,
-      subject: 'Welcome to Jerur',
-      text: 'Welcome to Jerur',
-      html
-    };
+    const mailOptions = brevoMailOptions(email, 'Welcome to Jerur', html);
 
     await sendEmailSafely(mailOptions, 'subscription welcome');
   } catch (error) {
@@ -281,13 +259,7 @@ const cancelSubscription = async (event) => {
       })
     );
 
-    const mailOptions = {
-      from: process.env.USER_NAME,
-      to: `${email}`,
-      subject: 'Subscription Cancelled',
-      text: 'Subscription Cancelled',
-      html
-    };
+    const mailOptions = brevoMailOptions(email, 'Subscription Cancelled', html);
 
     await sendEmailSafely(mailOptions, 'subscription cancellation');
   } catch (error) {
@@ -318,13 +290,7 @@ const cancelTrial = async (event) => {
       })
     );
 
-    const mailOptions = {
-      from: process.env.USER_NAME,
-      to: `${email}`,
-      subject: 'Trial Cancelled',
-      text: 'Trial Cancelled',
-      html
-    };
+    const mailOptions = brevoMailOptions(email, 'Trial Cancelled', html);
 
     await sendEmailSafely(mailOptions, 'trial cancellation');
   } catch (error) {
