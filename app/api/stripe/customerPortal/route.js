@@ -19,7 +19,12 @@ export async function POST(req) {
         }
 
         const stripe = getStripeClient();
-        const frontendOrigin = process.env.NEXT_FRONTEND_URL || new URL(req.url).origin;
+        // NEXTAUTH_URL is Jerur's canonical public application URL. Keep it
+        // ahead of NEXT_FRONTEND_URL because some hosting environments use a
+        // localhost frontend value for their internal listener.
+        const frontendOrigin = process.env.NEXTAUTH_URL
+            || process.env.NEXT_FRONTEND_URL
+            || new URL(req.url).origin;
         const returnUrl = new URL(
             '/protected/church/settings?section=subscription',
             frontendOrigin
