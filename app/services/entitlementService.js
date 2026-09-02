@@ -12,6 +12,7 @@ const BLOCKED_SUBSCRIPTION_STATUSES = new Set([
   'unpaid',
   'incomplete',
   'incomplete_expired',
+  'expired',
   'paused'
 ]);
 
