@@ -2,11 +2,13 @@ import { logger } from '../../../../utils/logger';
 import Church from '../../../models/church';
 import { getUserSession } from '../../../../utils/generateToken';
 import { getStripeClient } from '../../../../lib/stripe';
+import { mongoConnect } from '../../../../utils/connectDb';
 const { NextResponse } = require('next/server');
 
 // POST handler to create a customer portal session
 export async function POST(req) {
     try {
+        await mongoConnect();
         const user = await getUserSession(req, { requireActiveSubscription: false });
 
         if (!user?.church) {
