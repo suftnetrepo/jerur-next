@@ -4,6 +4,7 @@ import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialog
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
 import { useConfig } from '../../../../../hooks/useSettings';
 import Select from '../../../../../src/components/reuseable/Select';
+import ThemeSelector from './ThemeSelector';
 
 const ConfigPage = ({ data }) => {
   const { error, success, fields, rules, handleChange, handleSave, handleReset, handleSelect } = useConfig();
@@ -30,8 +31,9 @@ const ConfigPage = ({ data }) => {
   ];
 
   return (
-    <div style={{ marginLeft: 25, width: '40%', backgroundColor: 'white' }}>
-      <Form>
+    <div style={{ marginLeft: 25, width: 'calc(100% - 50px)', maxWidth: 980, backgroundColor: 'white' }}>
+      <ThemeSelector value={data?.theme_id} />
+      <Form style={{ width: '100%', maxWidth: 440 }}>
         <div className="row">
           <div className="col-md-12">
             <Form.Group controlId="formCurrency" className="mb-3">
