@@ -3,15 +3,15 @@ const nextConfig = {
   // ✅ Moved out of experimental (Next.js 15)
   serverExternalPackages: ['mongoose', 'mongodb', 'mjml', 'bunyan'],
 
-  eslint: {
-    ignoreDuringBuilds: true
-  },
   typescript: {
     ignoreBuildErrors: true
   },
   reactStrictMode: false,
   images: {
-    domains: ['jerur-next-production.onrender.com', 'jerur-next.onrender.com'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'jerur-next-production.onrender.com' },
+      { protocol: 'https', hostname: 'jerur-next.onrender.com' }
+    ],
     formats: ['image/avif', 'image/webp']
   },
 
@@ -61,7 +61,7 @@ const nextConfig = {
 
 // Conditionally add Sentry if installed
 try {
-  const { withSentryConfig } = require('@sentry/nextjs');
+  const { withSentryConfig } = require('@sentry/nextjs/config');
   module.exports = withSentryConfig(nextConfig, {
     org: 'suftnetcom',
     project: 'snatchi',
@@ -72,11 +72,15 @@ try {
       // source-map uploads enabled unless this flag is explicitly set.
       disable: process.env.SENTRY_SKIP_UPLOAD === '1'
     },
-    unstable_sentryWebpackPluginOptions: {
-      disable: process.env.SENTRY_SKIP_UPLOAD === '1'
-    },
-    disableLogger: true,
-    automaticVercelMonitors: true
+    webpack: {
+      unstable_sentryWebpackPluginOptions: {
+        disable: process.env.SENTRY_SKIP_UPLOAD === '1'
+      },
+      treeshake: {
+        removeDebugLogging: true
+      },
+      automaticVercelMonitors: true
+    }
   });
 } catch (error) {
   console.warn('⚠️ Sentry is not installed. Skipping Sentry configuration.');
