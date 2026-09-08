@@ -5,6 +5,7 @@ import {
   updateChurchAddress,
   updateChurchContact,
   updateFeatures,
+  updateTheme,
   updateOnboarding
 } from '../../../services/churchService';
 import { NextResponse } from 'next/server';
@@ -124,6 +125,12 @@ export const PUT = async (req) => {
       // body wrapper ({ features: [...] }) the client actually sends.
       const updated = await updateFeatures(user?.church, body.features);
       return NextResponse.json({ success: true, data: updated });
+    }
+
+    if (action === 'theme') {
+      const body = await req.json();
+      const updated = await updateTheme(user?.church, body.theme_id);
+      return NextResponse.json({ success: true, data: { theme_id: updated } });
     }
 
     return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });

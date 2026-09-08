@@ -1,4 +1,5 @@
 import Validator from 'fastest-validator';
+import { MOBILE_THEME_IDS } from '../../constants/mobileThemes';
 
 function updateAddressValidator(data) {
   const validator = new Validator();
@@ -93,6 +94,17 @@ function updateFeatureValidator(data) {
   return validator.validate(data, schema)
 }
 
+function updateThemeValidator(data) {
+  const validator = new Validator();
+  return validator.validate(data, {
+    theme_id: {
+      type: 'string',
+      empty: false,
+      enum: MOBILE_THEME_IDS
+    }
+  });
+}
+
 function churchValidator(data) {
   const validator = new Validator();
   const schema = {
@@ -122,6 +134,7 @@ export  {
   contactValidator,
   updateOneValidator,
   updateFeatureValidator,
+  updateThemeValidator,
   churchValidator,
   churchUpdateValidator,
   pastorValidator,

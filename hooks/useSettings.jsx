@@ -170,15 +170,19 @@ const usePastor = () => {
 
   const handleUpdate = async (body) => {
     setState((prev) => ({ ...prev, loading: true, success: false }));
-    const { success, errorMessage } = await zat(CHURCH.uploadPastor, body, VERBS.PUT);
+    const { success, errorMessage, data } = await zat(CHURCH.uploadPastor, body, VERBS.PUT);
 
     if (success) {
       setState((prevState) => ({
         ...prevState,
+        data,
+        fields: data && typeof data === 'object'
+          ? { ...prevState.fields, ...data }
+          : prevState.fields,
         success: true,
         loading: false
       }));
-      return true;
+      return data || true;
     } else {
       handleError(errorMessage || 'Failed to update the pastor.');
       return false;

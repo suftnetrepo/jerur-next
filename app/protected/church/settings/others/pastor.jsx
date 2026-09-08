@@ -6,15 +6,12 @@ import { validate } from '../../../../../validator/validator';
 import { usePastor } from '../../../../../hooks/useSettings';
 import ImageUploadPanel from '../../../../../src/components/reuseable/ImageUploadPanel';
 
-const Pastor = ({ data }) => {
+const Pastor = ({ data, onSaved }) => {
   const { error, success, fields, rules, handleChange, handleUpdate, handleReset, handleSelect } = usePastor();
   const [errorMessages, setErrorMessages] = useState({});
   const [previewUrl, setPreviewUrl] = useState(null);
   const [file, setFile] = useState(null);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-
-  console.log('Pastor data:', data); // Debugging line to check the data prop
-  console.log('Pastor success:', success); // Debugging line to check the fields state
 
   // Only load data once when component mounts or when data prop changes AND it's a different data
   useEffect(() => {
@@ -63,13 +60,20 @@ const Pastor = ({ data }) => {
     formData.append('first_name', fields.first_name);
     formData.append('last_name', fields.last_name);
 
-    handleUpdate(formData).then(() => {
-      // Reset the data loaded flag to allow reload if needed
-      setIsDataLoaded(false);
-    });
-    
-    // Reset the data loaded flag to allow reload if needed
-    // But keep the fields as they are after successful update
+    const savedPastor = await handleUpdate(formData);
+    if (!savedPastor) return;
+
+    // Use the server-persisted value immediately, then refresh the shared
+    // Settings snapshot. This prevents a later tab mount from restoring the
+    // stale pastor data that was originally fetched when Settings opened.
+    if (savedPastor && typeof savedPastor === 'object') {
+      handleSelect(savedPastor);
+    }
+    await onSaved?.();
+
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl(null);
   };
 
   const handleResetForm = () => {

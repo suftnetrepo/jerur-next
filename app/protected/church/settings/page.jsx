@@ -213,7 +213,7 @@ const SettingsPage = () => {
               <SocialMedia data={data} />
             </Tab>
             <Tab eventKey="pastor" title="Pastor">
-              <Pastor data={data?.pastor_section} />
+              <Pastor data={data?.pastor_section} onSaved={handleFetch} />
             </Tab>
             <Tab eventKey="prophetic" title="Prophetic Theme">
               <Prophetic data={data?.prophetic_focus} />

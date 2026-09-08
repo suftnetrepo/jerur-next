@@ -2,6 +2,7 @@
 import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
 import { DEFAULT_ENABLED_FEATURE_IDS } from '../../constants/mobileFeatures'
+import { DEFAULT_MOBILE_THEME_ID, MOBILE_THEME_IDS } from '../../constants/mobileThemes'
 
 const addressSchema = new Schema({
   addressLine1: {
@@ -115,6 +116,12 @@ const ChurchSchema = new mongoose.Schema(
     features: {
       type: [String],
       default: () => [...DEFAULT_ENABLED_FEATURE_IDS]
+    },
+    theme_id: {
+      type: String,
+      trim: true,
+      enum: MOBILE_THEME_IDS,
+      default: DEFAULT_MOBILE_THEME_ID
     },
     sliders: [
       {

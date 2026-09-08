@@ -5,6 +5,7 @@ import {
   updateAddressValidator,
   updateOneValidator,
   updateFeatureValidator,
+  updateThemeValidator,
   churchUpdateValidator,
   pastorValidator,
   propheticValidator,
@@ -209,9 +210,19 @@ async function updatePastor(suid, body) {
       secure_url: uploaded ? uploaded.secure_url : existingPastorSection.secure_url
     };
 
-    await Church.findByIdAndUpdate(suid, { pastor_section }, { new: true });
+    const updatedChurch = await Church.findByIdAndUpdate(
+      suid,
+      { $set: { pastor_section } },
+      { new: true }
+    ).select('pastor_section').lean();
 
-    return true;
+    if (!updatedChurch) {
+      throw new Error('Church not found');
+    }
+
+    // Return the persisted subdocument so the Settings client can replace
+    // its stale pre-save snapshot before another tab is opened.
+    return updatedChurch.pastor_section;
   } catch (error) {
     console.error(error);
     throw new Error('Error updating church pastor');
@@ -257,6 +268,32 @@ async function updateFeatures(suid, features) {
   } catch (error) {
     logger.error(error);
     throw new Error('Error while trying to update church features.');
+  }
+}
+
+async function updateTheme(suid, themeId) {
+  try {
+    const identifierValidateResult = identifierValidator(suid);
+    if (identifierValidateResult.length) {
+      throw new Error(identifierValidateResult.map((item) => item.message).join(','));
+    }
+
+    const validateResult = updateThemeValidator({ theme_id: themeId });
+    if (validateResult.length) {
+      throw new Error('Please select one of the available mobile themes.');
+    }
+
+    const church = await Church.findByIdAndUpdate(
+      suid,
+      { $set: { theme_id: themeId } },
+      { new: true }
+    ).select('theme_id').lean();
+
+    if (!church) throw new Error('Church not found.');
+    return church.theme_id;
+  } catch (error) {
+    logger.error(error);
+    throw new Error(error.message || 'Error updating the mobile theme.');
   }
 }
 async function updateChurchAddress(suid, body) {
@@ -340,7 +377,7 @@ async function getChurch(id) {
     // Church model but missing from this whitelist, so GET /church/get
     // never returned it. Backs the mobile app's "Give online" card
     // (app/(app)/give.tsx).
-    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination short_message verse address features sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id conference_link support_email logo_url logo_id giving_url').lean();
+    const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination short_message verse address features theme_id sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id conference_link support_email logo_url logo_id giving_url').lean();
     return {
       ...data,
       notification: buildNotificationResponse(data?.notification)
@@ -392,6 +429,17 @@ async function updateBulk(suid, body) {
     // social media, config, ...) never includes any of them, so this
     // whole block is a no-op for them.
     const { file, removeBanner, logoFile, removeLogo, ...fields } = body;
+
+    // Theme changes have their own validated action. Never allow the legacy
+    // generic settings update to bypass the approved theme catalogue.
+    delete fields.theme_id;
+
+    // Pastor and Slider have dedicated, lifecycle-aware endpoints. Never
+    // accept either through this generic updater: a client holding an older
+    // Church snapshot must not be able to restore stale embedded data while
+    // saving an unrelated Settings section.
+    delete fields.pastor_section;
+    delete fields.sliders;
 
     const needsExisting = file || removeBanner || logoFile || removeLogo;
     const existingChurch = needsExisting ? await Church.findById(suid).select('public_id logo_id') : null;
@@ -731,6 +779,7 @@ export {
   searchChurchesWithinRadius,
   getChurchByIdentifier,
   updateFeatures,
+  updateTheme,
   updateChurchContact,
   updatePastor,
   updateProphetic,
