@@ -3,6 +3,13 @@ const nextConfig = {
   // ✅ Moved out of experimental (Next.js 15)
   serverExternalPackages: ['mongoose', 'mongodb', 'mjml', 'bunyan'],
 
+  experimental: {
+    // This application still has a small custom webpack hook, which prevents
+    // Next from enabling its lower-memory build worker automatically.
+    webpackBuildWorker: true,
+    webpackMemoryOptimizations: true
+  },
+
   typescript: {
     ignoreBuildErrors: true
   },
@@ -66,7 +73,10 @@ try {
     org: 'suftnetcom',
     project: 'snatchi',
     silent: !process.env.CI,
-    widenClientFileUpload: true,
+    // Upload the normal set of source maps. Widening this set substantially
+    // increases webpack memory and build time without affecting runtime error
+    // reporting for application-owned chunks.
+    widenClientFileUpload: false,
     sourcemaps: {
       // Useful for offline/local release verification. Production keeps
       // source-map uploads enabled unless this flag is explicitly set.
