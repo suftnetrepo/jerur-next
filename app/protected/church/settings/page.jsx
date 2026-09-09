@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/alt-text */
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Tabs, Tab } from 'react-bootstrap';
@@ -25,7 +24,7 @@ import SubscriptionSettings from './subscription';
 const AddressForm = dynamic(() => import('./address'), { ssr: false });
 
 const SettingsPage = () => {
-  const { handleSave, handleChange, rules, loading, error, data, fields, success, handleSaveChangePassword } =
+  const { handleSave, handleChange, handleFetch, rules, loading, error, data, fields, success, handleSaveChangePassword } =
     useSettings();
   const { handleCustomerPortalSession } = useSubscriber();
   // Banner (Church.secure_url/public_id) - unchanged from before.
