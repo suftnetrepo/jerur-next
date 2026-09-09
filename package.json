@@ -15,7 +15,7 @@
     "build-local": "NODE_ENV=production next build --webpack",
     "start": "next start",
     "sass": "sass --no-source-map src/assets/scss:public/css",
-    "build:render": "yarn --frozen-lockfile --production=false install && SENTRY_SKIP_UPLOAD=1 NODE_OPTIONS='--trace-warnings' yarn build"
+    "build:render": "yarn --frozen-lockfile --production=false install && SENTRY_SKIP_UPLOAD=1 NODE_OPTIONS='--max-old-space-size=3072 --trace-warnings' yarn build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
