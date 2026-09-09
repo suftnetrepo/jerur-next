@@ -1,3 +1,5 @@
+const isLowMemoryBuild = process.env.SENTRY_SKIP_UPLOAD === '1';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // ✅ Moved out of experimental (Next.js 15)
@@ -7,8 +9,12 @@ const nextConfig = {
     // This application still has a small custom webpack hook, which prevents
     // Next from enabling its lower-memory build worker automatically.
     webpackBuildWorker: true,
-    webpackMemoryOptimizations: true
+    webpackMemoryOptimizations: true,
+    serverSourceMaps: !isLowMemoryBuild
   },
+
+  productionBrowserSourceMaps: false,
+  enablePrerenderSourceMaps: !isLowMemoryBuild,
 
   typescript: {
     ignoreBuildErrors: true
@@ -66,8 +72,12 @@ const nextConfig = {
   }
 };
 
-// Conditionally add Sentry if installed
-try {
+// Sentry's webpack wrapper creates and processes source maps even when upload
+// is disabled. Skip the build plugin on memory-constrained Render builds;
+// runtime instrumentation remains active via instrumentation-client/server.
+if (isLowMemoryBuild) {
+  module.exports = nextConfig;
+} else try {
   const { withSentryConfig } = require('@sentry/nextjs/config');
   module.exports = withSentryConfig(nextConfig, {
     org: 'suftnetcom',
