@@ -35,7 +35,38 @@ function attendanceValidator(data) {
       optional: true
     },
     wantsPastorContact: { type: 'boolean', optional: true },
-    submittedAt: { type: 'date', optional: true }
+    submittedAt: { type: 'date', optional: true },
+    household: {
+      type: 'object',
+      optional: true,
+      strict: true,
+      props: {
+        adults: {
+          type: 'object',
+          strict: true,
+          props: {
+            male: { type: 'number', integer: true, min: 0 },
+            female: { type: 'number', integer: true, min: 0 }
+          }
+        },
+        youth: {
+          type: 'object',
+          strict: true,
+          props: {
+            male: { type: 'number', integer: true, min: 0 },
+            female: { type: 'number', integer: true, min: 0 }
+          }
+        },
+        children: {
+          type: 'object',
+          strict: true,
+          props: {
+            male: { type: 'number', integer: true, min: 0 },
+            female: { type: 'number', integer: true, min: 0 }
+          }
+        }
+      }
+    }
   }
   return validator.validate(data, schema)
 }

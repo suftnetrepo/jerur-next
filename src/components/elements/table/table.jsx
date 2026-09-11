@@ -47,9 +47,9 @@ function Table({ data, columns, pageCount: controlledPageCount, fetchData, empty
         <table {...getTableProps()} className="table table-bordered table-striped">
           <thead>
             {headerGroups.map(headerGroup => {
-              const headerGroupProps = headerGroup.getHeaderGroupProps();
+              const { key: headerGroupKey, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
               return (
-                <tr key={headerGroupProps.key} {...headerGroupProps}>
+                <tr key={headerGroupKey} {...restHeaderGroupProps}>
                   {headerGroup.headers.map(column => {
                     // Get the props without the key
                     const headerProps = column.getHeaderProps(column.getSortByToggleProps());
@@ -79,15 +79,15 @@ function Table({ data, columns, pageCount: controlledPageCount, fetchData, empty
             {page.length > 0 ? (
               page.map(row => {
                 prepareRow(row);
-                const rowProps = row.getRowProps();
+                const { key: rowKey, ...restRowProps } = row.getRowProps();
                 return (
-                  <tr key={rowProps.key} {...rowProps}>
+                  <tr key={rowKey} {...restRowProps}>
                     {row.cells.map(cell => {
-                      const cellProps = cell.getCellProps();
+                      const { key: cellKey, ...restCellProps } = cell.getCellProps();
                       const cellClassName = resolveColumnClassName(cell.column.className);
                       const cellStyle = resolveColumnStyle(cell.column.className);
                       return (
-                        <td key={cellProps.key} {...cellProps} className={cellClassName} style={cellStyle}>
+                        <td key={cellKey} {...restCellProps} className={cellClassName} style={cellStyle}>
                           {cell.render('Cell')}
                         </td>
                       );

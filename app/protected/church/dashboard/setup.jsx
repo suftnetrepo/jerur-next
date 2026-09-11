@@ -904,7 +904,6 @@ const Dashboard = ({ dashboard }) => {
   // appears before the server state is applied.
   const onboardingHydrated = data?.onboarding != null;
   const membersEmpty   = (data?.members  || 0) === 0;
-  const attendanceEmpty = (data?.attendance || 0) === 0;
 
   useEffect(() => {
     if (!onboardingHydrated) return;
@@ -952,7 +951,7 @@ const Dashboard = ({ dashboard }) => {
       persistingStateRef.current = false;
       setPersistingState(false);
     }
-  }, [data?.onboarding, fetchAll, onboarding.completed, onboarding.dismissed, onboarding.setupChecklistDismissed]);
+  }, [data, fetchAll, onboarding.completed, onboarding.dismissed, onboarding.setupChecklistDismissed]);
 
   const handleNavigate = useCallback((href) => { router.push(href); }, [router]);
 
@@ -1072,16 +1071,7 @@ const Dashboard = ({ dashboard }) => {
             <Card.Body className="p-3">
               <h6 className="fw-bold mb-0">Attendance</h6>
               <p className="text-muted mb-3" style={{ fontSize: 12 }}>Last 7 Days</p>
-              {attendanceEmpty ? (
-                <PanelEmptyState
-                  icon={BsCalendarEvent}
-                  title="No attendance recorded yet"
-                  message="Record your first attendance to start seeing attendance trends."
-                  tone="primary"
-                />
-              ) : (
-                <AttendanceChart data={trentData} loading={loading} />
-              )}
+              <AttendanceChart data={trentData} loading={loading} />
             </Card.Body>
           </Card>
         </div>

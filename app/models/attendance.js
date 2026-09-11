@@ -1,6 +1,23 @@
 import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
 
+const GenderCountSchema = new Schema(
+  {
+    male: { type: Number, min: 0, default: 0 },
+    female: { type: Number, min: 0, default: 0 }
+  },
+  { _id: false }
+);
+
+const HouseholdAttendanceSchema = new Schema(
+  {
+    adults: { type: GenderCountSchema, default: () => ({}) },
+    youth: { type: GenderCountSchema, default: () => ({}) },
+    children: { type: GenderCountSchema, default: () => ({}) }
+  },
+  { _id: false }
+);
+
 const AttendanceSchema = new Schema(
   {
     // Legacy fields (preserved for backward compatibility)
@@ -40,7 +57,12 @@ const AttendanceSchema = new Schema(
     
     wantsPastorContact: { type: Boolean, default: false },
     
-    submittedAt: { type: Date, required: false }
+    submittedAt: { type: Date, required: false },
+
+    // One authenticated member can check in their whole household. The
+    // demographic values remain optional for historical/legacy records.
+    household: { type: HouseholdAttendanceSchema, required: false },
+    totalAttendance: { type: Number, min: 0, required: false }
   },
   { timestamps: true },
 );

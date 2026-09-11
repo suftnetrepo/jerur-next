@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { zat } from '../utils/api';
 import { VERBS } from '../config';
 import { ATTENDANCE, REGULAR_SERVICE, CARE_FOLLOW_UP, USER } from '../utils/apiUrl';
@@ -32,25 +32,35 @@ const getStoredFilters = () => {
   }
 };
 
-const buildDateRange = (selectedDate) => {
-  if (!selectedDate) {
+const buildDateRange = (startValue, endValue = startValue) => {
+  if (!startValue && !endValue) {
     return {};
   }
 
-  const [year, month, day] = selectedDate.split('-').map(Number);
+  const parseDate = (value, endOfDay = false) => {
+    if (!value) return null;
+    const [year, month, day] = value.split('-').map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day, endOfDay ? 23 : 0, endOfDay ? 59 : 0, endOfDay ? 59 : 0, endOfDay ? 999 : 0);
+  };
 
-  if (!year || !month || !day) {
-    return {};
-  }
-
-  const startDate = new Date(year, month - 1, day, 0, 0, 0, 0);
-  const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
+  const startDate = parseDate(startValue);
+  const endDate = parseDate(endValue, true);
 
   return {
-    startDate: startDate.toISOString(),
-    endDate: endDate.toISOString()
+    ...(startDate ? { startDate: startDate.toISOString() } : {}),
+    ...(endDate ? { endDate: endDate.toISOString() } : {})
   };
 };
+
+const buildReportParams = (state) => ({
+  ...buildDateRange(state.selectedStartDate, state.selectedEndDate),
+  ...(STATUS_FILTERS.includes(state.selectedQueue) ? { status: state.selectedQueue } : {}),
+  ...(state.selectedAgeGroup !== 'ALL' ? { ageGroup: state.selectedAgeGroup } : {}),
+  ...(state.selectedGender !== 'ALL' ? { gender: state.selectedGender } : {}),
+  ...(state.selectedSubmissionType !== 'ALL' ? { submissionType: state.selectedSubmissionType } : {}),
+  ...(state.selectedChannel !== 'ALL' ? { checkedInVia: state.selectedChannel } : {})
+});
 
 const STATUS_FILTERS = [
   'PRESENT_IN_CHURCH',
@@ -74,8 +84,13 @@ const useAttendance = (searchQuery = '') => {
     error: null,
     totalCount: 0,
     selectedService: storedFilters?.selectedService || null,
-    selectedDate: storedFilters?.selectedDate || getLastSundayDateString(),
+    selectedStartDate: storedFilters?.selectedStartDate || storedFilters?.selectedDate || getLastSundayDateString(),
+    selectedEndDate: storedFilters?.selectedEndDate || storedFilters?.selectedDate || getLastSundayDateString(),
     selectedQueue: storedFilters?.selectedQueue || 'ALL',
+    selectedAgeGroup: storedFilters?.selectedAgeGroup || 'ALL',
+    selectedGender: storedFilters?.selectedGender || 'ALL',
+    selectedSubmissionType: storedFilters?.selectedSubmissionType || 'ALL',
+    selectedChannel: storedFilters?.selectedChannel || 'ALL',
     statistics: null,
     dashboard: null,
     tableQuery: {
@@ -84,6 +99,23 @@ const useAttendance = (searchQuery = '') => {
       sortBy: []
     }
   });
+  const reportParams = useMemo(() => buildReportParams({
+    selectedAgeGroup: state.selectedAgeGroup,
+    selectedChannel: state.selectedChannel,
+    selectedEndDate: state.selectedEndDate,
+    selectedGender: state.selectedGender,
+    selectedQueue: state.selectedQueue,
+    selectedStartDate: state.selectedStartDate,
+    selectedSubmissionType: state.selectedSubmissionType
+  }), [
+    state.selectedAgeGroup,
+    state.selectedChannel,
+    state.selectedEndDate,
+    state.selectedGender,
+    state.selectedQueue,
+    state.selectedStartDate,
+    state.selectedSubmissionType
+  ]);
 
   const handleError = (error) => {
     setState((pre) => {
@@ -142,13 +174,12 @@ const useAttendance = (searchQuery = '') => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      const dateRange = buildDateRange(state.selectedDate || getLastSundayDateString());
       const params = {
         serviceId: state.selectedService,
         page: pageIndex === 0 ? 1 : pageIndex,
         limit: pageSize,
         searchQuery,
-        ...dateRange
+        ...reportParams
       };
 
       if (state.selectedQueue !== 'ALL') {
@@ -187,15 +218,14 @@ const useAttendance = (searchQuery = '') => {
       handleError('An unexpected error occurred while fetching attendance.');
       return false;
     }
-  }, [searchQuery, state.selectedDate, state.selectedService, state.selectedQueue]);
+  }, [reportParams, searchQuery, state.selectedQueue, state.selectedService]);
 
-  const handleFetchStatistics = useCallback(async (serviceId, selectedDate = state.selectedDate) => {
+  const handleFetchStatistics = useCallback(async (serviceId) => {
     try {
-      const dateRange = buildDateRange(selectedDate || getLastSundayDateString());
       const { data, success } = await zat(ATTENDANCE.getStatistics, null, VERBS.GET, {
         action: 'statistics',
         serviceId,
-        ...dateRange
+        ...reportParams
       });
 
       if (success) {
@@ -207,15 +237,14 @@ const useAttendance = (searchQuery = '') => {
     } catch (error) {
       console.warn('Error fetching statistics:', error);
     }
-  }, [state.selectedDate]);
+  }, [reportParams]);
 
-  const handleFetchDashboard = useCallback(async (serviceId, selectedDate = state.selectedDate) => {
+  const handleFetchDashboard = useCallback(async (serviceId) => {
     try {
-      const dateRange = buildDateRange(selectedDate || getLastSundayDateString());
       const { data, success } = await zat(ATTENDANCE.dashboard, null, VERBS.GET, {
         action: 'dashboard',
         ...(serviceId ? { serviceId } : {}),
-        ...dateRange
+        ...reportParams
       });
 
       if (success) {
@@ -229,7 +258,7 @@ const useAttendance = (searchQuery = '') => {
     } catch (error) {
       console.warn('Error fetching attendance dashboard:', error);
     }
-  }, [state.selectedDate]);
+  }, [reportParams]);
 
   const handleCreateFollowUp = async (followUpData) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
@@ -244,8 +273,8 @@ const useAttendance = (searchQuery = '') => {
           sortBy: state.tableQuery.sortBy
         });
         await Promise.all([
-          handleFetchStatistics(state.selectedService, state.selectedDate),
-          handleFetchDashboard(state.selectedService, state.selectedDate)
+          handleFetchStatistics(state.selectedService),
+          handleFetchDashboard(state.selectedService)
         ]);
         setState((prev) => ({ ...prev, loading: false }));
         return true;
@@ -272,15 +301,23 @@ const useAttendance = (searchQuery = '') => {
     }));
   };
 
-  const handleSelectDate = (selectedDate) => {
+  const handleSelectDateRange = (field, value) => {
     setState((prev) => ({
       ...prev,
-      selectedDate: selectedDate || getLastSundayDateString(),
+      [field]: value,
       tableQuery: {
         pageIndex: 1,
         pageSize: prev.tableQuery.pageSize,
         sortBy: prev.tableQuery.sortBy
       }
+    }));
+  };
+
+  const handleSelectReportFilter = (field, value) => {
+    setState((prev) => ({
+      ...prev,
+      [field]: value,
+      tableQuery: { ...prev.tableQuery, pageIndex: 1 }
     }));
   };
 
@@ -297,16 +334,24 @@ const useAttendance = (searchQuery = '') => {
   };
 
   useEffect(() => {
-    handleFetchServices();
-    handleFetchAssignableUsers();
+    const task = window.setTimeout(() => {
+      handleFetchServices();
+      handleFetchAssignableUsers();
+    }, 0);
+
+    return () => window.clearTimeout(task);
   }, [handleFetchAssignableUsers, handleFetchServices]);
 
   useEffect(() => {
-    if (state.selectedService) {
-      handleFetchDashboard(state.selectedService, state.selectedDate);
-      handleFetchStatistics(state.selectedService, state.selectedDate);
-    }
-  }, [state.selectedDate, state.selectedQueue, state.selectedService, handleFetchDashboard, handleFetchStatistics]);
+    if (!state.selectedService) return undefined;
+
+    const task = window.setTimeout(() => {
+      handleFetchDashboard(state.selectedService);
+      handleFetchStatistics(state.selectedService);
+    }, 0);
+
+    return () => window.clearTimeout(task);
+  }, [state.selectedQueue, state.selectedService, handleFetchDashboard, handleFetchStatistics]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -318,10 +363,15 @@ const useAttendance = (searchQuery = '') => {
     window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify({
       ...existingFilters,
       selectedService: state.selectedService,
-      selectedDate: state.selectedDate,
-      selectedQueue: state.selectedQueue
+      selectedStartDate: state.selectedStartDate,
+      selectedEndDate: state.selectedEndDate,
+      selectedQueue: state.selectedQueue,
+      selectedAgeGroup: state.selectedAgeGroup,
+      selectedGender: state.selectedGender,
+      selectedSubmissionType: state.selectedSubmissionType,
+      selectedChannel: state.selectedChannel
     }));
-  }, [state.selectedDate, state.selectedQueue, state.selectedService]);
+  }, [state.selectedAgeGroup, state.selectedChannel, state.selectedEndDate, state.selectedGender, state.selectedQueue, state.selectedService, state.selectedStartDate, state.selectedSubmissionType]);
 
   return {
     ...state,
@@ -329,7 +379,8 @@ const useAttendance = (searchQuery = '') => {
     handleFetchAssignableUsers,
     handleFetchAttendance,
     handleSelectService,
-    handleSelectDate,
+    handleSelectDateRange,
+    handleSelectReportFilter,
     handleSelectQueue,
     handleCreateFollowUp,
     handleFetchStatistics,

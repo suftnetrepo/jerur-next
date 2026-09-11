@@ -71,19 +71,27 @@ const getDashboardBaseData = async (churchId) => {
     ServiceTime.countDocuments(suidFilter),
     Sermon.countDocuments({ churchId: churchObjectId }),
     Donation.countDocuments(suidFilter),
-    Attendance.countDocuments(attendanceFilter),
+    Attendance.aggregate([
+      { $match: attendanceFilter },
+      { $group: { _id: null, total: { $sum: { $ifNull: ['$totalAttendance', { $ifNull: ['$count', 0] }] } } } }
+    ]),
     Member.countDocuments({
       church: churchObjectId,
       role: { $in: ['leader', 'pastor'] }
     }),
     Attendance.aggregate([
       { $match: attendanceFilter },
+      { $set: { attendanceDate: { $ifNull: ['$checkInTime', '$submittedAt'] } } },
       {
         $group: {
-          _id: null,
-          peak: { $max: '$count' }
+          _id: {
+            service: { $ifNull: ['$serviceId', '$service'] },
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$attendanceDate' } }
+          },
+          total: { $sum: { $ifNull: ['$totalAttendance', { $ifNull: ['$count', 0] }] } }
         }
-      }
+      },
+      { $group: { _id: null, peak: { $max: '$total' } } }
     ]),
     Event.countDocuments({
       ...suidFilter,
@@ -92,6 +100,7 @@ const getDashboardBaseData = async (churchId) => {
   ]);
 
   const peakAttendance = peakAttendanceResult.length > 0 ? peakAttendanceResult[0].peak : 0;
+  const attendanceTotal = attendanceCount.length > 0 ? attendanceCount[0].total : 0;
   const counts = {
     events: eventsCount,
     upcomingEvents: upcomingEventsCount,
@@ -100,7 +109,7 @@ const getDashboardBaseData = async (churchId) => {
     services: servicesCount,
     sermons: sermonsCount,
     donations: donationsCount,
-    attendance: attendanceCount,
+    attendance: attendanceTotal,
     leaders: leadersCount,
     peakAttendance
   };

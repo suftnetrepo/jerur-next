@@ -21,6 +21,115 @@ const CARE_SIGNAL = {
 };
 
 const SERVICE_DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const HOUSEHOLD_GROUPS = ['adults', 'youth', 'children'];
+const GENDERS = ['male', 'female'];
+const ATTENDANCE_REMINDER_GRACE_MINUTES = 120;
+
+const normalizeHousehold = (household = {}) => HOUSEHOLD_GROUPS.reduce((groups, group) => {
+  groups[group] = GENDERS.reduce((counts, gender) => {
+    const value = Number(household?.[group]?.[gender] ?? 0);
+    counts[gender] = Number.isInteger(value) && value >= 0 ? value : NaN;
+    return counts;
+  }, {});
+  return groups;
+}, {});
+
+const sumHousehold = (household) => HOUSEHOLD_GROUPS.reduce(
+  (total, group) => total + GENDERS.reduce((subtotal, gender) => subtotal + household[group][gender], 0),
+  0
+);
+
+const isAttendingStatus = (status) => ['PRESENT_IN_CHURCH', 'JOINED_ONLINE'].includes(status);
+const ATTENDANCE_STATUSES = [
+  'PRESENT_IN_CHURCH', 'JOINED_ONLINE', 'ABSENT', 'SICK', 'TRAVELLING',
+  'WORKING', 'FAMILY_COMMITMENT', 'NEEDS_PRAYER', 'OTHER'
+];
+
+const parseServiceTime = (value, date) => {
+  const match = String(value || '').trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours > 23 || minutes > 59) return null;
+
+  const result = new Date(date);
+  result.setHours(hours, minutes, 0, 0);
+  return result;
+};
+
+const getDayBounds = (date) => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
+  return { start, end };
+};
+
+const attendanceOnDateQuery = (identity, serviceId, date) => {
+  const { start, end } = getDayBounds(date);
+  return {
+    ...identity,
+    serviceId,
+    $or: [
+      { submittedAt: { $gte: start, $lt: end } },
+      { submittedAt: { $exists: false }, checkInTime: { $gte: start, $lt: end } }
+    ]
+  };
+};
+
+const applyAttendanceDateRange = (query, startDate, endDate) => {
+  if (!startDate && !endDate) return query;
+
+  const range = {};
+  if (startDate) range.$gte = new Date(startDate);
+  if (endDate) range.$lte = new Date(endDate);
+
+  query.$and = [
+    ...(query.$and || []),
+    { $or: [{ submittedAt: range }, { checkInTime: range }] }
+  ];
+  return query;
+};
+
+const applyAttendanceReportFilters = (query, options = {}) => {
+  const { ageGroup, gender, submissionType, checkedInVia, status } = options;
+  const conditions = [];
+
+  if (checkedInVia) conditions.push({ checkedInVia });
+  if (status && ATTENDANCE_STATUSES.includes(status)) {
+    conditions.push({ status });
+  }
+  if (submissionType === 'HOUSEHOLD') conditions.push({ household: { $exists: true } });
+  if (submissionType === 'INDIVIDUAL') conditions.push({ household: { $exists: false } });
+
+  if (ageGroup && HOUSEHOLD_GROUPS.includes(ageGroup)) {
+    if (gender && GENDERS.includes(gender)) {
+      conditions.push({ [`household.${ageGroup}.${gender}`]: { $gt: 0 } });
+    } else {
+      conditions.push({
+        $expr: {
+          $gt: [
+            { $add: [{ $ifNull: [`$household.${ageGroup}.male`, 0] }, { $ifNull: [`$household.${ageGroup}.female`, 0] }] },
+            0
+          ]
+        }
+      });
+    }
+  } else if (gender && GENDERS.includes(gender)) {
+    conditions.push({
+      $expr: {
+        $gt: [
+          { $add: HOUSEHOLD_GROUPS.map((group) => ({ $ifNull: [`$household.${group}.${gender}`, 0] })) },
+          0
+        ]
+      }
+    });
+  }
+
+  if (conditions.length) query.$and = [...(query.$and || []), ...conditions];
+  return query;
+};
 
 const getFullName = (person) => {
   if (!person) {
@@ -128,11 +237,8 @@ const getOpenCareCaseCountForService = async (serviceId, options = {}) => {
   const { startDate, endDate } = options;
   const attendanceQuery = { serviceId };
 
-  if (startDate || endDate) {
-    attendanceQuery.submittedAt = {};
-    if (startDate) attendanceQuery.submittedAt.$gte = new Date(startDate);
-    if (endDate) attendanceQuery.submittedAt.$lte = new Date(endDate);
-  }
+  applyAttendanceDateRange(attendanceQuery, startDate, endDate);
+  applyAttendanceReportFilters(attendanceQuery, options);
 
   const attendanceIds = await Attendance.find(attendanceQuery).distinct('_id');
 
@@ -159,15 +265,15 @@ const getAttendanceDashboard = async (churchId, options = {}) => {
 
     const activeServiceId = serviceId || services[0]?._id?.toString() || null;
     const stats = activeServiceId
-      ? await getAttendanceStatistics(churchId, { serviceId: activeServiceId, startDate, endDate })
-      : await getAttendanceStatistics(churchId, { startDate, endDate });
+      ? await getAttendanceStatistics(churchId, { ...options, serviceId: activeServiceId })
+      : await getAttendanceStatistics(churchId, options);
 
     const [openCareCases, serviceCards] = await Promise.all([
-      activeServiceId ? getOpenCareCaseCountForService(activeServiceId, { startDate, endDate }) : Promise.resolve(0),
+      activeServiceId ? getOpenCareCaseCountForService(activeServiceId, options) : Promise.resolve(0),
       Promise.all(
         services.map(async (service) => {
-          const serviceStats = await getAttendanceStatistics(churchId, { serviceId: service._id.toString(), startDate, endDate });
-          const serviceOpenCases = await getOpenCareCaseCountForService(service._id, { startDate, endDate });
+          const serviceStats = await getAttendanceStatistics(churchId, { ...options, serviceId: service._id.toString() });
+          const serviceOpenCases = await getOpenCareCaseCountForService(service._id, options);
           const submitted = serviceStats.totalSubmissions || 0;
           const attendanceRate = expectedMembers > 0
             ? Math.round((submitted / expectedMembers) * 100)
@@ -193,6 +299,19 @@ const getAttendanceDashboard = async (churchId, options = {}) => {
       kpis: {
         expectedMembers,
         attendanceSubmitted: stats.totalSubmissions || 0,
+        totalAttendance: stats.totalAttendance || 0,
+        adults: stats.adults || 0,
+        youth: stats.youth || 0,
+        children: stats.children || 0,
+        adultMale: stats.adultMale || 0,
+        adultFemale: stats.adultFemale || 0,
+        youthMale: stats.youthMale || 0,
+        youthFemale: stats.youthFemale || 0,
+        childrenMale: stats.childrenMale || 0,
+        childrenFemale: stats.childrenFemale || 0,
+        male: stats.male || 0,
+        female: stats.female || 0,
+        householdSubmissions: stats.householdSubmissions || 0,
         needAttention: getAttentionCountFromStats(stats),
         openCareCases
       },
@@ -238,6 +357,7 @@ const add = async (body) => {
 
     if (existing) {
       existing.count += count;
+      existing.totalAttendance = existing.count;
       const updated = await existing.save();
       return updated;
     } else {
@@ -245,7 +365,8 @@ const add = async (body) => {
         church,
         service,
         checkInTime,
-        count
+        count,
+        totalAttendance: count
       });
       const result = await newAttendance.save();
       return result;
@@ -364,26 +485,49 @@ const getAttendanceTrends = async (churchId) => {
   try {
     const now = new Date();
     const startDate = new Date(now);
-    const dayOfWeek = now.getDay();
-    startDate.setDate(now.getDate() - dayOfWeek);
+    startDate.setDate(now.getDate() - 6);
     startDate.setHours(0, 0, 0, 0);
 
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
     endDate.setHours(23, 59, 59, 999);
 
-    const results = await Attendance.find({
-      church: churchId,
-      checkInTime: {
-        $gte: startDate,
-        $lte: endDate
+    const results = await Attendance.aggregate([
+      {
+        $match: {
+          church: new mongoose.Types.ObjectId(churchId),
+          $or: [
+            { checkInTime: { $gte: startDate, $lte: endDate } },
+            { submittedAt: { $gte: startDate, $lte: endDate } }
+          ]
+        }
+      },
+      { $set: { attendanceDate: { $ifNull: ['$checkInTime', '$submittedAt'] } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$attendanceDate' } },
+          count: { $sum: { $ifNull: ['$totalAttendance', { $ifNull: ['$count', 0] }] } },
+          male: { $sum: { $add: [{ $ifNull: ['$household.adults.male', 0] }, { $ifNull: ['$household.youth.male', 0] }, { $ifNull: ['$household.children.male', 0] }] } },
+          female: { $sum: { $add: [{ $ifNull: ['$household.adults.female', 0] }, { $ifNull: ['$household.youth.female', 0] }, { $ifNull: ['$household.children.female', 0] }] } },
+          adults: { $sum: { $add: [{ $ifNull: ['$household.adults.male', 0] }, { $ifNull: ['$household.adults.female', 0] }] } },
+          youth: { $sum: { $add: [{ $ifNull: ['$household.youth.male', 0] }, { $ifNull: ['$household.youth.female', 0] }] } },
+          children: { $sum: { $add: [{ $ifNull: ['$household.children.male', 0] }, { $ifNull: ['$household.children.female', 0] }] } }
+        }
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          _id: 0,
+          checkInTime: { $dateFromString: { dateString: '$_id' } },
+          count: 1,
+          male: 1,
+          female: 1,
+          adults: 1,
+          youth: 1,
+          children: 1
+        }
       }
-    })
-      .sort({ checkInTime: 1 })
-      .populate({
-        path: 'service',
-        select: 'title'
-      });
+    ]);
 
     return results;
   } catch (error) {
@@ -489,16 +633,93 @@ const getServiceAttendanceSummary = async (serviceId) => {
  * legitimately need to record or correct attendance outside that exact
  * window.
  */
-const isServiceRunningToday = async (serviceId) => {
-  const service = await ServiceTime.findById(serviceId);
+const isServiceRunningToday = async (serviceId, churchId = null) => {
+  const query = { _id: serviceId };
+  if (churchId) query.suid = churchId;
+  const service = await ServiceTime.findOne(query);
   if (!service) return false;
   const todayIndex = new Date().getDay();
   return Array.isArray(service.days) && service.days.includes(todayIndex);
 };
 
+const getAttendanceReminder = async (churchId, memberId, now = new Date()) => {
+  const todayIndex = now.getDay();
+  const services = await ServiceTime.find({
+    suid: churchId,
+    status: true,
+    service_type: { $ne: 'prayer' },
+    days: todayIndex
+  }).sort({ start_time: 1 }).lean();
+
+  const candidates = services
+    .map((service) => {
+      const startsAt = parseServiceTime(service.start_time, now);
+      const endsAt = parseServiceTime(service.end_time, now);
+      if (!startsAt || !endsAt) return null;
+      if (endsAt <= startsAt) endsAt.setDate(endsAt.getDate() + 1);
+
+      const reminderStartsAt = new Date(startsAt.getTime() - Number(service.home_notice_minutes ?? 15) * 60_000);
+      const reminderEndsAt = new Date(endsAt.getTime() + ATTENDANCE_REMINDER_GRACE_MINUTES * 60_000);
+      if (now < reminderStartsAt || now > reminderEndsAt) return null;
+
+      return { service, startsAt, endsAt, reminderEndsAt };
+    })
+    .filter(Boolean);
+
+  for (const candidate of candidates) {
+    const submitted = memberId
+      ? await Attendance.exists(attendanceOnDateQuery({ memberId }, candidate.service._id, now))
+      : false;
+    if (submitted) continue;
+
+    const isLive = now >= candidate.startsAt && now <= candidate.endsAt;
+    return {
+      showReminder: true,
+      serviceId: candidate.service._id.toString(),
+      title: candidate.service.title,
+      description: candidate.service.description || '',
+      startTime: candidate.service.start_time,
+      endTime: candidate.service.end_time,
+      days: candidate.service.days || [],
+      remote: Boolean(candidate.service.remote),
+      remoteLink: candidate.service.remote ? candidate.service.remote_link || '' : '',
+      state: isLive ? 'LIVE' : now < candidate.startsAt ? 'UPCOMING' : 'ENDING_SOON',
+      eyebrow: isLive ? 'Service happening now' : now < candidate.startsAt ? 'Coming up today' : 'Before you go',
+      message: isLive
+        ? 'Let your church know you are here.'
+        : now < candidate.startsAt
+          ? 'Your service starts soon. Attendance opens now.'
+          : 'Please submit your attendance while it is fresh in your mind.',
+      actionLabel: 'Check in',
+      startsAt: candidate.startsAt.toISOString(),
+      reminderEndsAt: candidate.reminderEndsAt.toISOString()
+    };
+  }
+
+  return { showReminder: false };
+};
+
 const createAttendance = async (body) => {
   try {
     const { memberId, userId, serviceId, status, message, checkedInVia, wantsPastorContact, churchId } = body;
+    const resolvedStatus = status || 'PRESENT_IN_CHURCH';
+    const household = body.household ? normalizeHousehold(body.household) : null;
+
+    if (household && !Number.isFinite(sumHousehold(household))) {
+      const error = new Error('Household attendance counts must be non-negative whole numbers');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const totalAttendance = household
+      ? sumHousehold(household)
+      : (isAttendingStatus(resolvedStatus) ? 1 : 0);
+
+    if (body.household && isAttendingStatus(resolvedStatus) && totalAttendance < 1) {
+      const error = new Error('Add at least one person to the household attendance');
+      error.statusCode = 400;
+      throw error;
+    }
 
     if (!memberId && !userId) {
       throw new Error('Either memberId or userId is required');
@@ -508,15 +729,17 @@ const createAttendance = async (body) => {
       throw new Error('serviceId is required');
     }
 
-    // Check for duplicate submission (member can only submit once per service)
+    // Scope duplicates to today's occurrence so recurring services can be
+    // submitted again next week.
     const duplicateChecks = [];
+    const submittedAt = new Date();
 
     if (memberId) {
-      duplicateChecks.push({ memberId, serviceId });
+      duplicateChecks.push(attendanceOnDateQuery({ memberId }, serviceId, submittedAt));
     }
 
     if (userId) {
-      duplicateChecks.push({ userId, serviceId });
+      duplicateChecks.push(attendanceOnDateQuery({ userId }, serviceId, submittedAt));
     }
 
     const existing = duplicateChecks.length > 0
@@ -524,18 +747,24 @@ const createAttendance = async (body) => {
       : null;
 
     if (existing) {
-      throw new Error('Attendance already submitted for this service');
+      const error = new Error('Attendance already submitted for this service');
+      error.statusCode = 409;
+      throw error;
     }
 
     const newAttendance = new Attendance({
       memberId,
       userId,
       serviceId,
-      status: status || 'PRESENT_IN_CHURCH',
+      status: resolvedStatus,
       message,
       checkedInVia: checkedInVia || 'MANUAL',
       wantsPastorContact: wantsPastorContact || false,
-      submittedAt: new Date(),
+      submittedAt,
+      checkInTime: submittedAt,
+      count: totalAttendance,
+      household: household || undefined,
+      totalAttendance,
       church: churchId
     });
 
@@ -561,7 +790,9 @@ const createAttendance = async (body) => {
     return saved;
   } catch (error) {
     logger.error(error);
-    throw new Error(error.message || 'Error creating attendance');
+    const serviceError = new Error(error.message || 'Error creating attendance');
+    serviceError.statusCode = error.statusCode;
+    throw serviceError;
   }
 };
 
@@ -643,11 +874,8 @@ const getAttendanceByService = async (serviceId, options = {}) => {
     if (status && !['ALL', 'ATTENTION_REQUIRED', 'OPEN_CARE_CASES', 'URGENT', 'NEEDS_CARE'].includes(status)) {
       query.status = status;
     }
-    if (startDate || endDate) {
-      query.submittedAt = {};
-      if (startDate) query.submittedAt.$gte = new Date(startDate);
-      if (endDate) query.submittedAt.$lte = new Date(endDate);
-    }
+    applyAttendanceDateRange(query, startDate, endDate);
+    applyAttendanceReportFilters(query, options);
 
     const records = await Attendance.find(query)
       .populate('memberId', 'first_name last_name email mobile')
@@ -722,11 +950,7 @@ const getAttendanceByMember = async (memberId, options = {}) => {
     const query = { memberId };
     if (status) query.status = status;
 
-    if (startDate || endDate) {
-      query.submittedAt = {};
-      if (startDate) query.submittedAt.$gte = new Date(startDate);
-      if (endDate) query.submittedAt.$lte = new Date(endDate);
-    }
+    applyAttendanceDateRange(query, startDate, endDate);
 
     const total = await Attendance.countDocuments(query);
     const records = await Attendance.find(query)
@@ -782,6 +1006,7 @@ const getAttendanceStatistics = async (churchId, options = {}) => {
       if (startDate) query.submittedAt.$gte = new Date(startDate);
       if (endDate) query.submittedAt.$lte = new Date(endDate);
     }
+    applyAttendanceReportFilters(query, options);
 
     const stats = await Attendance.aggregate([
       { $match: query },
@@ -789,6 +1014,19 @@ const getAttendanceStatistics = async (churchId, options = {}) => {
         $group: {
           _id: null,
           totalSubmissions: { $sum: 1 },
+          totalAttendance: { $sum: { $ifNull: ['$totalAttendance', { $ifNull: ['$count', 0] }] } },
+          householdSubmissions: { $sum: { $cond: [{ $eq: [{ $type: '$household' }, 'object'] }, 1, 0] } },
+          adults: { $sum: { $add: [{ $ifNull: ['$household.adults.male', 0] }, { $ifNull: ['$household.adults.female', 0] }] } },
+          youth: { $sum: { $add: [{ $ifNull: ['$household.youth.male', 0] }, { $ifNull: ['$household.youth.female', 0] }] } },
+          children: { $sum: { $add: [{ $ifNull: ['$household.children.male', 0] }, { $ifNull: ['$household.children.female', 0] }] } },
+          adultMale: { $sum: { $ifNull: ['$household.adults.male', 0] } },
+          adultFemale: { $sum: { $ifNull: ['$household.adults.female', 0] } },
+          youthMale: { $sum: { $ifNull: ['$household.youth.male', 0] } },
+          youthFemale: { $sum: { $ifNull: ['$household.youth.female', 0] } },
+          childrenMale: { $sum: { $ifNull: ['$household.children.male', 0] } },
+          childrenFemale: { $sum: { $ifNull: ['$household.children.female', 0] } },
+          male: { $sum: { $add: [{ $ifNull: ['$household.adults.male', 0] }, { $ifNull: ['$household.youth.male', 0] }, { $ifNull: ['$household.children.male', 0] }] } },
+          female: { $sum: { $add: [{ $ifNull: ['$household.adults.female', 0] }, { $ifNull: ['$household.youth.female', 0] }, { $ifNull: ['$household.children.female', 0] }] } },
           presentInChurch: { $sum: { $cond: [{ $eq: ['$status', 'PRESENT_IN_CHURCH'] }, 1, 0] } },
           joinedOnline: { $sum: { $cond: [{ $eq: ['$status', 'JOINED_ONLINE'] }, 1, 0] } },
           absent: { $sum: { $cond: [{ $eq: ['$status', 'ABSENT'] }, 1, 0] } },
@@ -805,6 +1043,19 @@ const getAttendanceStatistics = async (churchId, options = {}) => {
 
     return stats[0] || {
       totalSubmissions: 0,
+      totalAttendance: 0,
+      householdSubmissions: 0,
+      adults: 0,
+      youth: 0,
+      children: 0,
+      adultMale: 0,
+      adultFemale: 0,
+      youthMale: 0,
+      youthFemale: 0,
+      childrenMale: 0,
+      childrenFemale: 0,
+      male: 0,
+      female: 0,
       presentInChurch: 0,
       joinedOnline: 0,
       absent: 0,
@@ -830,6 +1081,7 @@ export {
   getServiceAttendanceSummary,
   createAttendance,
   isServiceRunningToday,
+  getAttendanceReminder,
   updateAttendance,
   getAttendanceById,
   getAttendanceByService,

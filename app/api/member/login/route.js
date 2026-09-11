@@ -2,10 +2,11 @@ import { decrypt } from '../../../../utils/helpers';
 import { authenticateMember, generateMemberToken, MemberAuthError } from '../../../services/memberService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getMemberCredentials, getMobileClientId } from '../mobileAuthRequest';
 
 export const POST = async (req) => {
   try {
-    const clientId = req.headers.get('x-nj-client-id');
+    const clientId = getMobileClientId(req);
 
     if (!clientId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
@@ -18,12 +19,13 @@ export const POST = async (req) => {
     }
 
     const body = await req.json();
+    const { identifier, pin } = getMemberCredentials(body);
 
-    if (!body.identifier || !body.pin) {
+    if (!identifier || !pin) {
       return NextResponse.json({ success: false, error: 'Phone/email and PIN are required.' }, { status: 400 });
     }
 
-    const member = await authenticateMember({ church, identifier: body.identifier, pin: body.pin });
+    const member = await authenticateMember({ church, identifier, pin });
     const token = generateMemberToken(member);
 
     return NextResponse.json({
