@@ -182,7 +182,8 @@ export const POST = async (req) => {
         wantsPastorContact,
         checkInTime: serviceDate,
         submittedAt: getRandomSubmittedAt(serviceDate),
-        count: 1
+        count: ['PRESENT_IN_CHURCH', 'JOINED_ONLINE'].includes(status) ? 1 : 0,
+        totalAttendance: ['PRESENT_IN_CHURCH', 'JOINED_ONLINE'].includes(status) ? 1 : 0
       };
     });
 

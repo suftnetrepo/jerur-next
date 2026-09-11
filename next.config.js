@@ -5,6 +5,18 @@ const nextConfig = {
   // ✅ Moved out of experimental (Next.js 15)
   serverExternalPackages: ['mongoose', 'mongodb', 'mjml', 'bunyan'],
 
+  // `next dev` uses Turbopack by default (Next 16), which does not read the
+  // `webpack()` hook below. fastest-validator's debug-only humanize() helper
+  // lazily requires `prettier`/`cli-highlight` — neither is a real dependency
+  // of this app and that path is never called — so point Turbopack at a
+  // no-op stub instead of failing to resolve them.
+  turbopack: {
+    resolveAlias: {
+      prettier: './stubs/empty-module.js',
+      'cli-highlight': './stubs/empty-module.js'
+    }
+  },
+
   experimental: {
     // This application still has a small custom webpack hook, which prevents
     // Next from enabling its lower-memory build worker automatically.
@@ -55,6 +67,15 @@ const nextConfig = {
         'dtrace-provider': false,
       };
     }
+
+    // fastest-validator lazily requires these to power its optional
+    // humanize()/debug output, which this app never calls. Neither package
+    // is installed, so leave them unresolved rather than pull them in.
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      prettier: false,
+      'cli-highlight': false,
+    };
 
     config.externals = config.externals || [];
     if (isServer) {

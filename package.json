@@ -8,6 +8,8 @@
   "scripts": {
     "create-admin": "tsx scripts/create-admin.ts",
     "migrate": "tsx scripts/run-migrations.js",
+    "migrate:dev": "NODE_ENV=development tsx scripts/run-migrations.js",
+    "migrate:production": "NODE_ENV=production tsx scripts/run-migrations.js",
     "migrate-church-to-live": "tsx scripts/migrate-church-to-live.ts",
     "dev": "next dev",
     "lint": "eslint .",

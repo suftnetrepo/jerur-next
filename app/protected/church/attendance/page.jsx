@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Table } from '../../../../src/components/elements/table/table';
 import { Button, Badge, Card, Spinner, Form, InputGroup } from 'react-bootstrap';
 import { useAttendance } from '../../../../hooks/useAttendance';
-import ErrorDialogue from '../../../../src/components/elements/errorDialogue';
+import ErrorDialogue, { OkDialogue } from '../../../../src/components/elements/errorDialogue';
 import RenderFollowUpOffcanvas from './renderFollowUpOffcanvas';
 import Tooltip from '@mui/material/Tooltip';
 import { capitalizeFirstLetter } from '../../../../utils/helpers';
@@ -16,7 +16,7 @@ import useDebounce from '../../../../hooks/useDebounce';
 import { zat } from '../../../../utils/api';
 import { ATTENDANCE, CHURCH } from '../../../../utils/apiUrl';
 import { VERBS } from '../../../../config';
-import { exportAttendanceSummaryPdf } from '../../../../utils/attendanceExport';
+import { exportAttendanceCsv, exportAttendanceSummaryPdf } from '../../../../utils/attendanceExport';
 
 const FILTER_STORAGE_KEY = 'attendanceDashboardFilters';
 
@@ -62,6 +62,13 @@ const kpiCards = [
   { key: 'openCareCases', label: 'Open Care Cases', tone: 'danger', icon: BsHeartPulse }
 ];
 
+const demographicCards = [
+  { key: 'totalAttendance', label: 'Total People', maleKey: 'male', femaleKey: 'female' },
+  { key: 'adults', label: 'Adults', maleKey: 'adultMale', femaleKey: 'adultFemale' },
+  { key: 'youth', label: 'Youth', maleKey: 'youthMale', femaleKey: 'youthFemale' },
+  { key: 'children', label: 'Children', maleKey: 'childrenMale', femaleKey: 'childrenFemale' }
+];
+
 const STATUS_FILTERS = [
   'PRESENT_IN_CHURCH',
   'JOINED_ONLINE',
@@ -74,24 +81,18 @@ const STATUS_FILTERS = [
   'OTHER'
 ];
 
-const buildDateRange = (value) => {
-  if (!value) {
-    return {};
-  }
-
+const toDateBoundary = (value, endOfDay = false) => {
+  if (!value) return null;
   const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day, endOfDay ? 23 : 0, endOfDay ? 59 : 0, endOfDay ? 59 : 0, endOfDay ? 999 : 0);
+};
 
-  if (!year || !month || !day) {
-    return {};
-  }
-
-  const startDate = new Date(year, month - 1, day, 0, 0, 0, 0);
-  const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
-
-  return {
-    startDate: startDate.toISOString(),
-    endDate: endDate.toISOString()
-  };
+const formatInputDate = (date) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 const formatWords = (value, fallback = 'None') => {
@@ -119,7 +120,9 @@ const Page = () => {
   const [show, setShow] = useState(false);
   const [selectedAttendance, setSelectedAttendance] = useState(null);
   const [seedLoading, setSeedLoading] = useState(false);
-  const [exportLoading, setExportLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(null);
+  const [exportError, setExportError] = useState(null);
+  const [exportSuccess, setExportSuccess] = useState(null);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const {
     attendanceData,
@@ -129,13 +132,19 @@ const Page = () => {
     error,
     totalCount,
     selectedService,
-    selectedDate,
+    selectedStartDate,
+    selectedEndDate,
     selectedQueue,
+    selectedAgeGroup,
+    selectedGender,
+    selectedSubmissionType,
+    selectedChannel,
     dashboard,
     handleFetchAttendance,
     handleFetchDashboard,
     handleSelectService,
-    handleSelectDate,
+    handleSelectDateRange,
+    handleSelectReportFilter,
     handleSelectQueue,
     handleCreateFollowUp
   } = useAttendance(debouncedSearchQuery);
@@ -209,7 +218,12 @@ const Page = () => {
       page: 1,
       limit: Math.max(totalCount || attendanceData.length || 0, 1),
       searchQuery: debouncedSearchQuery,
-      ...buildDateRange(selectedDate)
+      ...(selectedStartDate ? { startDate: toDateBoundary(selectedStartDate)?.toISOString() } : {}),
+      ...(selectedEndDate ? { endDate: toDateBoundary(selectedEndDate, true)?.toISOString() } : {}),
+      ...(selectedAgeGroup !== 'ALL' ? { ageGroup: selectedAgeGroup } : {}),
+      ...(selectedGender !== 'ALL' ? { gender: selectedGender } : {}),
+      ...(selectedSubmissionType !== 'ALL' ? { submissionType: selectedSubmissionType } : {}),
+      ...(selectedChannel !== 'ALL' ? { checkedInVia: selectedChannel } : {})
     };
 
     if (selectedQueue !== 'ALL') {
@@ -229,12 +243,14 @@ const Page = () => {
     return Array.isArray(data) ? data : [];
   };
 
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     if (!selectedService || exportLoading || !hasAttendanceRows) {
       return;
     }
 
-    setExportLoading(true);
+    setExportError(null);
+    setExportSuccess(null);
+    setExportLoading(format);
 
     try {
       const [churchName, rows] = await Promise.all([
@@ -245,24 +261,46 @@ const Page = () => {
       const exportPayload = {
         churchName,
         serviceName: service?.title || 'Service',
-        serviceDate: selectedDate,
+        startDate: selectedStartDate,
+        endDate: selectedEndDate,
         generatedAt: new Date().toISOString(),
         generatedBy: getGeneratedBy(),
         dashboard,
-        rows
+        rows,
+        filters: {
+          status: selectedQueue,
+          ageGroup: selectedAgeGroup,
+          gender: selectedGender,
+          submissionType: selectedSubmissionType,
+          channel: selectedChannel,
+          search: debouncedSearchQuery
+        }
       };
 
       if (!rows.length) {
         throw new Error('No attendance records matched the selected filters.');
       }
 
-      await exportAttendanceSummaryPdf(exportPayload);
+      if (format === 'csv') {
+        exportAttendanceCsv(exportPayload);
+      } else {
+        await exportAttendanceSummaryPdf(exportPayload);
+      }
+      setExportSuccess(`Attendance ${format.toUpperCase()} exported successfully.`);
     } catch (exportError) {
       console.warn(exportError);
-      window.alert(exportError.message || 'Unable to export attendance report.');
+      setExportError(exportError.message || 'Unable to export attendance report.');
     } finally {
-      setExportLoading(false);
+      setExportLoading(null);
     }
+  };
+
+  const applyDatePreset = (days) => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - (days - 1));
+    handleSelectDateRange('selectedStartDate', formatInputDate(start));
+    handleSelectDateRange('selectedEndDate', formatInputDate(end));
   };
 
   const handleSeedAttendance = async () => {
@@ -325,6 +363,28 @@ const Page = () => {
             </Badge>
           </div>
         )
+      },
+      {
+        Header: 'Household',
+        accessor: 'totalAttendance',
+        Cell: ({ row, value }) => {
+          const household = row.original?.household;
+          const male = household
+            ? (household.adults?.male || 0) + (household.youth?.male || 0) + (household.children?.male || 0)
+            : null;
+          const female = household
+            ? (household.adults?.female || 0) + (household.youth?.female || 0) + (household.children?.female || 0)
+            : null;
+
+          return (
+            <div>
+              <span className="fw-semibold">{value ?? row.original?.count ?? 0} people</span>
+              <small className="d-block text-muted">
+                {household ? `Male ${male} · Female ${female}` : 'Demographics not captured'}
+              </small>
+            </div>
+          );
+        }
       },
       {
         Header: 'Member Response',
@@ -415,10 +475,15 @@ const Page = () => {
               )}
               <Tooltip title={hasAttendanceRows ? '' : 'No attendance records to export.'} disableHoverListener={hasAttendanceRows} arrow>
                 <span>
-                  <Button variant="outline-secondary" size="sm" onClick={handleExport} disabled={!hasAttendanceRows || exportLoading} className="text-nowrap">
+                  <Button variant="outline-secondary" size="sm" onClick={() => handleExport('pdf')} disabled={!hasAttendanceRows || Boolean(exportLoading)} className="text-nowrap">
                     <BsDownload className="me-2" />
-                    {exportLoading ? 'Generating Attendance Summary...' : 'Attendance Summary'}
-                    {exportLoading && <Spinner size="sm" className="ms-2" />}
+                    {exportLoading === 'pdf' ? 'Generating PDF...' : 'Export PDF'}
+                    {exportLoading === 'pdf' && <Spinner size="sm" className="ms-2" />}
+                  </Button>
+                  <Button variant="outline-primary" size="sm" onClick={() => handleExport('csv')} disabled={!hasAttendanceRows || Boolean(exportLoading)} className="text-nowrap ms-2">
+                    <BsDownload className="me-2" />
+                    {exportLoading === 'csv' ? 'Generating CSV...' : 'Export CSV'}
+                    {exportLoading === 'csv' && <Spinner size="sm" className="ms-2" />}
                   </Button>
                 </span>
               </Tooltip>
@@ -463,11 +528,29 @@ const Page = () => {
             </div>
           )}
 
+          {dashboard?.kpis && (
+            <div className="row g-3 mb-4">
+              {demographicCards.map((card) => (
+                <div className="col-sm-6 col-lg-3" key={card.key}>
+                  <Card className="border h-100">
+                    <Card.Body className="py-3 px-4">
+                      <small className="text-muted d-block">{card.label}</small>
+                      <span className="fs-4 fw-semibold">{dashboard.kpis?.[card.key] || 0}</span>
+                      <small className="d-block text-muted mt-1">
+                        Male {dashboard.kpis?.[card.maleKey] || 0} · Female {dashboard.kpis?.[card.femaleKey] || 0}
+                      </small>
+                    </Card.Body>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          )}
+
           {services.length > 0 && (
             <div className="mb-4">
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <h6 className="mb-0">Filters</h6>
-                <small className="text-muted">Refine attendance by service, date, search, and status.</small>
+                <small className="text-muted">The table, totals and exports use these filters.</small>
               </div>
               <div className="d-flex gap-3 flex-wrap align-items-end">
                 <Form.Group>
@@ -481,8 +564,12 @@ const Page = () => {
                   </Form.Select>
                 </Form.Group>
                 <Form.Group>
-                  <Form.Label className="small fw-semibold mb-1">Date</Form.Label>
-                  <Form.Control type="date" value={selectedDate || ''} onChange={(event) => handleSelectDate(event.target.value)} />
+                  <Form.Label className="small fw-semibold mb-1">From</Form.Label>
+                  <Form.Control type="date" value={selectedStartDate || ''} max={selectedEndDate || undefined} onChange={(event) => handleSelectDateRange('selectedStartDate', event.target.value)} />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label className="small fw-semibold mb-1">To</Form.Label>
+                  <Form.Control type="date" value={selectedEndDate || ''} min={selectedStartDate || undefined} onChange={(event) => handleSelectDateRange('selectedEndDate', event.target.value)} />
                 </Form.Group>
                 <Form.Group style={{ minWidth: 280 }}>
                   <Form.Label className="small fw-semibold mb-1">Search</Form.Label>
@@ -497,6 +584,47 @@ const Page = () => {
                       onChange={(event) => setSearchQuery(event.target.value)}
                     />
                   </InputGroup>
+                </Form.Group>
+              </div>
+              <div className="d-flex gap-2 flex-wrap mt-3">
+                <Button size="sm" variant="outline-secondary" onClick={() => applyDatePreset(1)}>Today</Button>
+                <Button size="sm" variant="outline-secondary" onClick={() => applyDatePreset(7)}>Last 7 days</Button>
+                <Button size="sm" variant="outline-secondary" onClick={() => applyDatePreset(30)}>Last 30 days</Button>
+              </div>
+              <div className="d-flex gap-3 flex-wrap align-items-end mt-3">
+                <Form.Group>
+                  <Form.Label className="small fw-semibold mb-1">Age group</Form.Label>
+                  <Form.Select value={selectedAgeGroup} onChange={(event) => handleSelectReportFilter('selectedAgeGroup', event.target.value)}>
+                    <option value="ALL">All age groups</option>
+                    <option value="adults">Adults</option>
+                    <option value="youth">Youth</option>
+                    <option value="children">Children</option>
+                  </Form.Select>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label className="small fw-semibold mb-1">Gender</Form.Label>
+                  <Form.Select value={selectedGender} onChange={(event) => handleSelectReportFilter('selectedGender', event.target.value)}>
+                    <option value="ALL">All genders</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </Form.Select>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label className="small fw-semibold mb-1">Submission</Form.Label>
+                  <Form.Select value={selectedSubmissionType} onChange={(event) => handleSelectReportFilter('selectedSubmissionType', event.target.value)}>
+                    <option value="ALL">All submissions</option>
+                    <option value="HOUSEHOLD">Household</option>
+                    <option value="INDIVIDUAL">Individual</option>
+                  </Form.Select>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label className="small fw-semibold mb-1">Channel</Form.Label>
+                  <Form.Select value={selectedChannel} onChange={(event) => handleSelectReportFilter('selectedChannel', event.target.value)}>
+                    <option value="ALL">All channels</option>
+                    <option value="MANUAL">In church / manual</option>
+                    <option value="ONLINE">Online</option>
+                    <option value="QR_CODE">QR code</option>
+                  </Form.Select>
                 </Form.Group>
               </div>
             </div>
@@ -550,6 +678,8 @@ const Page = () => {
       </div>
       {!loading && <span className="overlay__block" />}
       {error && <ErrorDialogue showError={error} onClose={() => {}} />}
+      {exportError && <ErrorDialogue showError message={exportError} onClose={() => setExportError(null)} />}
+      {exportSuccess && <OkDialogue showSuccess message={exportSuccess} onClose={() => setExportSuccess(null)} />}
       <RenderFollowUpOffcanvas
         handleClose={handleClose}
         show={show}

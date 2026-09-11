@@ -569,9 +569,12 @@ export async function registerMember({ church, first_name, last_name, mobile, em
  * a proxy), which is a separate piece of infra this doesn't attempt to add.
  */
 export async function authenticateMember({ church, identifier, pin }) {
+  const normalizedIdentifier = String(identifier ?? '').trim();
+  const normalizedEmail = normalizedIdentifier.toLowerCase();
+
   const member = await Member.findOne({
     church,
-    $or: [{ mobile: identifier }, { email: identifier.toLowerCase() }]
+    $or: [{ mobile: normalizedIdentifier }, { email: normalizedEmail }]
   }).select('+pinHash');
 
   if (!member) {
@@ -622,7 +625,10 @@ export async function authenticateMember({ church, identifier, pin }) {
  * penalize.
  */
 export async function forgotPin({ church, identifier, pin }) {
-  if (!identifier) {
+  const normalizedIdentifier = String(identifier ?? '').trim();
+  const normalizedEmail = normalizedIdentifier.toLowerCase();
+
+  if (!normalizedIdentifier) {
     throw new MemberAuthError('INVALID_CREDENTIALS', 'Enter your phone or email.');
   }
   if (!/^\d{4,6}$/.test(String(pin ?? ''))) {
@@ -631,7 +637,7 @@ export async function forgotPin({ church, identifier, pin }) {
 
   const member = await Member.findOne({
     church,
-    $or: [{ mobile: identifier }, { email: identifier.toLowerCase() }]
+    $or: [{ mobile: normalizedIdentifier }, { email: normalizedEmail }]
   });
 
   if (!member) {

@@ -40,6 +40,8 @@ const transformData = (records) => {
         month: "short",
       }),
       total: 0,
+      male: 0,
+      female: 0,
     });
   }
 
@@ -53,32 +55,56 @@ const transformData = (records) => {
     const existingDay = last7Days.find(d => d.key === recordDate);
 
     if (existingDay) {
-      existingDay.total += item.count;
+      existingDay.total += Number(item.count || 0);
+      existingDay.male += Number(item.male || 0);
+      existingDay.female += Number(item.female || 0);
     }
   });
 
   return {
     labels: last7Days.map(d => d.label),
-    values: last7Days.map(d => d.total),
+    totals: last7Days.map(d => d.total),
+    male: last7Days.map(d => d.male),
+    female: last7Days.map(d => d.female),
   };
 };
 
 export default function AttendanceChart({ data = [], loading = false }) {
   const [chartType, setChartType] = useState("bar");
 
-  const { labels, values } = transformData(data || []);
+  const { labels, totals, male, female } = transformData(data || []);
 
   const chartData = {
     labels,
     datasets: [
       {
-        label: "Attendance",
-        data: values,
-        backgroundColor: "rgba(13,110,253,0.6)",
-        borderColor: "#0d6efd",
+        label: "Male",
+        data: male,
+        backgroundColor: "rgba(13, 148, 136, 0.75)",
+        borderColor: "#0d9488",
         borderWidth: 2,
         borderRadius: 6,
         tension: 0.4,
+      },
+      {
+        label: "Female",
+        data: female,
+        backgroundColor: "rgba(14, 165, 233, 0.65)",
+        borderColor: "#0ea5e9",
+        borderWidth: 2,
+        borderRadius: 6,
+        tension: 0.4,
+      },
+      {
+        type: "line",
+        label: "Total attendance",
+        data: totals,
+        yAxisID: "total",
+        borderColor: "#172554",
+        backgroundColor: "#172554",
+        borderWidth: 2,
+        pointRadius: 3,
+        tension: 0.35,
       },
     ],
   };
@@ -86,10 +112,11 @@ export default function AttendanceChart({ data = [], loading = false }) {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
+    plugins: { legend: { display: true, position: "bottom" } },
     scales: {
-      y: { beginAtZero: true, grid: { color: "#e9ecef" } },
-      x: { grid: { display: false } },
+      y: { beginAtZero: true, stacked: true, grid: { color: "#e9ecef" } },
+      total: { beginAtZero: true, position: "right", display: false },
+      x: { stacked: true, grid: { display: false } },
     },
   };
 

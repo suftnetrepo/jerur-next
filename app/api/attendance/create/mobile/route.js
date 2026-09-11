@@ -2,6 +2,7 @@ import { add, createAttendance, isServiceRunningToday } from '../../../../servic
 import { logger } from '../../../../../utils/logger';
 import { decrypt } from '../../../../../utils/helpers';
 import { NextResponse } from 'next/server';
+import { verifyMemberToken } from '../../../../services/memberService';
 
 export const POST = async (req) => {
   try {
@@ -17,6 +18,20 @@ export const POST = async (req) => {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
+    const authHeader = req.headers.get('authorization');
+    let memberIdentity = null;
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        memberIdentity = verifyMemberToken(authHeader.slice(7));
+      } catch (tokenError) {
+        return NextResponse.json({ success: false, error: 'Member session has expired' }, { status: 401 });
+      }
+
+      if (String(memberIdentity.church) !== String(identifier)) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
     const body = await req.json();
 
     // Support both new and legacy methods
@@ -28,7 +43,7 @@ export const POST = async (req) => {
       // bypassed by calling this endpoint directly. Scoped to this mobile
       // self-service route only; the staff/admin attendance route can
       // still record outside that window.
-      if (body.serviceId && !(await isServiceRunningToday(body.serviceId))) {
+      if (body.serviceId && !(await isServiceRunningToday(body.serviceId, identifier))) {
         return NextResponse.json(
           { success: false, error: 'Attendance can only be submitted on the service day.' },
           { status: 400 }
@@ -38,6 +53,10 @@ export const POST = async (req) => {
       // New attendance submission with enhanced fields
       data = await createAttendance({
         ...body,
+        // Current clients are bound to the member JWT. Keeping the submitted
+        // ID fallback allows an already-installed legacy mobile build to keep
+        // working while the new app release rolls out.
+        memberId: memberIdentity?.memberId || body.memberId,
         churchId: identifier
       });
     } else {
@@ -48,6 +67,9 @@ export const POST = async (req) => {
     return NextResponse.json({ data, success: true });
   } catch (error) {
     logger.error(error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: error.statusCode || 500 }
+    );
   }
 };

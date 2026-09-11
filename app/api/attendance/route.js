@@ -23,6 +23,13 @@ export const GET = async (req) => {
     }
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
+    const reportFilters = {
+      status: url.searchParams.get('status'),
+      ageGroup: url.searchParams.get('ageGroup'),
+      gender: url.searchParams.get('gender'),
+      submissionType: url.searchParams.get('submissionType'),
+      checkedInVia: url.searchParams.get('checkedInVia')
+    };
 
     if (action === 'trend') {
       // await seedNext14DaysAttendance(user.church);
@@ -65,7 +72,8 @@ export const GET = async (req) => {
         queue,
         searchQuery,
         startDate,
-        endDate
+        endDate,
+        ...reportFilters
       });
       return NextResponse.json({
         data: result.data,
@@ -79,7 +87,12 @@ export const GET = async (req) => {
       const serviceId = url.searchParams.get('serviceId');
       const startDate = url.searchParams.get('startDate');
       const endDate = url.searchParams.get('endDate');
-      const data = await getAttendanceDashboard(user.church, { serviceId, startDate, endDate });
+      const data = await getAttendanceDashboard(user.church, {
+        serviceId,
+        startDate,
+        endDate,
+        ...reportFilters
+      });
       return NextResponse.json({ data, success: true });
     }
 
@@ -126,7 +139,8 @@ export const GET = async (req) => {
       const data = await getAttendanceStatistics(user.church, {
         serviceId,
         startDate,
-        endDate
+        endDate,
+        ...reportFilters
       });
       return NextResponse.json({ data, success: true });
     }

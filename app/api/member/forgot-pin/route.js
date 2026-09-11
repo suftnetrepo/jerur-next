@@ -2,6 +2,7 @@ import { decrypt } from '../../../../utils/helpers';
 import { forgotPin, MemberAuthError } from '../../../services/memberService';
 import { logger } from '../../../../utils/logger';
 import { NextResponse } from 'next/server';
+import { getMemberCredentials, getMobileClientId } from '../mobileAuthRequest';
 
 // Mobile self-service "forgot PIN" — same auth shape as member/login (a
 // valid nj-api-key is all that's required, no staff session), but instead
@@ -10,7 +11,7 @@ import { NextResponse } from 'next/server';
 // admin recovery path (member/reset-pin, staff-session gated).
 export const POST = async (req) => {
   try {
-    const clientId = req.headers.get('x-nj-client-id');
+    const clientId = getMobileClientId(req);
 
     if (!clientId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
@@ -23,12 +24,13 @@ export const POST = async (req) => {
     }
 
     const body = await req.json();
+    const { identifier, pin } = getMemberCredentials(body);
 
-    if (!body.identifier || !body.pin) {
+    if (!identifier || !pin) {
       return NextResponse.json({ success: false, error: 'Phone/email and new PIN are required.' }, { status: 400 });
     }
 
-    await forgotPin({ church, identifier: body.identifier, pin: body.pin });
+    await forgotPin({ church, identifier, pin });
 
     return NextResponse.json({ success: true });
   } catch (error) {
