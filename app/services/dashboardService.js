@@ -30,8 +30,13 @@ const buildOnboardingPayload = ({ church, counts }) => {
     members: counts.members > 0,
     events: counts.events > 0
   };
-  const completedCount = Object.values(tasks).filter(Boolean).length;
-  const completed = completedCount === ONBOARDING_TOTAL_TASKS;
+  const currentCompletedCount = Object.values(tasks).filter(Boolean).length;
+  const completed = Boolean(church?.onboarding?.onboardingCompleted) ||
+    currentCompletedCount === ONBOARDING_TOTAL_TASKS;
+  // Onboarding represents a completed milestone, not the current amount of
+  // content in the church. Once completed, later deletion of an event,
+  // member, or service must not turn the dashboard back into setup mode.
+  const completedCount = completed ? ONBOARDING_TOTAL_TASKS : currentCompletedCount;
 
   return {
     dismissed: Boolean(church?.onboarding?.welcomeModalDismissed),
@@ -128,7 +133,10 @@ const syncOnboardingStateIfNeeded = async (churchId, church, onboarding) => {
 
   const currentCompleted = Boolean(church.onboarding?.onboardingCompleted);
 
-  if (currentCompleted === onboarding.completed) {
+  // Completion is intentionally monotonic. Persist the first transition to
+  // true, but never reset it from live collection counts after content is
+  // deleted.
+  if (currentCompleted || !onboarding.completed) {
     return;
   }
 
@@ -136,7 +144,7 @@ const syncOnboardingStateIfNeeded = async (churchId, church, onboarding) => {
     { _id: normalizeObjectId(churchId) },
     {
       $set: {
-        'onboarding.onboardingCompleted': onboarding.completed
+        'onboarding.onboardingCompleted': true
       }
     }
   );
