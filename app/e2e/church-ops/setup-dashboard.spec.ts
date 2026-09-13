@@ -368,6 +368,22 @@ test.describe.serial('Church setup dashboard e2e validation', () => {
     await expect(page.locator('body')).toContainText('Recent Members');
     await expect(page.locator('body')).not.toContainText('Setup Progress');
 
+    // Completion is a permanent milestone. Removing the records that
+    // originally satisfied setup must not send an established church back
+    // to the onboarding dashboard.
+    await Promise.all([
+      Event.deleteOne({ _id: completionSeed.eventId, suid: setupFixture.churchId }),
+      ServiceTime.deleteOne({ _id: completionSeed.serviceId, suid: setupFixture.churchId }),
+      Member.deleteMany({
+        _id: { $in: [completionSeed.leaderId, completionSeed.memberId] },
+        church: setupFixture.churchId
+      })
+    ]);
+    await page.reload();
+    await expect(page.locator('body')).toContainText('Recent Members');
+    await expect(page.locator('body')).not.toContainText('Get your church workspace ready');
+    expect((await getOnboardingState(setupFixture.churchId))?.onboardingCompleted).toBe(true);
+
     const regressionCases = [
       { url: `${baseUrl}/protected/church/members`, text: 'Members' },
       { url: `${baseUrl}/protected/church/attendance`, text: 'Attendance' },
