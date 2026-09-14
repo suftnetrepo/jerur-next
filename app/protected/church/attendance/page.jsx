@@ -198,14 +198,17 @@ const Page = () => {
     return fullName || session?.user?.email || 'System';
   };
 
-  const fetchChurchName = async () => {
+  const fetchChurchBranding = async () => {
     const { data, success } = await zat(CHURCH.fetchOne, null, VERBS.GET);
 
     if (!success) {
-      return 'Church';
+      return { churchName: 'Church', churchLogoUrl: '' };
     }
 
-    return data?.name || 'Church';
+    return {
+      churchName: data?.name || 'Church',
+      churchLogoUrl: data?.logo_url || ''
+    };
   };
 
   const fetchExportRows = async () => {
@@ -253,13 +256,13 @@ const Page = () => {
     setExportLoading(format);
 
     try {
-      const [churchName, rows] = await Promise.all([
-        fetchChurchName(),
+      const [churchBranding, rows] = await Promise.all([
+        fetchChurchBranding(),
         fetchExportRows()
       ]);
       const service = getSelectedServiceMeta();
       const exportPayload = {
-        churchName,
+        ...churchBranding,
         serviceName: service?.title || 'Service',
         startDate: selectedStartDate,
         endDate: selectedEndDate,

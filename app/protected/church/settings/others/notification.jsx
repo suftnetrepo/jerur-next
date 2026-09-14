@@ -34,6 +34,17 @@ const SELECTED_BG = '#F0FDFA';
 const UNSELECTED_COLOR = '#9CA3AF';
 const UNSELECTED_BORDER = '#E5E7EB';
 
+// A datetime-local control deliberately has no timezone. Convert it in the
+// browser before sending so the administrator's local offset (including
+// daylight-saving time) is preserved. Otherwise the production server,
+// which runs in UTC, interprets the wall-clock value as UTC and shifts it
+// when the saved date is displayed again.
+const serializeLocalDateTime = (value) => {
+  if (!value) return '';
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString();
+};
+
 const NotificationTypeCard = ({ type, selected, onSelect }) => {
   const Icon = TYPE_ICONS[type.icon];
 
@@ -116,8 +127,8 @@ const NotificationSettings = ({ data }) => {
     formData.append('conference_link', fields.conference_link || '');
     formData.append('priority', fields.priority);
     formData.append('status', String(statusOverride ?? fields.status));
-    formData.append('start_date', fields.start_date || '');
-    formData.append('expiry_date', fields.expiry_date || '');
+    formData.append('start_date', serializeLocalDateTime(fields.start_date));
+    formData.append('expiry_date', serializeLocalDateTime(fields.expiry_date));
     if (file) {
       formData.append('file', file);
     } else if (imageRemoved) {
