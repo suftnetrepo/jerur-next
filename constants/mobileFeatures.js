@@ -191,6 +191,15 @@ export const MOBILE_FEATURES = [
     enabledByDefault: false
   },
   {
+    id: 'daily-devotional',
+    label: 'Daily Devotional',
+    description: 'Give members a daily devotional with Scripture, reflection and prayer to grow closer to God.',
+    category: 'Media',
+    icon: 'wb_sunny',
+    color: '#0F766E',
+    enabledByDefault: false
+  },
+  {
     id: 'sermons',
     label: 'Sermons',
     description: 'Let members watch or listen to past and recent sermons.',
