@@ -23,7 +23,8 @@ import {
   MdMenuBook,
   MdOndemandVideo,
   MdSelfImprovement,
-  MdAutoStories
+  MdAutoStories,
+  MdSpa
 } from 'react-icons/md';
 import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
@@ -52,7 +53,8 @@ const FEATURE_ICONS = {
   menu_book: MdMenuBook,
   ondemand_video: MdOndemandVideo,
   self_improvement: MdSelfImprovement,
-  auto_stories: MdAutoStories
+  auto_stories: MdAutoStories,
+  spa: MdSpa
 };
 
 const FeatureCard = ({ feature, checked, onToggle }) => {
