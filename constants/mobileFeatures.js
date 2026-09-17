@@ -182,6 +182,15 @@ export const MOBILE_FEATURES = [
     enabledByDefault: false
   },
   {
+    id: 'bible-inspiration',
+    label: 'Inspiration',
+    description: 'Help members find Bible verses for every season, emotion and area of life.',
+    category: 'Media',
+    icon: 'spa',
+    color: '#0B7C78',
+    enabledByDefault: false
+  },
+  {
     id: 'sermons',
     label: 'Sermons',
     description: 'Let members watch or listen to past and recent sermons.',
