@@ -24,12 +24,13 @@ import {
   MdOndemandVideo,
   MdSelfImprovement,
   MdAutoStories,
-  MdSpa
+  MdSpa,
+  MdExplore
 } from 'react-icons/md';
 import { OkDialogue } from '../../../../../src/components/elements/ConfirmDialogue';
 import ErrorDialogue from '../../../../../src/components/elements/errorDialogue';
 import { useFeatures } from '../../../../../hooks/useSettings';
-import { MOBILE_FEATURES, groupFeaturesByCategory } from '../../../../../constants/mobileFeatures';
+import { MOBILE_FEATURES, groupFeaturesByCategory, toggleFeatureId } from '../../../../../constants/mobileFeatures';
 
 // Maps the string icon identifiers stored in constants/mobileFeatures.js to
 // their react-icons/md component.
@@ -54,7 +55,8 @@ const FEATURE_ICONS = {
   ondemand_video: MdOndemandVideo,
   self_improvement: MdSelfImprovement,
   auto_stories: MdAutoStories,
-  spa: MdSpa
+  spa: MdSpa,
+  explore: MdExplore
 };
 
 const FeatureCard = ({ feature, checked, onToggle }) => {
@@ -122,9 +124,7 @@ const Features = ({ data }) => {
   }, [data]);
 
   const handleToggle = (featureId, isEnabled) => {
-    const nextFeatures = isEnabled
-      ? [...new Set([...enabledFeatures, featureId])]
-      : enabledFeatures.filter((id) => id !== featureId);
+    const nextFeatures = toggleFeatureId(enabledFeatures, featureId, isEnabled);
 
     handleChange('features', nextFeatures);
   };

@@ -25,7 +25,13 @@ export const GET = async (req) => {
     }
 
     const data = await getChurch(identifier);
-    return NextResponse.json({ data, success: true });
+    return NextResponse.json({
+      data,
+      // Explicit alias for mobile feature consumers. `data.features`
+      // remains unchanged for backwards compatibility with released apps.
+      enabledFeatureIds: data?.features || [],
+      success: true
+    });
   } catch (error) {
     logger.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
