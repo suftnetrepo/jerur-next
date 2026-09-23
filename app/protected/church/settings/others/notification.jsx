@@ -153,9 +153,12 @@ const NotificationSettings = ({ data }) => {
 
     const formData = buildFormData(statusOverride);
     handleUpdate(formData).then((result) => {
-      if (result) {
-       
-      }
+      if (!result) return;
+      if (result && typeof result === 'object') handleSelect(result);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setFile(null);
+      setPreviewUrl(null);
+      setImageRemoved(false);
     });
   };
 

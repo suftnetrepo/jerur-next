@@ -337,8 +337,18 @@ const About = ({
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 ) : (
-                  <div className="d-flex align-items-center justify-content-center h-100">
-                    <MdImage size={40} color="#c9ccd1" />
+                  <div
+                    className="d-flex flex-column align-items-center justify-content-center h-100 text-center"
+                    style={{ background: 'linear-gradient(135deg, #f7f9fa 0%, #eef3f2 100%)', padding: 24 }}
+                  >
+                    <div
+                      className="d-flex align-items-center justify-content-center mb-2"
+                      style={{ width: 58, height: 58, borderRadius: 18, backgroundColor: '#fff', border: '1px solid #e3e8e7' }}
+                    >
+                      <MdImage size={28} color="#8b9895" />
+                    </div>
+                    <div style={{ color: '#596662', fontWeight: 600, fontSize: 13 }}>No church banner uploaded</div>
+                    <div style={{ color: '#8b9693', fontSize: 11.5, marginTop: 3 }}>Select this area to add a landscape image</div>
                   </div>
                 )}
               </div>

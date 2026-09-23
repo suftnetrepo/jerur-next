@@ -77,6 +77,14 @@ const buildNotificationResponse = (notification) => {
   };
 };
 
+const isLegacyNestedImageUsedAsBanner = (church) => {
+  const bannerUrl = typeof church?.secure_url === 'string' ? church.secure_url.trim() : '';
+  if (!bannerUrl) return false;
+  const notificationUrl = typeof church?.notification?.secure_url === 'string' ? church.notification.secure_url.trim() : '';
+  const pastorUrl = typeof church?.pastor_section?.secure_url === 'string' ? church.pastor_section.secure_url.trim() : '';
+  return bannerUrl === notificationUrl || bannerUrl === pastorUrl;
+};
+
 async function getNotification(suid) {
   try {
     const identifierValidateResult = identifierValidator(suid);
@@ -378,8 +386,11 @@ async function getChurch(id) {
     // never returned it. Backs the mobile app's "Give online" card
     // (app/(app)/give.tsx).
     const data = await Church.findById(id).select('name pastor_section prophetic_focus mobile email description denomination short_message verse address features theme_id sliders contacts currency bank_name account_number sort_code tax_rate notification secure_url public_id conference_link support_email logo_url logo_id giving_url').lean();
+    const bannerIsLegacyNestedImage = isLegacyNestedImageUsedAsBanner(data);
     return {
       ...data,
+      secure_url: bannerIsLegacyNestedImage ? '' : data?.secure_url || '',
+      public_id: bannerIsLegacyNestedImage ? '' : data?.public_id || '',
       notification: buildNotificationResponse(data?.notification)
     };
   } catch (error) {
@@ -440,6 +451,19 @@ async function updateBulk(suid, body) {
     // saving an unrelated Settings section.
     delete fields.pastor_section;
     delete fields.sliders;
+    // Notification has its own endpoint and embedded image lifecycle. A
+    // stale Settings snapshot must never replace it during an unrelated
+    // bulk save (About, banking, social links, etc.).
+    delete fields.notification;
+
+    // Root identity images are write-protected here: only the explicit
+    // file/remove controls below may change them. This prevents a stale or
+    // malicious JSON bulk payload from copying a notification/pastor URL
+    // into the church banner or logo fields.
+    delete fields.secure_url;
+    delete fields.public_id;
+    delete fields.logo_url;
+    delete fields.logo_id;
 
     const needsExisting = file || removeBanner || logoFile || removeLogo;
     const existingChurch = needsExisting ? await Church.findById(suid).select('public_id logo_id') : null;
@@ -567,11 +591,13 @@ async function getChurchesByCountryCode(countryCode) {
     throw new Error('Error fetching churches');
   }
 }
+const CHURCH_SEARCH_FIELDS = 'name email mobile description short_message secure_url public_id logo_url logo_id denomination theme_id facebook_url instagram_url youtube_url address notification.secure_url pastor_section.secure_url';
+
 async function searchChurches(searchTerm) {
   try {
     const churches = await Church.find({
       $text: { $search: searchTerm }
-    }).limit(100);
+    }).select(CHURCH_SEARCH_FIELDS).limit(100);
     return churches;
   } catch (error) {
     logger.error(error);
@@ -590,7 +616,7 @@ async function searchChurchesWithinRadius(latitude, longitude, radius) {
           $maxDistance: parseFloat(radius) * 1000
         }
       }
-    }).limit(100);
+    }).select(CHURCH_SEARCH_FIELDS).limit(100);
 
     return churches;
   } catch (error) {
