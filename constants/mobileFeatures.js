@@ -191,6 +191,15 @@ export const MOBILE_FEATURES = [
     enabledByDefault: false
   },
   {
+    id: 'bible-discovery',
+    label: 'Bible Discovery',
+    description: 'Explore Bible stories through illustrated readings, flashcards and quizzes.',
+    category: 'Media',
+    icon: 'explore',
+    color: '#315C55',
+    enabledByDefault: false
+  },
+  {
     id: 'daily-devotional',
     label: 'Daily Devotional',
     description: 'Give members a daily devotional with Scripture, reflection and prayer to grow closer to God.',
@@ -273,6 +282,11 @@ export const DEFAULT_ENABLED_FEATURE_IDS = [
 ];
 
 export const getFeatureById = (id) => MOBILE_FEATURES.find((feature) => feature.id === id);
+
+export const toggleFeatureId = (featureIds = [], featureId, enabled) =>
+  enabled
+    ? [...new Set([...featureIds, featureId])]
+    : featureIds.filter((id) => id !== featureId);
 
 export const groupFeaturesByCategory = (features = MOBILE_FEATURES) =>
   FEATURE_CATEGORIES.reduce((groups, category) => {

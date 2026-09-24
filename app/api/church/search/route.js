@@ -8,10 +8,39 @@ const parseCoordinate = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const normalizeMediaUrl = (value) => (typeof value === 'string' ? value.trim() : '');
+
+// Public search returns church identity only. Notification artwork and the
+// pastor portrait are deliberately read just long enough to detect legacy
+// records where an older save flow copied one into the root banner field;
+// neither nested object is ever included in the response.
 const withExternalId = (churches) =>
   churches.map((church) => {
     const churchObj = typeof church.toObject === 'function' ? church.toObject() : church;
-    return { ...churchObj, externalId: encrypt(churchObj._id?.toString()) };
+    const bannerUrl = normalizeMediaUrl(churchObj.secure_url);
+    const notificationUrl = normalizeMediaUrl(churchObj.notification?.secure_url);
+    const pastorUrl = normalizeMediaUrl(churchObj.pastor_section?.secure_url);
+    const bannerIsLegacyNestedImage = Boolean(bannerUrl && (bannerUrl === notificationUrl || bannerUrl === pastorUrl));
+
+    return {
+      _id: churchObj._id,
+      externalId: encrypt(churchObj._id?.toString()),
+      name: churchObj.name,
+      email: churchObj.email,
+      mobile: churchObj.mobile,
+      description: churchObj.description,
+      short_message: churchObj.short_message,
+      secure_url: bannerIsLegacyNestedImage ? '' : bannerUrl,
+      public_id: bannerIsLegacyNestedImage ? '' : churchObj.public_id,
+      logo_url: normalizeMediaUrl(churchObj.logo_url),
+      logo_id: churchObj.logo_id,
+      denomination: churchObj.denomination,
+      theme_id: churchObj.theme_id,
+      facebook_url: churchObj.facebook_url,
+      instagram_url: churchObj.instagram_url,
+      youtube_url: churchObj.youtube_url,
+      address: churchObj.address
+    };
   });
 
 export const GET = async (req) => {

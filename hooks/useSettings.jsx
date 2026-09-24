@@ -331,15 +331,24 @@ const useNotification = () => {
 
   const handleUpdate = async (body) => {
     setState((prev) => ({ ...prev, loading: true, success: false }));
-    const { success, errorMessage } = await zat(CHURCH.uploadNotification, body, VERBS.PUT);
+    const { success, errorMessage, data } = await zat(CHURCH.uploadNotification, body, VERBS.PUT);
 
     if (success) {
       setState((prevState) => ({
         ...prevState,
+        data,
+        fields: data && typeof data === 'object'
+          ? {
+              ...prevState.fields,
+              ...data,
+              start_date: toDateTimeLocal(data.start_date),
+              expiry_date: toDateTimeLocal(data.expiry_date)
+            }
+          : prevState.fields,
         success: true,
         loading: false
       }));
-      return true;
+      return data || true;
     } else {
       handleError(errorMessage || 'Failed to update the notification.');
       return false;
