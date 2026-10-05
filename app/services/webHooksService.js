@@ -29,6 +29,30 @@ const invoiceMetadata = (invoice) => ({
   ...(invoice?.lines?.data?.[0]?.metadata || {})
 });
 
+const invoiceSubscriptionId = (invoice) => (
+  (typeof invoice?.subscription === 'string' ? invoice.subscription : invoice?.subscription?.id)
+  || (typeof invoice?.parent?.subscription_details?.subscription === 'string'
+    ? invoice.parent.subscription_details.subscription
+    : invoice?.parent?.subscription_details?.subscription?.id)
+  || ''
+);
+
+const subscriptionChurchUpdate = (subscription) => {
+  const priceId = subscriptionPriceId(subscription);
+  const planDetails = findSubscriptionPlanByPriceId(priceId);
+
+  if (!planDetails) throw new Error(`Unknown Stripe subscription price ${priceId}`);
+
+  return {
+    plan: planDetails.planName,
+    startDate: stripeDate(subscription.current_period_start),
+    endDate: stripeDate(subscription.current_period_end),
+    priceId,
+    status: subscription.status,
+    subscriptionId: subscription.id
+  };
+};
+
 const brevoMailOptions = (email, subject, html) => ({
   sender: { email: process.env.USER_NAME, name: process.env.TEAM || 'Jerur' },
   to: email ? [{ email }] : [],
@@ -54,7 +78,8 @@ const sendEmailSafely = async (mailOptions, context) => {
 
 const invoicePaymentSuccess = async (event) => {
   try {
-    const { hosted_invoice_url, amount_paid, period_end } = event.data.object;
+    const invoice = event.data.object;
+    const { hosted_invoice_url, amount_paid, period_end } = invoice;
 
     const metadata = invoiceMetadata(event.data.object);
     const { contact, email } = metadata;
@@ -63,7 +88,31 @@ const invoicePaymentSuccess = async (event) => {
     const amountPaidInDollars = amount_paid * 0.01;
     const periodEndFormatted = stripeDate(period_end)?.toISOString();
 
-    await updateChurchStatus(stripeCustomerId, { status: 'active' });
+    // A successfully paid invoice does not necessarily mean that its
+    // subscription is still active. Stripe can collect an outstanding invoice
+    // after its subscription has already been cancelled. In that case the
+    // payment must not restore access or replace a newer subscription in our
+    // database. For an active subscription, synchronize all canonical billing
+    // fields so a replacement subscription is recorded immediately.
+    const subscriptionId = invoiceSubscriptionId(invoice);
+    if (subscriptionId) {
+      const stripe = getStripeClient();
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+      if (['active', 'trialing'].includes(subscription.status)) {
+        await updateChurchStatus(stripeCustomerId, subscriptionChurchUpdate(subscription));
+      } else {
+        logger.warn(
+          { stripeCustomerId, subscriptionId, subscriptionStatus: subscription.status },
+          'Paid invoice belongs to a non-active subscription; leaving church entitlement unchanged'
+        );
+      }
+    } else {
+      logger.info(
+        { stripeCustomerId, invoiceId: invoice.id },
+        'Paid invoice is not associated with a subscription; leaving church entitlement unchanged'
+      );
+    }
 
     const html = await compileEmailTemplate(
       emailTemplates.invoicePaymentSuccess({
@@ -160,7 +209,7 @@ const trialWillEnd = async (event) => {
 const updateSubscription = async (event) => {
   try {
     const subscription = event.data.object;
-    const { metadata = {}, current_period_end, current_period_start, id, status } = subscription;
+    const { metadata = {}, status } = subscription;
     const { email, contact } = metadata;
     const stripeCustomerId = eventCustomerId(subscription);
     const priceId = subscriptionPriceId(subscription);
@@ -171,14 +220,7 @@ const updateSubscription = async (event) => {
 
     const { price, billingCycle, planName } = planDetails;
 
-    await updateChurchStatus(stripeCustomerId, {
-      plan: planName,
-      startDate: stripeDate(current_period_start),
-      endDate: stripeDate(current_period_end),
-      priceId,
-      status,
-      subscriptionId: id
-    });
+    await updateChurchStatus(stripeCustomerId, subscriptionChurchUpdate(subscription));
 
     const html = await compileEmailTemplate(
       emailTemplates.updateSubscription({
