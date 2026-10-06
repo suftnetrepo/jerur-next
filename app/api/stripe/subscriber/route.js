@@ -1,6 +1,7 @@
 import { logger } from '../../../../utils/logger';
 import { findSubscriptionPlanByPriceId, isCurrentPriceForEnvironment } from '../../../../constants/subscriptionPlans';
 import { getStripeClient } from '../../../../lib/stripe';
+import { createRegistrationProof, verifyRecaptchaToken } from '../../../../lib/recaptcha';
 const { NextResponse } = require('next/server');
 
 // POST handler for creating a subscription
@@ -8,7 +9,7 @@ export async function POST(req) {
     try {
         // Parse the request body
         const body = await req.json();
-        const { priceId, contact, email, idempotencyKey } = body;
+        const { priceId, contact, email, idempotencyKey, captchaToken } = body;
         const plan = findSubscriptionPlanByPriceId(priceId);
 
         if (!plan || !isCurrentPriceForEnvironment(priceId)) {
@@ -20,6 +21,16 @@ export async function POST(req) {
 
         if (!email || typeof email !== 'string') {
             return NextResponse.json({ error: 'A valid email address is required.' }, { status: 400 });
+        }
+
+        const forwardedFor = req.headers.get('x-forwarded-for');
+        const remoteIp = forwardedFor?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || undefined;
+        const captchaIsValid = await verifyRecaptchaToken(captchaToken, remoteIp);
+        if (!captchaIsValid) {
+            return NextResponse.json(
+                { error: 'Please complete the CAPTCHA challenge and try again.' },
+                { status: 400 }
+            );
         }
 
         const stripe = getStripeClient();
@@ -54,6 +65,11 @@ export async function POST(req) {
                     subscriptionId: subscription.id,
                     customerId: customer.id,
                     clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
+                    registrationProof: createRegistrationProof({
+                        email,
+                        stripeCustomerId: customer.id,
+                        subscriptionId: subscription.id
+                    }),
                 },
             },
             { status: 200 }
