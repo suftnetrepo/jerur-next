@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
+import Script from 'next/script';
 import Spinner from 'react-bootstrap/Spinner';
 import Button from 'react-bootstrap/Button';
 import { signIn, getCsrfToken } from 'next-auth/react';
@@ -14,7 +15,7 @@ import ErrorDialogue from '../../../src/components/elements/errorDialogue';
 import styles from './checkout.module.scss';
 
 const PASSWORD = '12345!';
-const CheckOut = () => {
+const CheckOut = ({ captchaSiteKey }) => {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -25,6 +26,9 @@ const CheckOut = () => {
   const [enrichedFields, setEnrichedFields] = useState(null);
   const userCreatedRef = useRef(false);
   const checkoutAttemptKeyRef = useRef(null);
+  const captchaContainerRef = useRef(null);
+  const captchaWidgetIdRef = useRef(null);
+  const [captchaToken, setCaptchaToken] = useState('');
   const [clientSecret, setClientSecret] = useState(null);
   const [cardError, setCardError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -34,6 +38,29 @@ const CheckOut = () => {
 
   useEffect(() => {
     getCsrfToken().then(setCsrfToken);
+  }, []);
+
+  const renderCaptcha = useCallback(() => {
+    if (
+      !captchaSiteKey
+      || !captchaContainerRef.current
+      || captchaWidgetIdRef.current !== null
+      || !window.grecaptcha
+    ) return;
+
+    captchaWidgetIdRef.current = window.grecaptcha.render(captchaContainerRef.current, {
+      sitekey: captchaSiteKey,
+      callback: (token) => setCaptchaToken(token),
+      'expired-callback': () => setCaptchaToken(''),
+      'error-callback': () => setCaptchaToken('')
+    });
+  }, [captchaSiteKey]);
+
+  const resetCaptcha = useCallback(() => {
+    setCaptchaToken('');
+    if (window.grecaptcha && captchaWidgetIdRef.current !== null) {
+      window.grecaptcha.reset(captchaWidgetIdRef.current);
+    }
   }, []);
 
   const ensureSubscriberRecord = async (userPayload) => {
@@ -118,6 +145,11 @@ const CheckOut = () => {
       return;
     }
 
+    if (!captchaToken) {
+      setCardError('Please complete the CAPTCHA challenge.');
+      return;
+    }
+
     if (!checkoutAttemptKeyRef.current) {
       checkoutAttemptKeyRef.current = crypto.randomUUID();
     }
@@ -127,7 +159,8 @@ const CheckOut = () => {
         priceId,
         contact: `${fields.first_name} ${fields.last_name}`,
         email: fields.email,
-        idempotencyKey: checkoutAttemptKeyRef.current
+        idempotencyKey: checkoutAttemptKeyRef.current,
+        captchaToken
       });
 
       if (subscriptionResult) {
@@ -135,7 +168,8 @@ const CheckOut = () => {
           ...fields,
           priceId,
           stripeCustomerId: subscriptionResult.customerId,
-          subscriptionId: subscriptionResult.subscriptionId
+          subscriptionId: subscriptionResult.subscriptionId,
+          registrationProof: subscriptionResult.registrationProof
         };
 
         const subscriberCreated = await ensureSubscriberRecord(fullFields);
@@ -147,6 +181,8 @@ const CheckOut = () => {
         setClientSecret(subscriptionResult.clientSecret);
         setEnrichedFields(fullFields);
         await handleCheckout(subscriptionResult.clientSecret, fullFields);
+      } else {
+        resetCaptcha();
       }
     } catch (error) {
       handleError(error instanceof Error ? error.message : 'Checkout could not be completed. Please try again.');
@@ -159,6 +195,12 @@ const CheckOut = () => {
 
   return (
     <section className={styles.page}>
+      <Script
+        src="https://www.google.com/recaptcha/api.js?render=explicit"
+        strategy="afterInteractive"
+        onLoad={renderCaptcha}
+        onReady={renderCaptcha}
+      />
       <div className="container py-14 py-md-16">
         <div className={styles.checkoutCard}>
           <div className="row g-0">
@@ -314,6 +356,12 @@ const CheckOut = () => {
                     <CheckoutForm onChange={(event) => setCardError(event.error?.message || '')} />
                   </div>
                   {cardError && <span className="text-danger fs-12" role="alert">{cardError}</span>}
+                  <div className="mt-3" ref={captchaContainerRef} />
+                  {!captchaSiteKey && (
+                    <span className="text-danger fs-12" role="alert">
+                      CAPTCHA is temporarily unavailable. Please contact support.
+                    </span>
+                  )}
                   <div className={styles.terms}>
                     <input
                       type="checkbox"
@@ -349,7 +397,7 @@ const CheckOut = () => {
                       className={styles.payButton}
                       variant="primary"
                       type="submit"
-                      disabled={!fields.terms || loading || isProcessing || !stripe}
+                      disabled={!fields.terms || !captchaToken || loading || isProcessing || !stripe}
                       data-testid="pay-button"
                       onClick={handleSubmit}
                     >
