@@ -3,6 +3,7 @@ import { VERBS } from '../config';
 import { STRIPE, SUBSCRIBER } from '../utils/apiUrl';
 import { zat } from '../utils/api';
 import { pricingList, findPrice } from '../src/data/pricing';
+import { isProductionBillingEnvironment } from '../constants/subscriptionPlans';
 
 const useSubscriber = (priceId) => {
   const [state, setState] = useState({
@@ -16,7 +17,7 @@ const useSubscriber = (priceId) => {
   });
 
   const handlePricing = (priceId) => {
-    const isLive = process.env.NEXT_PUBLIC_ENV === 'production' || process.env.NODE_ENV === 'production';
+    const isLive = isProductionBillingEnvironment();
     const plan = findPrice(priceId, isLive);
     setState((pre) => {
       return { ...pre, pricing: plan };
