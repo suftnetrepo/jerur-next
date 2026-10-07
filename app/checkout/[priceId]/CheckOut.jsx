@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Script from 'next/script';
 import Spinner from 'react-bootstrap/Spinner';
 import Button from 'react-bootstrap/Button';
@@ -15,6 +15,8 @@ import ErrorDialogue from '../../../src/components/elements/errorDialogue';
 import styles from './checkout.module.scss';
 
 const PASSWORD = '12345!';
+const CAPTCHA_ACTION = 'checkout';
+
 const CheckOut = ({ captchaSiteKey }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -26,9 +28,6 @@ const CheckOut = ({ captchaSiteKey }) => {
   const [enrichedFields, setEnrichedFields] = useState(null);
   const userCreatedRef = useRef(false);
   const checkoutAttemptKeyRef = useRef(null);
-  const captchaContainerRef = useRef(null);
-  const captchaWidgetIdRef = useRef(null);
-  const [captchaToken, setCaptchaToken] = useState('');
   const [clientSecret, setClientSecret] = useState(null);
   const [cardError, setCardError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -40,41 +39,17 @@ const CheckOut = ({ captchaSiteKey }) => {
     getCsrfToken().then(setCsrfToken);
   }, []);
 
-  const renderCaptcha = useCallback(() => {
-    const render = () => {
-      if (
-        !captchaSiteKey
-        || !captchaContainerRef.current
-        || captchaWidgetIdRef.current !== null
-        || !window.grecaptcha
-      ) return;
-
-      // api.js defines window.grecaptcha before the full library loads, so
-      // render may not exist yet; defer until reCAPTCHA reports it is ready.
-      if (typeof window.grecaptcha.render !== 'function') {
-        if (typeof window.grecaptcha.ready === 'function') {
-          window.grecaptcha.ready(render);
-        }
-        return;
-      }
-
-      captchaWidgetIdRef.current = window.grecaptcha.render(captchaContainerRef.current, {
-        sitekey: captchaSiteKey,
-        callback: (token) => setCaptchaToken(token),
-        'expired-callback': () => setCaptchaToken(''),
-        'error-callback': () => setCaptchaToken('')
-      });
-    };
-
-    render();
-  }, [captchaSiteKey]);
-
-  const resetCaptcha = useCallback(() => {
-    setCaptchaToken('');
-    if (window.grecaptcha && captchaWidgetIdRef.current !== null) {
-      window.grecaptcha.reset(captchaWidgetIdRef.current);
+  // reCAPTCHA v3 tokens expire after two minutes, so fetch one per submission.
+  const getCaptchaToken = () => new Promise((resolve, reject) => {
+    if (!captchaSiteKey || typeof window.grecaptcha?.ready !== 'function') {
+      reject(new Error('Security check is still loading. Please try again in a moment.'));
+      return;
     }
-  }, []);
+
+    window.grecaptcha.ready(() => {
+      window.grecaptcha.execute(captchaSiteKey, { action: CAPTCHA_ACTION }).then(resolve, reject);
+    });
+  });
 
   const ensureSubscriberRecord = async (userPayload) => {
     if (userCreatedRef.current) {
@@ -158,16 +133,12 @@ const CheckOut = ({ captchaSiteKey }) => {
       return;
     }
 
-    if (!captchaToken) {
-      setCardError('Please complete the CAPTCHA challenge.');
-      return;
-    }
-
     if (!checkoutAttemptKeyRef.current) {
       checkoutAttemptKeyRef.current = crypto.randomUUID();
     }
 
     try {
+      const captchaToken = await getCaptchaToken();
       const subscriptionResult = await handleNewSubscriber({
         priceId,
         contact: `${fields.first_name} ${fields.last_name}`,
@@ -194,8 +165,6 @@ const CheckOut = ({ captchaSiteKey }) => {
         setClientSecret(subscriptionResult.clientSecret);
         setEnrichedFields(fullFields);
         await handleCheckout(subscriptionResult.clientSecret, fullFields);
-      } else {
-        resetCaptcha();
       }
     } catch (error) {
       handleError(error instanceof Error ? error.message : 'Checkout could not be completed. Please try again.');
@@ -208,12 +177,12 @@ const CheckOut = ({ captchaSiteKey }) => {
 
   return (
     <section className={styles.page}>
-      <Script
-        src="https://www.google.com/recaptcha/api.js?render=explicit"
-        strategy="afterInteractive"
-        onLoad={renderCaptcha}
-        onReady={renderCaptcha}
-      />
+      {captchaSiteKey && (
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(captchaSiteKey)}`}
+          strategy="afterInteractive"
+        />
+      )}
       <div className="container py-14 py-md-16">
         <div className={styles.checkoutCard}>
           <div className="row g-0">
@@ -369,9 +338,8 @@ const CheckOut = ({ captchaSiteKey }) => {
                     <CheckoutForm onChange={(event) => setCardError(event.error?.message || '')} />
                   </div>
                   {cardError && <span className="text-danger fs-12" role="alert">{cardError}</span>}
-                  <div className="mt-3" ref={captchaContainerRef} />
                   {!captchaSiteKey && (
-                    <span className="text-danger fs-12" role="alert">
+                    <span className="d-block mt-3 text-danger fs-12" role="alert">
                       CAPTCHA is temporarily unavailable. Please contact support.
                     </span>
                   )}
@@ -410,9 +378,8 @@ const CheckOut = ({ captchaSiteKey }) => {
                       className={styles.payButton}
                       variant="primary"
                       type="submit"
-                      disabled={!fields.terms || !captchaToken || loading || isProcessing || !stripe}
+                      disabled={!fields.terms || !captchaSiteKey || loading || isProcessing || !stripe}
                       data-testid="pay-button"
-                      onClick={handleSubmit}
                     >
                       {(loading || isProcessing) && (
                         <Spinner as="span" animation="border" size="sm" className="me-2" aria-hidden="true" />
