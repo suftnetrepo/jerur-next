@@ -25,10 +25,10 @@ export async function POST(req) {
 
         const forwardedFor = req.headers.get('x-forwarded-for');
         const remoteIp = forwardedFor?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || undefined;
-        const captchaIsValid = await verifyRecaptchaToken(captchaToken, remoteIp);
+        const captchaIsValid = await verifyRecaptchaToken(captchaToken, { remoteIp, action: 'checkout' });
         if (!captchaIsValid) {
             return NextResponse.json(
-                { error: 'Please complete the CAPTCHA challenge and try again.' },
+                { error: 'We could not verify your request. Please refresh the page and try again.' },
                 { status: 400 }
             );
         }
