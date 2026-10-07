@@ -44,7 +44,25 @@ export const SUBSCRIPTION_PLANS = [
   }
 ];
 
+const stripeKeyMode = (key) => {
+  if (typeof key !== 'string') return null;
+  if (/^(sk|pk|rk)_live_/.test(key)) return 'live';
+  if (/^(sk|pk|rk)_test_/.test(key)) return 'test';
+  return null;
+};
+
+/**
+ * Live vs test billing follows the configured Stripe key, because live price
+ * IDs only exist in live mode and vice versa. NODE_ENV cannot decide this:
+ * `next build`/`next start` always set it to 'production', even on test
+ * deployments. The secret key is only visible on the server; the publishable
+ * key is inlined at build time so the client resolves the same mode.
+ */
 export function isProductionBillingEnvironment() {
+  const mode = stripeKeyMode(process.env.STRIPE_SECRET_KEY)
+    || stripeKeyMode(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  if (mode) return mode === 'live';
+
   return process.env.NEXT_PUBLIC_ENV === 'production' || process.env.NODE_ENV === 'production';
 }
 

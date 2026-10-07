@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import Price from './price';
 import NextLink from '../../reuseable/links/NextLink';
+import { isProductionBillingEnvironment } from '../../../../constants/subscriptionPlans';
 
 // ================================================================
 type PricingCardProps = {
@@ -27,7 +28,7 @@ const PricingCard: FC<PricingCardProps> = (props) => {
 
     const yearClasses = activeYearly ? 'price-show' : 'price-hide price-hidden';
     const monthClasses = !activeYearly ? 'price-show' : 'price-hide price-hidden';
-    const checkout_priceId = process.env.NEXT_PUBLIC_ENV === 'production' || process.env.NODE_ENV === 'production'
+    const checkout_priceId = isProductionBillingEnvironment()
       ? live_priceId
       : priceId;
 
