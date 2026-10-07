@@ -41,19 +41,32 @@ const CheckOut = ({ captchaSiteKey }) => {
   }, []);
 
   const renderCaptcha = useCallback(() => {
-    if (
-      !captchaSiteKey
-      || !captchaContainerRef.current
-      || captchaWidgetIdRef.current !== null
-      || !window.grecaptcha
-    ) return;
+    const render = () => {
+      if (
+        !captchaSiteKey
+        || !captchaContainerRef.current
+        || captchaWidgetIdRef.current !== null
+        || !window.grecaptcha
+      ) return;
 
-    captchaWidgetIdRef.current = window.grecaptcha.render(captchaContainerRef.current, {
-      sitekey: captchaSiteKey,
-      callback: (token) => setCaptchaToken(token),
-      'expired-callback': () => setCaptchaToken(''),
-      'error-callback': () => setCaptchaToken('')
-    });
+      // api.js defines window.grecaptcha before the full library loads, so
+      // render may not exist yet; defer until reCAPTCHA reports it is ready.
+      if (typeof window.grecaptcha.render !== 'function') {
+        if (typeof window.grecaptcha.ready === 'function') {
+          window.grecaptcha.ready(render);
+        }
+        return;
+      }
+
+      captchaWidgetIdRef.current = window.grecaptcha.render(captchaContainerRef.current, {
+        sitekey: captchaSiteKey,
+        callback: (token) => setCaptchaToken(token),
+        'expired-callback': () => setCaptchaToken(''),
+        'error-callback': () => setCaptchaToken('')
+      });
+    };
+
+    render();
   }, [captchaSiteKey]);
 
   const resetCaptcha = useCallback(() => {
